@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "plugins": {
+    "academic-research-skills@academic-research-skills": [
+      {
+        "scope": "project",
+        "installPath": ".claude/plugins/cache/academic-research-skills/academic-research-skills/3.9.4.2",
+        "version": "3.9.4.2",
+        "installedAt": "2026-05-22T00:35:00.000Z",
+        "lastUpdated": "2026-05-22T00:35:00.000Z"
+      }
+    ]
+  }
+}
