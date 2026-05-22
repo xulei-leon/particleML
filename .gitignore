@@ -219,3 +219,6 @@ __marimo__/
 
 # Claude Code plugin cache
 .claude/plugins/cache/
+
+# Claude Code worktrees
+.claude/worktrees/
