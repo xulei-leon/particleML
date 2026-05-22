@@ -188,18 +188,19 @@
 <section>
   <h2>1. Executive Summary</h2>
   <p>
-    This project investigates how <strong>particle-level input feature representations</strong> affect the performance
-    and transfer-learning efficiency of jet foundation models in high-energy physics. Building on the comparative
-    study of OmniJet-&alpha; and OmniLearn, which identified input feature dimensionality as the primary determinant
-    of peak performance regardless of architecture, this study conducts a systematic ablation of input feature
-    configurations using the publicly available <strong>OmniLearn pretrained backbone</strong> (PET-based architecture).
+    This project investigates how <strong>particle-level input feature representations</strong> affect the
+    binary top-tagging performance and data efficiency of jet foundation models in high-energy physics.
+    Building on the comparative study of OmniJet-&alpha; and OmniLearn, which observed that input feature
+    dimensionality correlated strongly with peak performance, this study conducts a systematic ablation of
+    input feature configurations using the publicly available <strong>OmniLearn pretrained backbone</strong>
+    (PET-based architecture), benchmarked against non-foundation baselines (Deep Sets, ParticleNet).
   </p>
   <br>
   <p>
     The project is designed to be <strong>completed in 12 weeks</strong> by a University of Toronto physics undergraduate
-    with strong Python and Bayesian inference skills who is building deep learning expertise. All experiments use
-    existing open-source code and pretrained model checkpoints, requiring only <strong>single-GPU fine-tuning</strong>
-    on cloud instances with an estimated compute budget of <strong>$100–200 USD</strong>. The output is an
+    with strong Python and Bayesian inference skills who is building deep learning expertise. The core ablation
+    (Tier 1) requires <strong>single-GPU fine-tuning</strong> on cloud instances with an estimated compute budget of
+    <strong>$110–130 USD</strong>; a Tier 2 extension adds ~$20 for broader scope. The output is an
     arXiv-ready first-author paper targeting <em>Machine Learning: Science and Technology</em> or a similar venue.
   </p>
 </section>
@@ -212,7 +213,7 @@
   <p>
     Foundation models—neural networks pretrained on large datasets and adapted to downstream tasks via transfer
     learning—are emerging as a paradigm shift in high-energy physics (HEP). In jet physics, two pioneering
-    architectures demonstrated this capability:
+    architectures showed this capability:
   </p>
   <ul>
     <li><strong>OmniJet-&alpha;</strong> (Birk et al., 2024): GPT-style autoregressive transformer with VQ-VAE
@@ -225,8 +226,8 @@
 
   <h3>2.2 The Feature Representation Question</h3>
   <p>
-    A key finding from the comparative study (Group Report, 2026) is that <strong>the dimensionality and richness
-    of input particle representations is the primary determinant of peak performance</strong>, outweighing
+    A finding of the comparative study (Group Report, 2026) is that <strong>the dimensionality and richness
+    of input particle representations was highly correlated with peak performance</strong>, appearing to outweigh
     architectural differences between OmniJet-&alpha; and OmniLearn at dataset sizes above 10<sup>3</sup> jets.
     Specifically:
   </p>
@@ -250,7 +251,7 @@
     <li><strong>Vent et al. (2025)</strong> showed via PCA + Shapley analysis on ParticleNet that only ~5 principal
       components of jet substructure recover full quark-gluon discrimination AUC, suggesting significant
       redundancy in typical input representations.</li>
-    <li><strong>Rai &amp; Ganguly (2026)</strong> demonstrated through mechanistic interpretability of the Particle
+    <li><strong>Rai &amp; Ganguly (2026)</strong> showed through mechanistic interpretability of the Particle
       Transformer that a sparse six-head circuit recovers ~97% of AUC, with the residual stream preferentially
       encoding energy correlator basis functions.</li>
   </ul>
@@ -264,8 +265,16 @@
 <section>
   <h2>3. Research Questions</h2>
 
-  <p><strong>Primary RQ:</strong> How do particle-level input feature representations affect the classification
-  performance and transfer-learning efficiency of a PET-based jet foundation model?</p>
+  <p><strong>Primary RQ:</strong> How do particle-level input feature representations affect the binary
+  top-tagging performance and data efficiency of a fine-tuned PET-based jet foundation model, and which
+  features drive the largest marginal gains?</p>
+
+  <p style="margin-top:10px; padding:10px 14px; background:#fef3c7; border-left:3px solid #d97706; font-size:13px; color:#78350f;">
+    <strong>Causal attribution limitation:</strong> This study reports &Delta;AUC and performance trends
+    across feature configurations; it does <em>not</em> claim that a specific feature <em>causes</em>
+    a specific performance change. Observed differences may reflect feature correlations rather than
+    independent causal effects. Feature ablation reveals <em>associations</em>, not causal mechanisms.
+  </p>
   <br>
 
   <table>
@@ -273,28 +282,37 @@
     <tr>
       <td><strong>RQ1</strong></td>
       <td>What is the minimal sufficient feature set for competitive binary top-tagging (t&rarr;bqq&prime; vs. QCD)
-        using a pretrained OmniLearn backbone, and which features drive the largest marginal performance gains?</td>
+        using a fine-tuned pretrained OmniLearn backbone, and which feature categories (PID, charge, energy fractions)
+        account for the largest marginal AUC gains?</td>
       <td><span class="tag">Primary</span></td>
     </tr>
     <tr>
       <td><strong>RQ2</strong></td>
-      <td>How does input feature richness modulate data efficiency—does a richer feature set reduce the amount of
-        labeled fine-tuning data needed to reach a given performance threshold?</td>
+      <td>How does input feature richness modulate data efficiency&mdash;does a richer feature set reduce the amount of
+        labeled fine-tuning data needed to reach a given AUC threshold? Does the ranking of feature importance
+        change with dataset size?</td>
       <td><span class="tag">Primary</span></td>
     </tr>
     <tr>
       <td><strong>RQ3</strong></td>
-      <td>Does the impact of input feature configuration generalize across jet types (multi-class classification
-        on 5 JetClass categories), or are certain features more important for specific jet classes?</td>
+      <td>Does a pretrained foundation-model backbone (OmniLearn-pretrained) outperform strong non-foundation baselines
+        (Deep Sets, ParticleNet) when both are given identical input features and fine-tuning data?</td>
       <td><span class="tag">Secondary</span></td>
     </tr>
     <tr>
       <td><strong>RQ4</strong></td>
-      <td>Does the feature configuration that optimizes classification also optimize generation quality
-        (measured by Wasserstein distance), or is there a task-dependent trade-off?</td>
-      <td><span class="tag">Exploratory</span></td>
+      <td>Does the impact of input feature configuration generalize across jet types (multi-class classification
+        on 5 JetClass categories, one-vs-rest macro-averaged AUC)?</td>
+      <td><span class="tag warn">Tier 2</span></td>
     </tr>
   </table>
+
+  <p style="font-size:13px; color:#555; margin-top:12px;">
+    <strong>RQ1&ndash;RQ2</strong> form the minimum publishable core (Tier 1). <strong>RQ3</strong> provides
+    the comparative context that distinguishes this work from an internal ablation. <strong>RQ4</strong>
+    is an extension to be pursued if Tier 1 is completed within budget and schedule. The generation
+    task (previously RQ4) is deferred to future work (&sect;4.3.2).
+  </p>
 </section>
 
 <!-- ======== METHODOLOGY ======== -->
@@ -307,7 +325,38 @@
     publicly available pretrained checkpoint from
     <a href="https://github.com/ViniciusMikuni/OmniLearn">github.com/ViniciusMikuni/OmniLearn</a>.
     The PET backbone has on the order of hundreds of thousands of parameters—compact enough for
-    single-GPU fine-tuning. All experiments fine-tune the pretrained backbone rather than training from scratch.
+    single-GPU fine-tuning. All experiments use the fine-tuned pretrained backbone as the primary setting; from-scratch training on the same architecture serves as an auxiliary ablation (see §4.5).
+  </p>
+
+  <h4>4.1.1 Non-Foundation Baselines</h4>
+  <p>
+    To assess whether a pretrained foundation model backbone offers advantages over strong task-specific
+    architectures, we include two non-foundation baselines. Both receive <strong>identical input feature
+    configurations</strong> (Config A–D) and are trained on the same data splits, ensuring that any
+    performance difference is attributable to architecture and pretraining, not input representation.
+  </p>
+  <table>
+    <tr><th>Baseline</th><th>Architecture</th><th>Reference</th><th>Implementation</th></tr>
+    <tr>
+      <td><strong>Deep Sets</strong></td>
+      <td>Permutation-invariant: per-particle MLP → sum aggregation → jet-level MLP</td>
+      <td>Zaheer et al. (2017); Qu &amp; Gouskos (2020)</td>
+      <td>Re-implement in TensorFlow/Keras following the OmniLearn codebase conventions</td>
+    </tr>
+    <tr>
+      <td><strong>ParticleNet</strong></td>
+      <td>Dynamic graph CNN with edge convolutions on particle point clouds</td>
+      <td>Qu &amp; Gouskos (2020), Phys. Rev. D 101, 056019</td>
+      <td>Use the
+        <a href="https://github.com/jet-universe/particle_transformer">Weaver</a> reference implementation,
+        adapted to accept the same 4-momentum input format</td>
+    </tr>
+  </table>
+  <p style="font-size:13px; color:#555; margin-top:8px;">
+    <strong>Note:</strong> Particle Transformer (Qu et al., 2022) is a stronger baseline in principle, but
+    its heavier compute requirements and attention-based architecture make it less suitable as a "task-specific"
+    control given our single-GPU budget. Deep Sets and ParticleNet span the complexity range from minimal
+    permutation-invariant to graph-based, providing a meaningful comparison spectrum.
   </p>
 
   <h3>4.2 Feature Configurations (Independent Variable)</h3>
@@ -340,12 +389,50 @@
   </table>
 
   <h3>4.3 Tasks &amp; Metrics (Dependent Variables)</h3>
+
   <table>
     <tr><th>Task</th><th>Dataset</th><th>Primary Metric</th><th>Secondary</th></tr>
-    <tr><td>Binary top-tagging</td><td>JetClass (t&rarr;bqq&prime; vs. QCD)</td><td>AUC (ROC)</td><td>Accuracy, background rejection at 30% signal efficiency</td></tr>
-    <tr><td>Multi-class classification</td><td>JetClass (5 types: t&rarr;bqq&prime;, H&rarr;bb&#773;, t&rarr;bl&nu;, W&rarr;qq&prime;, Z&rarr;qq&prime;)</td><td>AUC (per class)</td><td>Macro-averaged accuracy</td></tr>
-    <tr><td>Generation quality</td><td>JetClass top jets</td><td>Wasserstein distance (1D, per-feature)</td><td>Jet-mass distribution WD</td></tr>
+    <tr>
+      <td>Binary top-tagging</td>
+      <td>JetClass (t&rarr;bqq&prime; vs. QCD)</td>
+      <td>AUC (ROC) with 95% bootstrap CI</td>
+      <td>Accuracy, background rejection at 30% signal efficiency (&epsilon;<sub>sig</sub> = 0.3)</td>
+    </tr>
+    <tr>
+      <td>Multi-class classification <span class="tag warn">Tier 2</span></td>
+      <td>JetClass (5 types: t&rarr;bqq&prime;, H&rarr;bb&#773;, t&rarr;bl&nu;, W&rarr;qq&prime;, Z&rarr;qq&prime;)</td>
+      <td>One-vs-rest macro-averaged AUC (mean of per-class AUCs, each treating that class as signal)</td>
+      <td>Macro-averaged accuracy</td>
+    </tr>
   </table>
+
+  <h4>4.3.1 Physical Observables (Auxiliary)</h4>
+  <p>
+    Beyond classifier-level metrics, we compare distributions of physically interpretable observables
+    to assess whether feature configuration affects the model's ability to capture jet substructure:
+  </p>
+  <ul>
+    <li><strong>Jet mass</strong> <em>m</em><sub>jet</sub>: reconstructed from the sum of constituent 4-momenta;
+      sensitive to heavy-resonance identification (top, W, Z, Higgs).</li>
+    <li><strong>N-subjettiness</strong> &tau;<sub>21</sub> = &tau;<sub>2</sub>/&tau;<sub>1</sub>: discriminates
+      2-prong (W/Z/H) from 1-prong (QCD) substructure.</li>
+    <li><strong>Jet mass distribution</strong> for correctly vs. incorrectly classified jets: checks whether
+      models with richer features make different types of errors (e.g., failing only on jets near mass boundaries).</li>
+  </ul>
+  <p>
+    These are not primary metrics but provide physical interpretability: a &Delta;AUC of 0.01 may be
+    statistically significant yet physically meaningless; subleading differences in jet-mass agreement may
+    reveal which features encode physically relevant information.
+  </p>
+
+  <h4>4.3.2 Note on Generation Task</h4>
+  <p>
+    The earlier exploratory RQ on generation quality (Wasserstein distance evaluation) is deferred to
+    future work. A meaningful generation comparison requires a fully specified generation head, joint-distribution
+    metrics (e.g., MMD, FID-style score on particle clouds), and physics-level validation of generated jets—each
+    of which significantly expands the scope. The present study focuses on the classification ablation,
+    for which the experimental design is most mature.
+  </p>
 
   <h3>4.4 Data Scale Conditions</h3>
   <p>For binary top-tagging (RQ1, RQ2), four fine-tuning dataset sizes are tested:</p>
@@ -358,47 +445,163 @@
   </table>
 
   <h3>4.5 Experimental Design Matrix</h3>
+
+  <p>
+    The experiment plan is structured in two tiers. <strong>Tier 1</strong> defines the minimum publishable
+    core: if these experiments succeed, the study has a coherent narrative regardless of Tier 2 outcomes.
+    <strong>Tier 2</strong> extends the scope if budget and schedule allow.
+  </p>
+
+  <h4>4.5.1 Tier 1 — Core Ablation &amp; Baselines (MVP)</h4>
   <table>
-    <tr><th>Experiment Set</th><th>Configs</th><th>Sizes</th><th>Repeats</th><th>Runs</th><th>Priority</th></tr>
+    <tr><th>ID</th><th>Description</th><th>Backbone</th><th>Configs</th><th>Sizes</th><th>Seeds</th><th>Runs</th></tr>
     <tr>
-      <td><strong>E1: Core ablation</strong> (binary, fine-tuned backbone)</td>
-      <td>A, B, C, D</td><td>S1–S4</td><td>3</td><td>48</td>
-      <td><span class="tag ok">Highest</span></td>
+      <td><strong>E1a</strong></td>
+      <td>Core feature ablation</td>
+      <td>OmniLearn (fine-tuned)</td>
+      <td>A, B, C, D</td>
+      <td>S1–S4</td>
+      <td>5</td>
+      <td>80</td>
     </tr>
     <tr>
-      <td><strong>E2: From-scratch baseline</strong></td>
-      <td>A, B, C, D</td><td>S4 only</td><td>3</td><td>12</td>
-      <td><span class="tag ok">Highest</span></td>
+      <td><strong>E1b</strong></td>
+      <td>From-scratch ablation (control)</td>
+      <td>OmniLearn (random init)</td>
+      <td>A, D (extremes)</td>
+      <td>S4 only</td>
+      <td>3</td>
+      <td>6</td>
     </tr>
     <tr>
-      <td><strong>E3: Frozen vs. fine-tuned</strong></td>
-      <td>A, D (extremes)</td><td>S2, S4</td><td>3</td><td>12</td>
-      <td><span class="tag">Medium</span></td>
+      <td><strong>E2a</strong></td>
+      <td>Deep Sets baseline</td>
+      <td>Deep Sets</td>
+      <td>A, D (extremes)</td>
+      <td>S4 only</td>
+      <td>3</td>
+      <td>6</td>
     </tr>
     <tr>
-      <td><strong>E4: Multi-class</strong> (5 jet types)</td>
-      <td>A, B, C, D</td><td>S4</td><td>3</td><td>12</td>
-      <td><span class="tag">Medium</span></td>
-    </tr>
-    <tr>
-      <td><strong>E5: Generation</strong></td>
-      <td>A, D (extremes)</td><td>S4</td><td>3</td><td>6</td>
-      <td><span class="tag warn">Lower</span></td>
+      <td><strong>E2b</strong></td>
+      <td>ParticleNet baseline</td>
+      <td>ParticleNet</td>
+      <td>A, D (extremes)</td>
+      <td>S4 only</td>
+      <td>3</td>
+      <td>6</td>
     </tr>
     <tr style="font-weight:600; background:#f0f9ff;">
-      <td>Total</td><td></td><td></td><td></td><td>90</td><td></td>
+      <td colspan="6">Tier 1 Total</td>
+      <td>98</td>
     </tr>
   </table>
 
+  <h4>4.5.2 Tier 2 — Extension (if budget &amp; schedule allow)</h4>
+  <table>
+    <tr><th>ID</th><th>Description</th><th>Backbone</th><th>Configs</th><th>Sizes</th><th>Seeds</th><th>Runs</th></tr>
+    <tr>
+      <td><strong>E3</strong></td>
+      <td>Frozen-backbone control</td>
+      <td>OmniLearn (frozen)</td>
+      <td>A, D (extremes)</td>
+      <td>S2, S4</td>
+      <td>3</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <td><strong>E4</strong></td>
+      <td>Multi-class classification (5 types)</td>
+      <td>OmniLearn (fine-tuned)</td>
+      <td>A, B, C, D</td>
+      <td>S4</td>
+      <td>3</td>
+      <td>12</td>
+    </tr>
+    <tr style="font-weight:600; background:#fefce8;">
+      <td colspan="6">Tier 2 Total</td>
+      <td>24</td>
+    </tr>
+    <tr style="font-weight:700; background:#f0f9ff;">
+      <td colspan="6">Grand Total (Tier 1 + Tier 2)</td>
+      <td>122</td>
+    </tr>
+  </table>
+
+  <p style="font-size:13px; color:#555; margin-top:12px;">
+    <strong>Changes from v1:</strong> Removed generation experiment (deferred to future work).
+    Merged frozen-vs-fine-tuned into Tier 2. Added two non-foundation baselines (Deep Sets, ParticleNet)
+    at Config A &amp; D extremes. Increased key ablation repeats from 3 to 5 seeds; Tier 2 remains at 3 seeds.
+    The rise from 90 to 122 runs is offset by the narrower scope (fewer architecture variations, one main task).
+  </p>
+
   <h3>4.6 Statistical Approach</h3>
+
+  <h4>4.6.1 Fixed Test Set</h4>
+  <p>
+    A single, pre-split test set is used for <strong>all</strong> experiment runs. This ensures that every
+    model—regardless of feature configuration, backbone setting, or baseline architecture—is evaluated on
+    exactly the same jets. Differences in metrics therefore reflect genuine model differences rather than
+    variation in test-set composition.
+  </p>
+
+  <h4>4.6.2 Uncertainty Quantification</h4>
   <ul>
-    <li><strong>Uncertainty:</strong> Standard error of the mean from 3 independent repeats with different random seeds.</li>
-    <li><strong>Comparison:</strong> For each data scale, compare AUC across feature configurations via
-      &Delta;AUC relative to Config A (kinematic-only baseline). Report both raw values and normalized differences.</li>
-    <li><strong>Data efficiency curves:</strong> For each config, plot AUC vs. log<sub>10</sub>(N). Fit a saturating
-      exponential to estimate asymptotic performance and half-saturation dataset size.</li>
-    <li><strong>Significance:</strong> Non-overlapping 2&times;SEM error bars as threshold for meaningful
-      difference; supplement with Cohen's d for effect sizes between adjacent feature configs.</li>
+    <li><strong>Bootstrap confidence intervals:</strong> For each trained model, we draw 1,000 bootstrap
+      samples (with replacement) from the fixed test set and compute the metric on each. The 2.5th and
+      97.5th percentiles form the 95% confidence interval. This avoids the small-N fragility of 3-repeat
+      SEM and makes no normality assumption about the sampling distribution.</li>
+    <li><strong>Seed repeats:</strong> Each experimental condition is repeated with 5 independent random
+      seeds for all Tier 1 (MVP) runs (see §4.5). For Tier 2 (extension) runs, 3 seeds are used.
+      The final reported metric for a condition is the <em>median</em> across seeds, with bootstrap CIs
+      pooled across the seed ensemble.</li>
+  </ul>
+
+  <h4>4.6.3 Formal Comparison Tests</h4>
+  <table>
+    <tr><th>Comparison</th><th>Test</th><th>Rationale</th></tr>
+    <tr>
+      <td>Feature Config A vs. B, C, D (same backbone, same N)</td>
+      <td><strong>DeLong test</strong> (correlated ROC curves)</td>
+      <td>Same test set → ROC curves are correlated; DeLong accounts for this dependence. Used for AUC comparisons.</td>
+    </tr>
+    <tr>
+      <td>Accuracy comparisons (same backbone, same N)</td>
+      <td><strong>McNemar test</strong> (paired nominal data)</td>
+      <td>Same test set, binary predictions → McNemar tests whether the two models disagree differently on the same instances.</td>
+    </tr>
+    <tr>
+      <td>OmniLearn vs. baseline model (same feature config)</td>
+      <td><strong>DeLong test</strong></td>
+      <td>Architecture comparison on identical test set with identical input features.</td>
+    </tr>
+    <tr>
+      <td>Data-efficiency curves (AUC vs. log&thinsp;N)</td>
+      <td><strong>Bootstrap CI overlap</strong></td>
+      <td>At each N, compare 95% CIs. Non-overlap indicates a meaningful difference at that data scale.</td>
+    </tr>
+  </table>
+
+  <h4>4.6.4 Data Efficiency Analysis</h4>
+  <ul>
+    <li>For each feature configuration, plot AUC vs. log<sub>10</sub>(N) with bootstrap 95% CIs.</li>
+    <li>Fit a saturating exponential <em>f</em>(N) = <em>a</em> &minus; <em>b</em> &middot; exp(&minus;<em>c</em> &middot; N)
+      to estimate asymptotic AUC (<em>a</em>) and half-saturation dataset size (N<sub>half</sub> = ln&thinsp;2 / <em>c</em>).</li>
+    <li>Compare N<sub>half</sub> across feature configurations: a smaller N<sub>half</sub> for richer features
+      would indicate higher data efficiency.</li>
+  </ul>
+
+  <h4>4.6.5 Effect Size Reporting</h4>
+  <ul>
+    <li>For each pair of adjacent feature configurations (A→B, B→C, C→D), report:
+      <ul>
+        <li>&Delta;AUC with 95% bootstrap CI</li>
+        <li>Cohen's <em>d</em> computed on the bootstrap distribution of AUC differences</li>
+        <li>Interpretation thresholds: |<em>d</em>| &lt; 0.2 = negligible; 0.2–0.5 = small; 0.5–0.8 = medium; &gt; 0.8 = large</li>
+      </ul>
+    </li>
+    <li>Statistical significance is assessed at &alpha; = 0.05 with the DeLong test. We <strong>do not</strong>
+      use non-overlapping error bars as a significance criterion.</li>
   </ul>
 
   <h3>4.7 Implementation Details</h3>
@@ -409,9 +612,9 @@
     <tr><td>Batch size</td><td>256 (adjust based on GPU memory; reduce to 128 if OOM)</td></tr>
     <tr><td>Epochs (fine-tuning)</td><td>20 per run; best checkpoint selected by validation AUC</td></tr>
     <tr><td>Epochs (from-scratch)</td><td>40 per run</td></tr>
-    <tr><td>Train/val/test split</td><td>80/10/10 (stratified)</td></tr>
+    <tr><td>Train/val/test split</td><td>80/10/10 split <strong>by file</strong>—no particle from the same HDF5 file appears in more than one split, eliminating cross-contamination from jet fragmentation products spanning file boundaries. Stratification preserves class proportions in each split.</td></tr>
     <tr><td>GPU target</td><td>NVIDIA RTX 3090/4090 or A4000 (16–24 GB VRAM)</td></tr>
-    <tr><td>Reproducibility</td><td>Fixed random seeds (42, 123, 777 for the 3 repeats); all configs logged via JSON</td></tr>
+    <tr><td>Reproducibility</td><td>Fixed random seeds (42, 123, 456, 789, 1011 for Tier 1 5-repeat conditions; 42, 123, 777 for Tier 2 3-repeat conditions); all hyperparameters and metrics logged via JSON per run</td></tr>
   </table>
 </section>
 
@@ -431,48 +634,65 @@
   <h3>5.2 Cloud GPU Strategy</h3>
   <table>
     <tr><th>Provider</th><th>GPU</th><th>VRAM</th><th>Rate (approx.)</th><th>Use Case</th></tr>
-    <tr><td><a href="https://vast.ai">vast.ai</a></td><td>RTX 3090</td><td>24 GB</td><td>$0.15–0.35/hr</td><td>Primary workhorse; most fine-tuning runs</td></tr>
-    <tr><td>vast.ai</td><td>RTX 4090</td><td>24 GB</td><td>$0.31–0.45/hr</td><td>Larger batch sizes, generation experiments</td></tr>
-    <tr><td>Google Colab Pro</td><td>T4 / L4</td><td>16 / 24 GB</td><td>$9.99/month</td><td>Backup; exploratory and small-data runs</td></tr>
+    <tr><td><a href="https://vast.ai">vast.ai</a></td><td>RTX 3090</td><td>24 GB</td><td>$0.15–0.35/hr</td><td>Primary workhorse; most fine-tuning and baseline runs</td></tr>
+    <tr><td>vast.ai</td><td>RTX 4090</td><td>24 GB</td><td>$0.31–0.45/hr</td><td>S4-scale runs (10<sup>5</sup> jets) for faster turnaround</td></tr>
+    <tr><td>Google Colab Pro</td><td>T4 / L4</td><td>16 / 24 GB</td><td>$9.99/month</td><td>Backup; S1–S2 small-data runs; debugging</td></tr>
   </table>
 
-  <h3>5.3 Cost Estimation</h3>
+  <h3>5.3 Cost Estimation — Tier 1 (MVP)</h3>
   <div class="budget-grid">
     <div class="budget-card">
-      <div class="amount">~225 hrs</div>
-      <div class="label">Total GPU Time<br>(90 runs &times; ~2.5 hrs avg)</div>
+      <div class="amount">~245 hrs</div>
+      <div class="label">Tier 1 GPU Time<br>(98 runs &times; ~2.5 hrs avg)</div>
     </div>
     <div class="budget-card">
-      <div class="amount">~$70</div>
-      <div class="label">Core Experiments<br>(vast.ai RTX 3090 @ $0.30/hr)</div>
+      <div class="amount">~$75</div>
+      <div class="label">Tier 1 Core Cost<br>(vast.ai RTX 3090 @ $0.30/hr)</div>
     </div>
     <div class="budget-card">
-      <div class="amount">~$30</div>
+      <div class="amount">~$35</div>
       <div class="label">Debugging &amp; Buffer<br>(failed runs, restarts, overhead)</div>
     </div>
     <div class="budget-card">
-      <div class="amount">~$100</div>
-      <div class="label">Estimated Total<br>(conservative, with buffer)</div>
+      <div class="amount">~$110</div>
+      <div class="label">Tier 1 Estimated Total<br>(conservative, with buffer)</div>
+    </div>
+  </div>
+
+  <h3>5.4 Cost Estimation — Tier 2 (Extension, Contingent)</h3>
+  <div class="budget-grid">
+    <div class="budget-card">
+      <div class="amount">~60 hrs</div>
+      <div class="label">Tier 2 GPU Time<br>(24 runs &times; ~2.5 hrs avg)</div>
     </div>
     <div class="budget-card">
-      <div class="amount">$100–200</div>
+      <div class="amount">~$20</div>
+      <div class="label">Tier 2 Additional Cost<br>(vast.ai RTX 3090 @ $0.30/hr)</div>
+    </div>
+    <div class="budget-card">
+      <div class="amount">~$130</div>
+      <div class="label">Grand Total Estimate<br>(Tier 1 + Tier 2 + buffer)</div>
+    </div>
+    <div class="budget-card">
+      <div class="amount">$130–200</div>
       <div class="label">Recommended Budget<br>(upper bound for safety)</div>
     </div>
   </div>
 
-  <h3>5.4 Storage</h3>
+  <h3>5.5 Storage</h3>
   <ul>
     <li><strong>JetClass dataset:</strong> ~190 GB (v1). Download to external SSD or cloud instance attached storage.</li>
     <li><strong>Cloud instance storage:</strong> Most vast.ai instances include sufficient temporary storage (100–500 GB).</li>
     <li><strong>Results:</strong> Model weights + metrics ~5–10 GB total. Store locally and back up.</li>
   </ul>
 
-  <h3>5.5 Cost Optimization</h3>
+  <h3>5.6 Cost Optimization &amp; Contingency</h3>
   <ul>
     <li>Use vast.ai interruptible instances where possible (e.g., S1–S3 data sizes that complete in &lt;2 hrs).</li>
-    <li>Run E5 (generation) only if E1–E4 are completed under budget.</li>
-    <li>Reduce repeats from 3 to 2 for E3 and E4 if budget is tight—these are confirmatory, not primary.</li>
+    <li>Tier 1 is non-negotiable; Tier 2 proceeds only if remaining budget &ge; $20 at Week 8.</li>
+    <li>If budget is tight before Tier 1 completion: reduce E1a S1 from 5 to 3 seeds (saves ~16 runs), or defer E2a/E2b (baseline comparisons) to a reduced-scope version (Config D only).</li>
     <li>Preprocess data locally (CPU-only) before uploading to cloud instance to minimize idle GPU time.</li>
+    <li><strong>MVP fallback:</strong> If at Week 8 less than 70% of Tier 1 runs have completed, drop Tier 2 entirely and focus on E1a (core ablation) + E2a (Deep Sets only) as the minimum publishable result.</li>
   </ul>
 </section>
 
@@ -484,22 +704,22 @@
     <div class="tl-phase p1">
       <div class="wk">W1–2</div>
       <div class="label">Setup &amp; Reproduction</div>
-      <div class="detail">Environment, baseline verification, feature config</div>
+      <div class="detail">Environment, OmniLearn baseline, feature configs A–D</div>
     </div>
     <div class="tl-phase p2">
       <div class="wk">W3–6</div>
-      <div class="label">Core Experiments</div>
-      <div class="detail">E1 (48 runs) + E2 (12 runs) on cloud GPU</div>
+      <div class="label">Tier 1 Core Ablation</div>
+      <div class="detail">E1a (80 runs) — feature ablation across S1–S4</div>
     </div>
     <div class="tl-phase p3">
       <div class="wk">W7–8</div>
-      <div class="label">Extended Experiments</div>
-      <div class="detail">E3, E4, E5; preliminary analysis begins</div>
+      <div class="label">Tier 1 Baselines + MVP Gate</div>
+      <div class="detail">E1b + E2a + E2b; preliminary analysis; MVP decision</div>
     </div>
     <div class="tl-phase p4">
       <div class="wk">W9–10</div>
-      <div class="label">Analysis</div>
-      <div class="detail">Statistical analysis, figures, interpretation</div>
+      <div class="label">Analysis + Tier 2 (if greenlit)</div>
+      <div class="detail">Statistical analysis, figures; E3/E4 if budget allows</div>
     </div>
     <div class="tl-phase p5">
       <div class="wk">W11–12</div>
@@ -513,47 +733,76 @@
     <tr><th>Week</th><th>Phase</th><th>Key Deliverables</th><th>Checkpoint</th></tr>
     <tr>
       <td>1</td><td rowspan="2">Setup</td>
-      <td>OmniLearn repo cloned and running; JetClass subset downloaded; Docker environment working</td>
-      <td rowspan="2"><span class="tag ok">Gate: Baseline AUC reproduced within 2&sigma; of published values</span></td>
+      <td>OmniLearn repo cloned and running locally; JetClass subset downloaded; Docker environment working; Deep Sets baseline skeleton implemented</td>
+      <td rowspan="2"><span class="tag ok">Gate W2: Baseline AUC reproduced within published values; all Config A–D feature pipelines verified</span></td>
     </tr>
-    <tr><td>2</td><td>Feature configs A–D implemented in preprocessing pipeline; baseline AUC verified; experiment runner script ready</td></tr>
-    <tr><td>3</td><td rowspan="4">Core</td><td>E1: Configs A–D, data sizes S1–S2 (10<sup>2</sup>, 10<sup>3</sup>), 3 repeats each = 24 runs</td><td rowspan="2">Mid-point: early results for S1–S2; verify feature effects are measurable</td></tr>
-    <tr><td>4</td><td>E1: Configs A–D, S3 (10<sup>4</sup>), 3 repeats = 12 runs; begin S4</td></tr>
-    <tr><td>5</td><td>E1: Configs A–D, S4 (10<sup>5</sup>), 3 repeats = 12 runs</td><td></td></tr>
-    <tr><td>6</td><td>E2: From-scratch baselines (12 runs) + buffer week for any re-runs</td><td><span class="tag ok">Gate: E1 + E2 complete; preliminary AUC vs. N plots generated</span></td></tr>
-    <tr><td>7</td><td rowspan="2">Extended</td><td>E3: Frozen vs. fine-tuned (12 runs); begin E4 multi-class (6 of 12 runs)</td><td></td></tr>
-    <tr><td>8</td><td>E4: Complete multi-class (remaining 6 runs); E5: Generation (6 runs, if budget allows)</td><td><span class="tag">Gate: All experiments complete; data archived locally</span></td></tr>
-    <tr><td>9</td><td rowspan="2">Analysis</td><td>Statistical analysis: &Delta;AUC tables, data efficiency curves, saturating exponential fits; draft all figures</td><td></td></tr>
-    <tr><td>10</td><td>Interpretation: synthesize findings; write Results and Discussion sections</td><td><span class="tag ok">Gate: All figures final; Results section complete</span></td></tr>
+    <tr><td>2</td><td>Feature configs A–D implemented in preprocessing pipeline; experiment runner script ready; ParticleNet baseline adapted from Weaver reference</td></tr>
+    <tr>
+      <td>3</td><td rowspan="4">Tier 1<br>Core Ablation</td>
+      <td>E1a: Configs A–D, data sizes S1–S2 (10<sup>2</sup>, 10<sup>3</sup>), 5 seeds each = 40 runs</td>
+      <td rowspan="2">Mid-point: early results for S1–S2; verify &Delta;AUC magnitude exceeds bootstrap noise floor</td>
+    </tr>
+    <tr><td>4</td><td>E1a: Configs A–D, S3 (10<sup>4</sup>), 5 seeds = 20 runs; begin S4</td></tr>
+    <tr><td>5</td><td>E1a: Configs A–D, S4 (10<sup>5</sup>), 5 seeds = 20 runs</td><td></td></tr>
+    <tr><td>6</td><td>E1a buffer + preliminary analysis: AUC vs. N plots, bootstrap CIs; begin E2a (Deep Sets) runs</td><td><span class="tag ok">Gate W6: E1a ≥ 80% complete; preliminary feature ranking visible</span></td></tr>
+    <tr>
+      <td>7</td><td rowspan="2">Tier 1<br>Baselines</td>
+      <td>Complete E1b (from-scratch, 6 runs) + E2a (Deep Sets, 6 runs) + E2b (ParticleNet, 6 runs)</td>
+      <td rowspan="2"><span class="tag ok" style="background:#fef3c7; color:#92400e;">MVP GATE W8: Tier 1 ≥ 90% complete. Decision: proceed to Tier 2 or begin writing with Tier 1 results only.</span></td>
+    </tr>
+    <tr><td>8</td><td>Finalize Tier 1 analysis: &Delta;AUC tables, DeLong tests, data-efficiency curves; decide Tier 2 scope</td></tr>
+    <tr>
+      <td>9</td><td rowspan="2">Analysis<br>+ Tier 2?</td>
+      <td><strong>If Tier 2 greenlit:</strong> E3 + E4 runs begin. <strong>If not:</strong> Full statistical analysis of Tier 1 data; draft all figures.</td>
+      <td></td>
+    </tr>
+    <tr><td>10</td><td>Interpretation: synthesize findings; write Results and Discussion sections</td><td><span class="tag ok">Gate W10: All figures final; Results section complete</span></td></tr>
     <tr><td>11</td><td rowspan="2">Writing</td><td>Complete first draft: Introduction, Methods, Results, Discussion, Conclusion</td><td></td></tr>
-    <tr><td>12</td><td>Revision: advisor feedback integration, polishing, arXiv submission preparation</td><td><span class="tag ok">Gate: Manuscript ready for arXiv submission</span></td></tr>
+    <tr><td>12</td><td>Revision: advisor feedback integration, polishing, arXiv submission preparation</td><td><span class="tag ok">Gate W12: Manuscript ready for arXiv submission</span></td></tr>
   </table>
+
+  <p style="margin-top:12px; padding:10px 14px; background:#fef3c7; border-left:3px solid #d97706; font-size:13px; color:#78350f;">
+    <strong>MVP Fallback (if W8 gate not met):</strong> If fewer than 90% of Tier 1 runs have completed by
+    Week 8, the scope contracts to <em>E1a (core ablation) + E2a (Deep Sets baseline only)</em> as the
+    minimum publishable result. Weeks 9–10 focus exclusively on analysis of completed runs; Weeks 11–12
+    on writing. A study with 4 feature configs &times; 4 data scales &times; 5 seeds + one strong baseline
+    comparison remains a coherent contribution even without ParticleNet or Tier 2 extensions.
+  </p>
 </section>
 
 <!-- ======== EXPECTED OUTCOMES ======== -->
 <section>
   <h2>7. Expected Outcomes &amp; Contributions</h2>
 
-  <h3>7.1 Anticipated Findings</h3>
+  <h3>7.1 Hypothesized Findings</h3>
+  <p style="font-size:13px; color:#555; margin-bottom:10px;">
+    The following are predictions based on prior work; the study design is agnostic to their confirmation or refutation.
+  </p>
   <ol>
-    <li><strong>Feature marginal value ranking:</strong> Quantify the AUC gain per added feature category
-      (PID, charge, energy fractions) across data scales. Expect diminishing returns beyond Config C
-      for classification, based on the Group Report finding that additional features primarily affect
-      peak performance at large N.</li>
-    <li><strong>Data efficiency curves:</strong> Richer features should shift the AUC-vs-N curve upward
-      at all N, but the relative benefit should be largest at intermediate N (10<sup>3</sup>–10<sup>4</sup>),
-      where the backbone has enough data to leverage feature richness but hasn't yet saturated.</li>
-    <li><strong>Task-dependent feature importance:</strong> Classification and generation may weight features
-      differently. PID may matter more for generation (particle identity affects shower development)
-      than for classification (kinematic substructure dominates tagging).</li>
-    <li><strong>Frozen vs. fine-tuned interaction:</strong> With richer inputs, frozen backbone performance
-      may degrade less relative to fine-tuned, since the pretrained representation already encodes
-      feature-rich jet structure.</li>
+    <li><strong>Feature marginal value ranking:</strong> We expect to quantify the AUC gain per added feature
+      category (PID, charge, energy fractions) across data scales. Based on the Group Report observations,
+      we hypothesize diminishing returns beyond Config C for classification, but this has not been
+      systematically tested and a different pattern (e.g., PID dominating at all scales) would be equally
+      informative.</li>
+    <li><strong>Data efficiency curves:</strong> If richer features carry complementary information to what
+      the pretrained backbone already encodes, the AUC-vs-N curve should shift upward at all N, with the
+      largest relative benefit at intermediate N (10<sup>3</sup>–10<sup>4</sup>). A null result—feature
+      configuration having no effect on data efficiency—would suggest the pretrained representation is
+      sufficiently expressive to compensate for missing features.</li>
+    <li><strong>Foundation model vs. task-specific baselines:</strong> We hypothesize that OmniLearn's
+      pretrained backbone provides a performance advantage over Deep Sets and ParticleNet when both receive
+      identical input features. However, this advantage may narrow or disappear for the richest feature
+      configuration (Config D), if task-specific architectures are more efficient at exploiting high-dimensional
+      per-particle information.</li>
+    <li><strong>Physical interpretability:</strong> If feature configuration affects which jets are
+      correctly classified (as measured by jet-mass distributions of true/false positives), we expect
+      richer features to improve classification near the W-mass peak, where PID and charge help
+      separate hadronic W decays from QCD background.</li>
   </ol>
 
   <h3>7.2 Contributions</h3>
   <ul>
-    <li><strong>Empirical:</strong> First systematic ablation of input features for a jet foundation model,
+    <li><strong>Empirical:</strong> To our knowledge, the first systematic ablation of input features for a jet foundation model,
       directly addressing a gap identified in the OmniJet-&alpha; vs. OmniLearn comparative study.</li>
     <li><strong>Methodological:</strong> A reproducible experimental framework for feature ablation in
       foundation model fine-tuning, applicable to future architectures.</li>
@@ -592,31 +841,45 @@
     </tr>
     <tr>
       <td>R3</td>
-      <td><strong>Budget exceeded before all experiments complete</strong></td>
+      <td><strong>Budget exceeded before Tier 1 experiments complete</strong></td>
       <td><span class="tag warn">High</span></td>
       <td>Low–Med</td>
-      <td>Strict priority ordering: E1 &gt; E2 &gt; E3 &gt; E4 &gt; E5. Drop E5 first, then reduce E3/E4 repeats from 3 to 2. Core ablation (E1) is non-negotiable and budgeted first</td>
+      <td>Strict tiered priority: E1a (core ablation) is non-negotiable. If budget tightens mid-run, defer E1b (from-scratch) and reduce baselines (E2a only). The Tier 1 plan with 5 seeds already embeds statistical robustness; dropping to 3 seeds for S1–S2 saves ~32 runs without compromising the S3–S4 comparisons</td>
     </tr>
     <tr>
       <td>R4</td>
       <td><strong>Feature effects smaller than measurement uncertainty</strong></td>
       <td>Medium</td>
       <td>Low–Med</td>
-      <td>If 3-repeat SEM is too large, increase to 5 repeats for the key comparison (Config A vs. D at S3). A null result (features don't matter beyond kinematics) is itself publishable and informative</td>
+      <td>5 seeds + bootstrap CI + DeLong test provide substantially more statistical power than the original 3-seed design. If &Delta;AUC between adjacent configs is still not significant at &alpha; = 0.05, we report the null result with confidence bounds. A finding that features beyond kinematics do <em>not</em> meaningfully affect AUC is itself publishable and informative for detector design</td>
     </tr>
     <tr>
       <td>R5</td>
       <td><strong>Training instability or OOM on cloud GPU</strong></td>
       <td>Medium</td>
       <td>Low–Med</td>
-      <td>Start with batch size 128, increase if stable. Use gradient accumulation if needed. RTX 3090 (24 GB) is well above OmniLearn's requirements for the small variant</td>
+      <td>Start with batch size 128, increase if stable. Use gradient accumulation if needed. RTX 3090 (24 GB) is well above OmniLearn's requirements for the small variant. Baseline models (ParticleNet) may require memory profiling before full-scale runs</td>
     </tr>
     <tr>
       <td>R6</td>
       <td><strong>Insufficient time for paper writing</strong></td>
       <td><span class="tag warn">High</span></td>
       <td>Low–Med</td>
-      <td>Begin writing Introduction and Methods (Week 6–8) in parallel with extended experiments. These sections do not depend on results. Results section uses template-driven approach with automated figure generation scripts</td>
+      <td>Begin writing Introduction and Methods (Week 6) in parallel with Tier 1 baseline experiments. These sections do not depend on results. MVP gate at Week 8 provides a hard checkpoint to switch from experiments to writing. If Tier 2 is dropped, the extra 4 weeks provide comfortable writing time</td>
+    </tr>
+    <tr>
+      <td>R7</td>
+      <td><strong>Baseline model implementation exceeds available time/skill</strong></td>
+      <td>Medium</td>
+      <td>Medium</td>
+      <td>Deep Sets is architecturally simple and can be implemented in &lt;200 lines of TensorFlow/Keras (similar to the OmniLearn codebase). ParticleNet may require more effort; if the Weaver adaptation proves unworkable by Week 4, fall back to a simpler EdgeConv implementation or drop to Deep Sets-only baseline comparison</td>
+    </tr>
+    <tr>
+      <td>R8</td>
+      <td><strong>Data leakage from file-level splitting not properly enforced</strong></td>
+      <td><span class="tag warn">High</span></td>
+      <td>Low</td>
+      <td>Split indices are generated once, hashed by file ID, and stored in a version-controlled JSON manifest. The experiment runner loads the same split file for every run. This eliminates any possibility of cross-contamination between train/val/test</td>
     </tr>
   </table>
 </section>
@@ -694,6 +957,8 @@
       arXiv:2605.07471</li>
     <li>Birk, J., Hallin, A., Kasieczka, G., et al. (2025). Enhancing next token prediction based pre-training
       for jet foundation models. arXiv:2512.04149</li>
+    <li>Zaheer, M., Kottur, S., Ravanbakhsh, S., Poczos, B., Salakhutdinov, R., &amp; Smola, A. (2017).
+      Deep Sets. <em>Advances in Neural Information Processing Systems</em>, 30. arXiv:1703.06114</li>
     <li>JetClass dataset. Zenodo. <a href="https://zenodo.org/records/6619768">https://zenodo.org/records/6619768</a></li>
     <li>OmniLearn GitHub repository. <a href="https://github.com/ViniciusMikuni/OmniLearn">https://github.com/ViniciusMikuni/OmniLearn</a></li>
   </ol>
