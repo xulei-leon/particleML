@@ -2,6 +2,16 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Researcher Context
+
+This project is part of a computational physics research portfolio by a University of Toronto physics undergraduate (junior, Fall 2028 expected graduation). The researcher's work spans Bayesian inference (dark matter halo concentration-mass relation, PyMC 5 MCMC) and particle physics (UCL computational physics collaboration, in progress).
+
+**Research focus:** Computational physics — applying statistical and machine learning methods to data-intensive problems across physics domains, from astrophysical inference to collider phenomenology.
+
+**Graduate goal:** Physics PhD (Fall 2027/2028 intake), with parallel interest in computational/data science master's programs.
+
+**Technical skills:** Python (4.0 in two courses), Bayesian MCMC (PyMC 5), scientific computing. Currently building deep learning expertise through this project.
+
 ## Project Overview
 
 This is a research project exploring foundation model architectures for jet physics in high-energy physics (HEP). The goal is to develop and compare neural network backbones that can perform multiple jet-physics tasks (tagging, generation, anomaly detection) via transfer learning.
