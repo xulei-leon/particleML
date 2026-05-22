@@ -8,7 +8,7 @@ This project is part of a computational physics research portfolio by a Universi
 
 **Research focus:** Computational physics — applying statistical and machine learning methods to data-intensive problems across physics domains, from astrophysical inference to collider phenomenology.
 
-**Graduate goal:** Physics PhD (Fall 2027/2028 intake), with parallel interest in computational/data science master's programs.
+**Graduate goal:** Physics PhD or Physics academic master's (Fall 2027/2028 intake), with parallel interest in computational/data science master's programs.
 
 **Technical skills:** Python (4.0 in two courses), Bayesian MCMC (PyMC 5), scientific computing. Currently building deep learning expertise through this project.
 
