@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Research Plan: Input Feature Representations in Jet Foundation Models</title>
+<style>
+  :root {
+    --bg: #fafaf9;
+    --card-bg: #ffffff;
+    --text: #1a1a1a;
+    --text-secondary: #555;
+    --accent: #2563eb;
+    --accent-light: #dbeafe;
+    --border: #e5e7eb;
+    --tag-bg: #f0f9ff;
+    --tag-text: #0369a1;
+    --warning-bg: #fef3c7;
+    --warning-text: #92400e;
+    --success-bg: #ecfdf5;
+    --success-text: #065f46;
+    --radius: 8px;
+    --font: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --mono: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 15px;
+  }
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  header {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px 36px;
+    margin-bottom: 32px;
+  }
+  header .label {
+    display: inline-block;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 99px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 8px;
+  }
+  header .meta {
+    color: var(--text-secondary);
+    font-size: 13px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  section {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    margin-bottom: 20px;
+  }
+  section h2 {
+    font-size: 18px;
+    font-weight: 650;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    color: #111;
+  }
+  section h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 20px 0 8px;
+    color: #222;
+  }
+  section p, section li { color: #333; }
+  section ul, section ol { padding-left: 20px; }
+  section li { margin-bottom: 6px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    text-align: left;
+  }
+  th {
+    background: #f8fafc;
+    font-weight: 600;
+    color: #444;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  tr:nth-child(even) td { background: #fafafa; }
+
+  .tag {
+    display: inline-block;
+    background: var(--tag-bg);
+    color: var(--tag-text);
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+    margin-right: 4px;
+  }
+  .tag.warn { background: var(--warning-bg); color: var(--warning-text); }
+  .tag.ok   { background: var(--success-bg); color: var(--success-text); }
+
+  .timeline { display: flex; gap: 0; margin: 16px 0; }
+  .tl-phase {
+    flex: 1;
+    text-align: center;
+    padding: 12px 4px;
+    border: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .tl-phase:first-child { border-radius: var(--radius) 0 0 var(--radius); }
+  .tl-phase:last-child  { border-radius: 0 var(--radius) var(--radius); }
+  .tl-phase .wk { font-weight: 700; font-size: 15px; color: var(--accent); }
+  .tl-phase .label { font-weight: 600; margin: 4px 0 2px; }
+  .tl-phase .detail { color: var(--text-secondary); font-size: 11px; }
+  .tl-phase.p1 { background: #eff6ff; }
+  .tl-phase.p2 { background: #f0fdf4; }
+  .tl-phase.p3 { background: #fefce8; }
+  .tl-phase.p4 { background: #fef2f2; }
+  .tl-phase.p5 { background: #f5f3ff; }
+
+  .budget-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .budget-card {
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    text-align: center;
+  }
+  .budget-card .amount { font-size: 22px; font-weight: 700; color: var(--accent); }
+  .budget-card .label  { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+
+  @media print {
+    body { background: #fff; }
+    section { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- ======== HEADER ======== -->
+<header>
+  <div class="label">Research Plan &middot; 3-Month Project</div>
+  <h1>Input Feature Representations in Jet Foundation Models:<br>A Systematic Ablation Study</h1>
+  <div class="meta">
+    <span>Principal Investigator: University of Toronto Physics Undergraduate (Junior)</span>
+    <span>Advisor: UCL Physics Professor</span>
+    <span>Target Completion: August 2026</span>
+  </div>
+</header>
+
+<!-- ======== EXECUTIVE SUMMARY ======== -->
+<section>
+  <h2>1. Executive Summary</h2>
+  <p>
+    This project investigates how <strong>particle-level input feature representations</strong> affect the performance
+    and transfer-learning efficiency of jet foundation models in high-energy physics. Building on the comparative
+    study of OmniJet-&alpha; and OmniLearn, which identified input feature dimensionality as the primary determinant
+    of peak performance regardless of architecture, this study conducts a systematic ablation of input feature
+    configurations using the publicly available <strong>OmniLearn pretrained backbone</strong> (PET-based architecture).
+  </p>
+  <br>
+  <p>
+    The project is designed to be <strong>completed in 12 weeks</strong> by a University of Toronto physics undergraduate
+    with strong Python and Bayesian inference skills who is building deep learning expertise. All experiments use
+    existing open-source code and pretrained model checkpoints, requiring only <strong>single-GPU fine-tuning</strong>
+    on cloud instances with an estimated compute budget of <strong>$100–200 USD</strong>. The output is an
+    arXiv-ready first-author paper targeting <em>Machine Learning: Science and Technology</em> or a similar venue.
+  </p>
+</section>
+
+<!-- ======== BACKGROUND ======== -->
+<section>
+  <h2>2. Background &amp; Motivation</h2>
+
+  <h3>2.1 Foundation Models for Jet Physics</h3>
+  <p>
+    Foundation models—neural networks pretrained on large datasets and adapted to downstream tasks via transfer
+    learning—are emerging as a paradigm shift in high-energy physics (HEP). In jet physics, two pioneering
+    architectures demonstrated this capability:
+  </p>
+  <ul>
+    <li><strong>OmniJet-&alpha;</strong> (Birk et al., 2024): GPT-style autoregressive transformer with VQ-VAE
+      tokenization. Treats jets as ordered sequences of discrete tokens. Pretrained via next-token prediction
+      (generation), fine-tuned for classification.</li>
+    <li><strong>OmniLearn</strong> (Mikuni &amp; Nachman, 2025): Point-Edge Transformer (PET) operating on
+      continuous, unordered point clouds. Uses supervised pretraining on JetClass, fine-tunes across
+      classification, generation, anomaly detection, and likelihood ratio estimation.</li>
+  </ul>
+
+  <h3>2.2 The Feature Representation Question</h3>
+  <p>
+    A key finding from the comparative study (Group Report, 2026) is that <strong>the dimensionality and richness
+    of input particle representations is the primary determinant of peak performance</strong>, outweighing
+    architectural differences between OmniJet-&alpha; and OmniLearn at dataset sizes above 10<sup>3</sup> jets.
+    Specifically:
+  </p>
+  <ul>
+    <li>OmniLearn's performance advantage largely disappeared when its extra input features (PID, charge,
+      energy/momentum fractions) were removed to match OmniJet-&alpha;'s kinematic-only representation.</li>
+    <li>Discrete tokenization (VQ-VAE codebook) introduced only marginal information loss for classification.</li>
+    <li>In the small-data regime (&#8804;10<sup>3</sup> jets), architectural differences persisted independently
+      of input features—the PET architecture learned jet structure more rapidly.</li>
+    <li>The study called for future work "building new models which consider more particle features" to
+      systematically understand this relationship.</li>
+  </ul>
+
+  <h3>2.3 Related Work on Feature Importance</h3>
+  <p>
+    Several recent interpretability studies provide complementary motivation:
+  </p>
+  <ul>
+    <li><strong>Khot et al. (2023)</strong> used SHAP and input-zeroing ablation on constituent-based top taggers,
+      finding that correlations between features can mislead naive importance rankings.</li>
+    <li><strong>Vent et al. (2025)</strong> showed via PCA + Shapley analysis on ParticleNet that only ~5 principal
+      components of jet substructure recover full quark-gluon discrimination AUC, suggesting significant
+      redundancy in typical input representations.</li>
+    <li><strong>Rai &amp; Ganguly (2026)</strong> demonstrated through mechanistic interpretability of the Particle
+      Transformer that a sparse six-head circuit recovers ~97% of AUC, with the residual stream preferentially
+      encoding energy correlator basis functions.</li>
+  </ul>
+  <p>
+    These findings converge on a central open question: <strong>which input features are necessary and sufficient
+    for foundation model performance, and how does this depend on task type and data scale?</strong>
+  </p>
+</section>
+
+<!-- ======== RESEARCH QUESTIONS ======== -->
+<section>
+  <h2>3. Research Questions</h2>
+
+  <p><strong>Primary RQ:</strong> How do particle-level input feature representations affect the classification
+  performance and transfer-learning efficiency of a PET-based jet foundation model?</p>
+  <br>
+
+  <table>
+    <tr><th style="width:10%">RQ</th><th>Question</th><th style="width:12%">Type</th></tr>
+    <tr>
+      <td><strong>RQ1</strong></td>
+      <td>What is the minimal sufficient feature set for competitive binary top-tagging (t&rarr;bqq&prime; vs. QCD)
+        using a pretrained OmniLearn backbone, and which features drive the largest marginal performance gains?</td>
+      <td><span class="tag">Primary</span></td>
+    </tr>
+    <tr>
+      <td><strong>RQ2</strong></td>
+      <td>How does input feature richness modulate data efficiency—does a richer feature set reduce the amount of
+        labeled fine-tuning data needed to reach a given performance threshold?</td>
+      <td><span class="tag">Primary</span></td>
+    </tr>
+    <tr>
+      <td><strong>RQ3</strong></td>
+      <td>Does the impact of input feature configuration generalize across jet types (multi-class classification
+        on 5 JetClass categories), or are certain features more important for specific jet classes?</td>
+      <td><span class="tag">Secondary</span></td>
+    </tr>
+    <tr>
+      <td><strong>RQ4</strong></td>
+      <td>Does the feature configuration that optimizes classification also optimize generation quality
+        (measured by Wasserstein distance), or is there a task-dependent trade-off?</td>
+      <td><span class="tag">Exploratory</span></td>
+    </tr>
+  </table>
+</section>
+
+<!-- ======== METHODOLOGY ======== -->
+<section>
+  <h2>4. Methodology</h2>
+
+  <h3>4.1 Base Architecture &amp; Pretrained Model</h3>
+  <p>
+    <strong>OmniLearn</strong> (Mikuni &amp; Nachman, 2025), implemented in TensorFlow/Keras, using the
+    publicly available pretrained checkpoint from
+    <a href="https://github.com/ViniciusMikuni/OmniLearn">github.com/ViniciusMikuni/OmniLearn</a>.
+    The PET backbone has on the order of hundreds of thousands of parameters—compact enough for
+    single-GPU fine-tuning. All experiments fine-tune the pretrained backbone rather than training from scratch.
+  </p>
+
+  <h3>4.2 Feature Configurations (Independent Variable)</h3>
+  <table>
+    <tr><th>Config</th><th>Features</th><th>Dim.</th><th>Rationale</th></tr>
+    <tr>
+      <td><strong>A (Minimal)</strong></td>
+      <td>&Delta;&eta;, &Delta;&phi;, log(p<sub>T</sub>) [kinematic only]</td>
+      <td>3</td>
+      <td>OmniJet-&alpha; baseline; tests whether kinematic information alone is sufficient</td>
+    </tr>
+    <tr>
+      <td><strong>B (+PID)</strong></td>
+      <td>Config A + particle ID (one-hot: &pi;&plusmn;, K&plusmn;, p, e&plusmn;, &mu;&plusmn;, &gamma;)</td>
+      <td>~9</td>
+      <td>Tests the marginal value of particle identity beyond kinematics</td>
+    </tr>
+    <tr>
+      <td><strong>C (+PID+Q)</strong></td>
+      <td>Config B + electric charge (&plusmn;1, 0)</td>
+      <td>~10</td>
+      <td>Tests whether charge adds discriminative power for quark/gluon separation</td>
+    </tr>
+    <tr>
+      <td><strong>D (Full)</strong></td>
+      <td>Config C + E/E<sub>jet</sub>, p/p<sub>jet</sub> [energy/momentum fractions]</td>
+      <td>~12</td>
+      <td>OmniLearn default; maximum information, reference upper bound</td>
+    </tr>
+  </table>
+
+  <h3>4.3 Tasks &amp; Metrics (Dependent Variables)</h3>
+  <table>
+    <tr><th>Task</th><th>Dataset</th><th>Primary Metric</th><th>Secondary</th></tr>
+    <tr><td>Binary top-tagging</td><td>JetClass (t&rarr;bqq&prime; vs. QCD)</td><td>AUC (ROC)</td><td>Accuracy, background rejection at 30% signal efficiency</td></tr>
+    <tr><td>Multi-class classification</td><td>JetClass (5 types: t&rarr;bqq&prime;, H&rarr;bb&#773;, t&rarr;bl&nu;, W&rarr;qq&prime;, Z&rarr;qq&prime;)</td><td>AUC (per class)</td><td>Macro-averaged accuracy</td></tr>
+    <tr><td>Generation quality</td><td>JetClass top jets</td><td>Wasserstein distance (1D, per-feature)</td><td>Jet-mass distribution WD</td></tr>
+  </table>
+
+  <h3>4.4 Data Scale Conditions</h3>
+  <p>For binary top-tagging (RQ1, RQ2), four fine-tuning dataset sizes are tested:</p>
+  <table>
+    <tr><th>Condition</th><th>N (signal + background each)</th><th>Rationale</th></tr>
+    <tr><td>S1 (Very small)</td><td>10<sup>2</sup></td><td>Extreme data scarcity; tests lower bound of transfer learning</td></tr>
+    <tr><td>S2 (Small)</td><td>10<sup>3</sup></td><td>Reference paper's key threshold where architectural differences emerge</td></tr>
+    <tr><td>S3 (Medium)</td><td>10<sup>4</sup></td><td>Intermediate regime; typical for rare physics processes</td></tr>
+    <tr><td>S4 (Large)</td><td>10<sup>5</sup></td><td>Near-saturation; isolates peak-performance effects of feature choice</td></tr>
+  </table>
+
+  <h3>4.5 Experimental Design Matrix</h3>
+  <table>
+    <tr><th>Experiment Set</th><th>Configs</th><th>Sizes</th><th>Repeats</th><th>Runs</th><th>Priority</th></tr>
+    <tr>
+      <td><strong>E1: Core ablation</strong> (binary, fine-tuned backbone)</td>
+      <td>A, B, C, D</td><td>S1–S4</td><td>3</td><td>48</td>
+      <td><span class="tag ok">Highest</span></td>
+    </tr>
+    <tr>
+      <td><strong>E2: From-scratch baseline</strong></td>
+      <td>A, B, C, D</td><td>S4 only</td><td>3</td><td>12</td>
+      <td><span class="tag ok">Highest</span></td>
+    </tr>
+    <tr>
+      <td><strong>E3: Frozen vs. fine-tuned</strong></td>
+      <td>A, D (extremes)</td><td>S2, S4</td><td>3</td><td>12</td>
+      <td><span class="tag">Medium</span></td>
+    </tr>
+    <tr>
+      <td><strong>E4: Multi-class</strong> (5 jet types)</td>
+      <td>A, B, C, D</td><td>S4</td><td>3</td><td>12</td>
+      <td><span class="tag">Medium</span></td>
+    </tr>
+    <tr>
+      <td><strong>E5: Generation</strong></td>
+      <td>A, D (extremes)</td><td>S4</td><td>3</td><td>6</td>
+      <td><span class="tag warn">Lower</span></td>
+    </tr>
+    <tr style="font-weight:600; background:#f0f9ff;">
+      <td>Total</td><td></td><td></td><td></td><td>90</td><td></td>
+    </tr>
+  </table>
+
+  <h3>4.6 Statistical Approach</h3>
+  <ul>
+    <li><strong>Uncertainty:</strong> Standard error of the mean from 3 independent repeats with different random seeds.</li>
+    <li><strong>Comparison:</strong> For each data scale, compare AUC across feature configurations via
+      &Delta;AUC relative to Config A (kinematic-only baseline). Report both raw values and normalized differences.</li>
+    <li><strong>Data efficiency curves:</strong> For each config, plot AUC vs. log<sub>10</sub>(N). Fit a saturating
+      exponential to estimate asymptotic performance and half-saturation dataset size.</li>
+    <li><strong>Significance:</strong> Non-overlapping 2&times;SEM error bars as threshold for meaningful
+      difference; supplement with Cohen's d for effect sizes between adjacent feature configs.</li>
+  </ul>
+
+  <h3>4.7 Implementation Details</h3>
+  <table>
+    <tr><th>Parameter</th><th>Value</th></tr>
+    <tr><td>Framework</td><td>TensorFlow / Keras (matching OmniLearn reference implementation)</td></tr>
+    <tr><td>Optimizer</td><td>Adam, learning rate 10<sup>&minus;4</sup></td></tr>
+    <tr><td>Batch size</td><td>256 (adjust based on GPU memory; reduce to 128 if OOM)</td></tr>
+    <tr><td>Epochs (fine-tuning)</td><td>20 per run; best checkpoint selected by validation AUC</td></tr>
+    <tr><td>Epochs (from-scratch)</td><td>40 per run</td></tr>
+    <tr><td>Train/val/test split</td><td>80/10/10 (stratified)</td></tr>
+    <tr><td>GPU target</td><td>NVIDIA RTX 3090/4090 or A4000 (16–24 GB VRAM)</td></tr>
+    <tr><td>Reproducibility</td><td>Fixed random seeds (42, 123, 777 for the 3 repeats); all configs logged via JSON</td></tr>
+  </table>
+</section>
+
+<!-- ======== COMPUTE & BUDGET ======== -->
+<section>
+  <h2>5. Compute Resources &amp; Budget</h2>
+
+  <h3>5.1 Resource Constraints</h3>
+  <ul>
+    <li><strong>No institutional cluster access.</strong> This is a personal project with UCL professor guidance
+      but no official affiliation granting compute resources.</li>
+    <li><strong>Personal PC:</strong> No discrete GPU. CPU-only machine suitable for data preprocessing,
+      analysis, and writing—not training.</li>
+    <li><strong>All GPU training must use cloud instances,</strong> funded by the researcher personally.</li>
+  </ul>
+
+  <h3>5.2 Cloud GPU Strategy</h3>
+  <table>
+    <tr><th>Provider</th><th>GPU</th><th>VRAM</th><th>Rate (approx.)</th><th>Use Case</th></tr>
+    <tr><td><a href="https://vast.ai">vast.ai</a></td><td>RTX 3090</td><td>24 GB</td><td>$0.15–0.35/hr</td><td>Primary workhorse; most fine-tuning runs</td></tr>
+    <tr><td>vast.ai</td><td>RTX 4090</td><td>24 GB</td><td>$0.31–0.45/hr</td><td>Larger batch sizes, generation experiments</td></tr>
+    <tr><td>Google Colab Pro</td><td>T4 / L4</td><td>16 / 24 GB</td><td>$9.99/month</td><td>Backup; exploratory and small-data runs</td></tr>
+  </table>
+
+  <h3>5.3 Cost Estimation</h3>
+  <div class="budget-grid">
+    <div class="budget-card">
+      <div class="amount">~225 hrs</div>
+      <div class="label">Total GPU Time<br>(90 runs &times; ~2.5 hrs avg)</div>
+    </div>
+    <div class="budget-card">
+      <div class="amount">~$70</div>
+      <div class="label">Core Experiments<br>(vast.ai RTX 3090 @ $0.30/hr)</div>
+    </div>
+    <div class="budget-card">
+      <div class="amount">~$30</div>
+      <div class="label">Debugging &amp; Buffer<br>(failed runs, restarts, overhead)</div>
+    </div>
+    <div class="budget-card">
+      <div class="amount">~$100</div>
+      <div class="label">Estimated Total<br>(conservative, with buffer)</div>
+    </div>
+    <div class="budget-card">
+      <div class="amount">$100–200</div>
+      <div class="label">Recommended Budget<br>(upper bound for safety)</div>
+    </div>
+  </div>
+
+  <h3>5.4 Storage</h3>
+  <ul>
+    <li><strong>JetClass dataset:</strong> ~190 GB (v1). Download to external SSD or cloud instance attached storage.</li>
+    <li><strong>Cloud instance storage:</strong> Most vast.ai instances include sufficient temporary storage (100–500 GB).</li>
+    <li><strong>Results:</strong> Model weights + metrics ~5–10 GB total. Store locally and back up.</li>
+  </ul>
+
+  <h3>5.5 Cost Optimization</h3>
+  <ul>
+    <li>Use vast.ai interruptible instances where possible (e.g., S1–S3 data sizes that complete in &lt;2 hrs).</li>
+    <li>Run E5 (generation) only if E1–E4 are completed under budget.</li>
+    <li>Reduce repeats from 3 to 2 for E3 and E4 if budget is tight—these are confirmatory, not primary.</li>
+    <li>Preprocess data locally (CPU-only) before uploading to cloud instance to minimize idle GPU time.</li>
+  </ul>
+</section>
+
+<!-- ======== TIMELINE ======== -->
+<section>
+  <h2>6. Timeline &amp; Milestones</h2>
+
+  <div class="timeline">
+    <div class="tl-phase p1">
+      <div class="wk">W1–2</div>
+      <div class="label">Setup &amp; Reproduction</div>
+      <div class="detail">Environment, baseline verification, feature config</div>
+    </div>
+    <div class="tl-phase p2">
+      <div class="wk">W3–6</div>
+      <div class="label">Core Experiments</div>
+      <div class="detail">E1 (48 runs) + E2 (12 runs) on cloud GPU</div>
+    </div>
+    <div class="tl-phase p3">
+      <div class="wk">W7–8</div>
+      <div class="label">Extended Experiments</div>
+      <div class="detail">E3, E4, E5; preliminary analysis begins</div>
+    </div>
+    <div class="tl-phase p4">
+      <div class="wk">W9–10</div>
+      <div class="label">Analysis</div>
+      <div class="detail">Statistical analysis, figures, interpretation</div>
+    </div>
+    <div class="tl-phase p5">
+      <div class="wk">W11–12</div>
+      <div class="label">Writing</div>
+      <div class="detail">Draft &rarr; revision &rarr; final manuscript</div>
+    </div>
+  </div>
+
+  <br>
+  <table>
+    <tr><th>Week</th><th>Phase</th><th>Key Deliverables</th><th>Checkpoint</th></tr>
+    <tr>
+      <td>1</td><td rowspan="2">Setup</td>
+      <td>OmniLearn repo cloned and running; JetClass subset downloaded; Docker environment working</td>
+      <td rowspan="2"><span class="tag ok">Gate: Baseline AUC reproduced within 2&sigma; of published values</span></td>
+    </tr>
+    <tr><td>2</td><td>Feature configs A–D implemented in preprocessing pipeline; baseline AUC verified; experiment runner script ready</td></tr>
+    <tr><td>3</td><td rowspan="4">Core</td><td>E1: Configs A–D, data sizes S1–S2 (10<sup>2</sup>, 10<sup>3</sup>), 3 repeats each = 24 runs</td><td rowspan="2">Mid-point: early results for S1–S2; verify feature effects are measurable</td></tr>
+    <tr><td>4</td><td>E1: Configs A–D, S3 (10<sup>4</sup>), 3 repeats = 12 runs; begin S4</td></tr>
+    <tr><td>5</td><td>E1: Configs A–D, S4 (10<sup>5</sup>), 3 repeats = 12 runs</td><td></td></tr>
+    <tr><td>6</td><td>E2: From-scratch baselines (12 runs) + buffer week for any re-runs</td><td><span class="tag ok">Gate: E1 + E2 complete; preliminary AUC vs. N plots generated</span></td></tr>
+    <tr><td>7</td><td rowspan="2">Extended</td><td>E3: Frozen vs. fine-tuned (12 runs); begin E4 multi-class (6 of 12 runs)</td><td></td></tr>
+    <tr><td>8</td><td>E4: Complete multi-class (remaining 6 runs); E5: Generation (6 runs, if budget allows)</td><td><span class="tag">Gate: All experiments complete; data archived locally</span></td></tr>
+    <tr><td>9</td><td rowspan="2">Analysis</td><td>Statistical analysis: &Delta;AUC tables, data efficiency curves, saturating exponential fits; draft all figures</td><td></td></tr>
+    <tr><td>10</td><td>Interpretation: synthesize findings; write Results and Discussion sections</td><td><span class="tag ok">Gate: All figures final; Results section complete</span></td></tr>
+    <tr><td>11</td><td rowspan="2">Writing</td><td>Complete first draft: Introduction, Methods, Results, Discussion, Conclusion</td><td></td></tr>
+    <tr><td>12</td><td>Revision: advisor feedback integration, polishing, arXiv submission preparation</td><td><span class="tag ok">Gate: Manuscript ready for arXiv submission</span></td></tr>
+  </table>
+</section>
+
+<!-- ======== EXPECTED OUTCOMES ======== -->
+<section>
+  <h2>7. Expected Outcomes &amp; Contributions</h2>
+
+  <h3>7.1 Anticipated Findings</h3>
+  <ol>
+    <li><strong>Feature marginal value ranking:</strong> Quantify the AUC gain per added feature category
+      (PID, charge, energy fractions) across data scales. Expect diminishing returns beyond Config C
+      for classification, based on the Group Report finding that additional features primarily affect
+      peak performance at large N.</li>
+    <li><strong>Data efficiency curves:</strong> Richer features should shift the AUC-vs-N curve upward
+      at all N, but the relative benefit should be largest at intermediate N (10<sup>3</sup>–10<sup>4</sup>),
+      where the backbone has enough data to leverage feature richness but hasn't yet saturated.</li>
+    <li><strong>Task-dependent feature importance:</strong> Classification and generation may weight features
+      differently. PID may matter more for generation (particle identity affects shower development)
+      than for classification (kinematic substructure dominates tagging).</li>
+    <li><strong>Frozen vs. fine-tuned interaction:</strong> With richer inputs, frozen backbone performance
+      may degrade less relative to fine-tuned, since the pretrained representation already encodes
+      feature-rich jet structure.</li>
+  </ol>
+
+  <h3>7.2 Contributions</h3>
+  <ul>
+    <li><strong>Empirical:</strong> First systematic ablation of input features for a jet foundation model,
+      directly addressing a gap identified in the OmniJet-&alpha; vs. OmniLearn comparative study.</li>
+    <li><strong>Methodological:</strong> A reproducible experimental framework for feature ablation in
+      foundation model fine-tuning, applicable to future architectures.</li>
+    <li><strong>Practical:</strong> Guidance for experimentalists on which particle-level features are worth
+      the engineering cost of reconstruction in detector design and data preparation pipelines.</li>
+  </ul>
+
+  <h3>7.3 Publication Plan</h3>
+  <table>
+    <tr><th>Stage</th><th>Timing</th><th>Action</th></tr>
+    <tr><td>arXiv preprint</td><td>Week 12</td><td>Submit to arXiv (hep-ph or physics.data-an)</td></tr>
+    <tr><td>Journal submission</td><td>Week 13–14</td><td>Target: <em>Machine Learning: Science and Technology</em> (primary) or <em>Journal of High Energy Physics</em></td></tr>
+    <tr><td>Conference</td><td>Fall 2026</td><td>Potential: APS DPF or ML4Jets workshop abstract</td></tr>
+  </table>
+</section>
+
+<!-- ======== RISK ======== -->
+<section>
+  <h2>8. Risk Assessment &amp; Mitigation</h2>
+
+  <table>
+    <tr><th style="width:5%">#</th><th>Risk</th><th style="width:8%">Severity</th><th style="width:8%">Likelihood</th><th>Mitigation</th></tr>
+    <tr>
+      <td>R1</td>
+      <td><strong>Pretrained model incompatible or unavailable</strong></td>
+      <td><span class="tag warn">High</span></td>
+      <td>Low</td>
+      <td>Week 1–2 dedicated to reproduction; if checkpoint is broken, use OmniLearned-small public checkpoint or train a minimal backbone from scratch on S4 data as fallback</td>
+    </tr>
+    <tr>
+      <td>R2</td>
+      <td><strong>Cloud GPU unavailable or queue times long</strong></td>
+      <td>Medium</td>
+      <td>Medium</td>
+      <td>Register on both vast.ai and Colab Pro simultaneously; pre-warm instances during analysis days; schedule runs during off-peak hours</td>
+    </tr>
+    <tr>
+      <td>R3</td>
+      <td><strong>Budget exceeded before all experiments complete</strong></td>
+      <td><span class="tag warn">High</span></td>
+      <td>Low–Med</td>
+      <td>Strict priority ordering: E1 &gt; E2 &gt; E3 &gt; E4 &gt; E5. Drop E5 first, then reduce E3/E4 repeats from 3 to 2. Core ablation (E1) is non-negotiable and budgeted first</td>
+    </tr>
+    <tr>
+      <td>R4</td>
+      <td><strong>Feature effects smaller than measurement uncertainty</strong></td>
+      <td>Medium</td>
+      <td>Low–Med</td>
+      <td>If 3-repeat SEM is too large, increase to 5 repeats for the key comparison (Config A vs. D at S3). A null result (features don't matter beyond kinematics) is itself publishable and informative</td>
+    </tr>
+    <tr>
+      <td>R5</td>
+      <td><strong>Training instability or OOM on cloud GPU</strong></td>
+      <td>Medium</td>
+      <td>Low–Med</td>
+      <td>Start with batch size 128, increase if stable. Use gradient accumulation if needed. RTX 3090 (24 GB) is well above OmniLearn's requirements for the small variant</td>
+    </tr>
+    <tr>
+      <td>R6</td>
+      <td><strong>Insufficient time for paper writing</strong></td>
+      <td><span class="tag warn">High</span></td>
+      <td>Low–Med</td>
+      <td>Begin writing Introduction and Methods (Week 6–8) in parallel with extended experiments. These sections do not depend on results. Results section uses template-driven approach with automated figure generation scripts</td>
+    </tr>
+  </table>
+</section>
+
+<!-- ======== SKILLS DEVELOPMENT ======== -->
+<section>
+  <h2>9. Skills Development &amp; Graduate School Alignment</h2>
+
+  <p>This project is designed to build competencies directly relevant to the researcher's Physics PhD / Master's applications (Fall 2027/2028 intake) while leveraging existing strengths:</p>
+
+  <table>
+    <tr><th>Existing Strength</th><th>How It's Used</th><th>New Skill Built</th></tr>
+    <tr>
+      <td>Bayesian inference, PyMC 5 MCMC</td>
+      <td>Statistical analysis of results: saturating exponential fits, uncertainty quantification, effect size estimation</td>
+      <td>— (reinforced)</td>
+    </tr>
+    <tr>
+      <td>Python (4.0 GPA)</td>
+      <td>Experiment scripting, data pipeline, analysis automation, figure generation</td>
+      <td>TensorFlow/Keras model training and fine-tuning</td>
+    </tr>
+    <tr>
+      <td>Scientific computing</td>
+      <td>Systematic experimental design, HDF5 data handling, cloud resource management</td>
+      <td>GPU computing, Docker containers, experiment tracking</td>
+    </tr>
+    <tr>
+      <td>First-author paper experience</td>
+      <td>Manuscript structure, literature review, revision process</td>
+      <td>Deep learning research communication; ML+Physics interdisciplinary writing</td>
+    </tr>
+    <tr>
+      <td>— (new)</td>
+      <td></td>
+      <td><strong>Foundation model fine-tuning, transfer learning, transformer/PET architectures, systematic ablation study design</strong></td>
+    </tr>
+  </table>
+
+  <p>
+    The completed project strengthens the graduate application narrative: <strong>computational physics as a
+    unifying thread</strong>—from Bayesian astrophysical inference (dark matter c-M relation) to deep
+    learning for collider phenomenology (this project). The UCL professor advising this work can provide
+    a recommendation letter grounded in direct supervision of the research.
+  </p>
+</section>
+
+<!-- ======== REFERENCES ======== -->
+<section>
+  <h2>10. References</h2>
+
+  <ol style="font-size:13px;">
+    <li>Birk, J., Hallin, A., &amp; Kasieczka, G. (2024). OmniJet-&alpha;: the first cross-task foundation
+      model for particle physics. <em>Machine Learning: Science and Technology</em>, 5(3), 035031.
+      arXiv:2403.05618</li>
+    <li>Mikuni, V. &amp; Nachman, B. (2025). OmniLearn: A Method to Simultaneously Facilitate All Jet Physics
+      Tasks. <em>Physical Review D</em>, 111(5), 054015. arXiv:2404.16091</li>
+    <li>Bhimji, W., Harris, C., Mikuni, V., &amp; Nachman, B. (2025). OmniLearned: A Foundation Model Framework
+      for All Tasks Involving Jet Physics. arXiv:2510.24066</li>
+    <li>Group Report (2026). Exploring Foundational Models for Strong Interactions. UCL Physics Group Project.</li>
+    <li>Qu, H. &amp; Gouskos, L. (2020). Jet tagging via particle clouds. <em>Physical Review D</em>, 101, 056019.
+      arXiv:1909.00768</li>
+    <li>Qu, H., Li, C., &amp; Qian, S. (2022). Particle Transformer for Jet Tagging. <em>ICML 2022</em>.
+      arXiv:2202.03772</li>
+    <li>Khot, A., Neubauer, M. S., &amp; Roy, A. (2023). A Detailed Study of Interpretability of DNN-based
+      Top Taggers. <em>Machine Learning: Science and Technology</em>, 4(3), 035004. arXiv:2210.04371</li>
+    <li>Vent, S., Falkowski, A., &amp; Rigou, S. (2025). How to Deep-Learn the Theory behind Quark-Gluon Tagging.
+      arXiv:2507.21214</li>
+    <li>Rai, A. &amp; Ganguly, S. (2026). Dissecting Jet-Tagger Through Mechanistic Interpretability.
+      arXiv:2605.09881</li>
+    <li>Heinrich, L., Golling, T., Kagan, M., Klein, S., Leigh, M., &amp; Raine, J. A. (2024). Masked Particle
+      Modeling on Sets: Towards Self-Supervised High Energy Physics Foundation Models.
+      <em>Machine Learning: Science and Technology</em>, 5(3), 035074. arXiv:2401.13537</li>
+    <li>Schott, M. &amp; Flek, L. (2026). Transfer Learning Across Fast- and Full-Simulation Domains.
+      arXiv:2605.07471</li>
+    <li>Birk, J., Hallin, A., Kasieczka, G., et al. (2025). Enhancing next token prediction based pre-training
+      for jet foundation models. arXiv:2512.04149</li>
+    <li>JetClass dataset. Zenodo. <a href="https://zenodo.org/records/6619768">https://zenodo.org/records/6619768</a></li>
+    <li>OmniLearn GitHub repository. <a href="https://github.com/ViniciusMikuni/OmniLearn">https://github.com/ViniciusMikuni/OmniLearn</a></li>
+  </ol>
+</section>
+
+<!-- ======== APPENDIX ======== -->
+<section>
+  <h2>Appendix A: Researcher Profile Summary</h2>
+  <table>
+    <tr><th style="width:25%">Dimension</th><th>Detail</th></tr>
+    <tr><td>Education</td><td>University of Toronto, Physics BSc, junior (Fall 2028 expected graduation). GPA 3.0/4.0</td></tr>
+    <tr><td>Research experience</td><td>(1) Dark matter c-M relation — Bayesian inference pipeline, PyMC 5 MCMC, first-author paper ready for arXiv. (2) UCL particle physics — computational physics, in progress (started May 2026)</td></tr>
+    <tr><td>Technical skills</td><td>Python (GPA 4.0 in 2 courses), Bayesian MCMC (PyMC 5), scientific computing. Building deep learning expertise through this project</td></tr>
+    <tr><td>GRE</td><td>317 (V 151, Q 166)</td></tr>
+    <tr><td>Graduate goals</td><td>Physics PhD or Physics academic master's (Fall 2027/2028 intake), with parallel interest in computational/data science master's</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>Appendix B: Experiment Run Log Template</h2>
+  <p>A CSV or JSON log should be maintained for every training run:</p>
+  <table>
+    <tr><th>Field</th><th>Example</th></tr>
+    <tr><td><code>run_id</code></td><td><code>E1_C_S3_r2</code> (Experiment E1, Config C, Size S3, Repeat 2)</td></tr>
+    <tr><td><code>feature_config</code></td><td><code>C</code></td></tr>
+    <tr><td><code>data_size</code></td><td><code>10000</code></td></tr>
+    <tr><td><code>repeat_seed</code></td><td><code>123</code></td></tr>
+    <tr><td><code>backbone</code></td><td><code>pretrained | scratch</code></td></tr>
+    <tr><td><code>frozen_backbone</code></td><td><code>true | false</code></td></tr>
+    <tr><td><code>batch_size</code></td><td><code>256</code></td></tr>
+    <tr><td><code>learning_rate</code></td><td><code>1e-4</code></td></tr>
+    <tr><td><code>epochs_completed</code></td><td><code>20</code></td></tr>
+    <tr><td><code>best_epoch</code></td><td><code>16</code></td></tr>
+    <tr><td><code>val_auc</code></td><td><code>0.9824</code></td></tr>
+    <tr><td><code>test_auc</code></td><td><code>0.9819</code></td></tr>
+    <tr><td><code>test_accuracy</code></td><td><code>0.9341</code></td></tr>
+    <tr><td><code>gpu_type</code></td><td><code>RTX_3090</code></td></tr>
+    <tr><td><code>wall_time_hrs</code></td><td><code>2.7</code></td></tr>
+    <tr><td><code>notes</code></td><td><code>—</code></td></tr>
+  </table>
+</section>
+
+</div>
+</body>
+</html>
