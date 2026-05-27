@@ -37,6 +37,10 @@ physics-foundation-models/
 └── docs/          # References and notes
 ```
 
+## Language Convention
+
+All text content in this project, including code and comments, must be written in English.
+
 ## Domain-Specific Conventions
 
 - **Jet representation**: Particles are represented as sets of 4-momentum features (pT, η, φ, mass) plus optional particle ID (charge, type). Models treat jets as either ordered sequences (by descending pT) or unordered point clouds.
