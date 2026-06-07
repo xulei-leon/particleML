@@ -222,3 +222,4 @@ __marimo__/
 
 # Claude Code worktrees
 .claude/worktrees/
+data/
