@@ -28,7 +28,7 @@ Reference paper: `docs/references/Group-Report.pdf` — a comparative study of O
 ## Planned Project Structure
 
 ```
-physics-foundation-models/
+particleML/
 ├── data/          # Data loading, preprocessing, dataloader classes
 ├── models/        # Model architectures (PET, autoregressive, custom)
 ├── training/      # Training scripts and configs

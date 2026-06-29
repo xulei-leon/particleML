@@ -1,4 +1,4 @@
-# Physics Foundation Models
+# ParticleML
 
 ## Project Background
 
@@ -52,7 +52,7 @@ The primary dataset used for training and evaluation is **JetClass**, a large-sc
 ## Project Structure
 
 ```
-physics-foundation-models/
+particleML/
 ├── docs/
 │   └── references/       # Reference papers and literature
 ├── data/                 # Data loading and preprocessing
