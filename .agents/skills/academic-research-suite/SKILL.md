@@ -1,45 +1,67 @@
 ---
 name: academic-research-suite
 description: >
-  Codex-native Academic Research Skills suite for deep research, academic paper
-  writing, manuscript review, full research-to-paper pipelines, and experiment
-  planning or validation. Use when the user asks for deep research, literature
-  review, systematic review, meta-analysis, research question refinement,
-  academic paper drafting, paper revision, citation or integrity checks,
-  reviewer simulation, peer review, editorial decision letters, research-to-paper
-  workflows, experiment execution planning, statistical interpretation, or human
-  study protocol support. Also use for Claude-style ARS command aliases such as
-  /ars-plan, ars-plan, /ars-outline, /ars-abstract, /ars-lit-review,
-  /ars-citation-check, /ars-disclosure, /ars-format-convert,
-  /ars-revision-coach, /ars-revision, and /ars-full. This skill vendors ARS
-  role prompts, references, templates, and shared handoff schemas under ars/.
-metadata:
-  version: "0.1.8"
-  upstream_suite: "academic-research-skills"
-  codex_adapter: true
+  Project-specific Academic Research Suite router for particleML research,
+  computational physics, jet-physics foundation models, HEP machine learning,
+  literature review, experiment planning, benchmark interpretation, manuscript
+  drafting, paper revision, citation verification, reviewer simulation, and
+  research-to-paper workflows. Use when the user asks for research question
+  refinement, paper topic scoping, related work synthesis, JetClass or top-tagging
+  experiment design, model-comparison framing, reproducibility planning,
+  statistical interpretation, academic writing, reviewer responses, citation or
+  integrity checks, or Claude-style ARS aliases such as /ars-plan, ars-plan,
+  /ars-outline, /ars-abstract, /ars-lit-review, /ars-citation-check,
+  /ars-disclosure, /ars-format-convert, /ars-revision-coach, /ars-revision, and
+  /ars-full.
 ---
 
-# Academic Research Suite for Codex
+# Academic Research Suite for particleML
 
-This is a Codex adapter for the ARS suite. The vendored ARS content lives under
-`ars/`; keep it as source material and route through this file first.
+Use this skill as the Codex entry point for research and writing support in the
+particleML project. The vendored Academic Research Skills suite lives under
+`ars/`; keep those files as upstream source material and route through this file
+first.
 
-## Versioning
+## Operating Rules
 
-This Codex package is version `0.1.8`. The repo-root `VERSION`, this
-`SKILL.md` metadata version, and `manifest.json` `adapter_version` must match.
-Vendored ARS suite versions are tracked separately by source repository commit
-in `manifest.json`.
-
-## First Rule
-
-Do not load the whole suite by default. Select one workflow, read that workflow's
-`WORKFLOW.md`, then load only the agent, reference, template, or shared files needed
-for the user's current stage.
+1. Do not load the whole ARS suite by default.
+2. Select one workflow from the router below.
+3. Read that workflow's `WORKFLOW.md`.
+4. Read only the agents, references, templates, or shared files needed for the
+   current stage.
+5. Keep all project artifacts, prose, comments, and code in English unless the
+   user explicitly asks for a separate translated user-facing summary.
+6. Treat upstream Claude Code wording as source material; adapt it to Codex
+   behavior using the runtime mapping below.
 
 The internal workflow entry files are named `WORKFLOW.md`, not `SKILL.md`, so
 Codex registers only this root router skill instead of exposing every vendored
 upstream workflow as a separate skill.
+
+## Project Context
+
+Assume the project is a computational physics research portfolio focused on
+foundation model architectures for jet physics in high-energy physics.
+
+Core project frame:
+
+- Research goal: compare and develop neural backbones that support jet tagging,
+  generation, anomaly detection, and transfer learning.
+- Reference direction: OmniJet-alpha style autoregressive token models versus
+  OmniLearn or Point-Edge-Transformer style continuous set-based models.
+- Primary dataset: JetClass HDF5 files with particle-level `data`, jet-level
+  `jet`, and label `pid` datasets.
+- Standard baseline: binary top-tagging, top quark jets versus QCD background.
+- Jet representation: particles as sets or sequences of four-momentum features
+  such as pT, eta, phi, mass, with optional particle ID or charge features.
+- Metrics: accuracy and AUC for classification, Wasserstein distance for
+  generation quality, and standard errors from repeated seeded runs when
+  comparing methods.
+- Researcher profile: undergraduate computational physics researcher building
+  deep learning expertise for physics graduate applications.
+
+When giving research advice, connect recommendations to this project frame
+instead of producing generic academic-writing advice.
 
 ## Workflow Router
 
@@ -47,60 +69,65 @@ Choose the workflow by intent:
 
 | User intent | Read first |
 |---|---|
-| Deep research, literature review, systematic review, meta-analysis, fact-checking, research question refinement | `ars/deep-research/WORKFLOW.md` |
-| Academic paper writing, paper outline, abstract, revision, citation formatting, AI disclosure, LaTeX/DOCX/PDF formatting guidance | `ars/academic-paper/WORKFLOW.md` |
-| Paper review, peer review simulation, editorial decision, reviewer calibration, re-review after revision | `ars/academic-paper-reviewer/WORKFLOW.md` |
-| End-to-end research-to-paper pipeline, integrity gate, staged review/revision/finalization workflow | `ars/academic-pipeline/WORKFLOW.md` |
-| Experiment planning, code experiment execution plan, human study protocol, statistical interpretation, reproducibility validation | `ars/experiment-agent/WORKFLOW.md` |
+| Research question scoping, literature discovery, systematic review, meta-analysis, fact-checking, HEP ML background synthesis | `ars/deep-research/WORKFLOW.md` |
+| Paper outline, abstract, introduction, related work, methods/results prose, citation formatting, AI disclosure, LaTeX/DOCX/PDF formatting guidance | `ars/academic-paper/WORKFLOW.md` |
+| Peer review simulation, reviewer calibration, editorial decision, paper critique, re-review after revision | `ars/academic-paper-reviewer/WORKFLOW.md` |
+| End-to-end research-to-paper pipeline, staged gates, integrity checks, review/revision/finalization workflow | `ars/academic-pipeline/WORKFLOW.md` |
+| Experiment planning, ablation design, code experiment execution plan, statistical interpretation, reproducibility validation | `ars/experiment-agent/WORKFLOW.md` |
 
-If the request spans multiple workflows, start with `ars/academic-pipeline/WORKFLOW.md`
-unless the user clearly asked for a single phase.
+If a request spans multiple workflows, start with
+`ars/academic-pipeline/WORKFLOW.md` unless the user clearly asks for one phase.
 
-### Paper Topic Scoping Override
+## particleML Routing Overrides
 
-Apply this override before the general paper/pipeline routing rule and before the Claude-Style Alias Router below.
-The override applies regardless of whether the user invokes ARS via natural
-language or via an `ars-*` alias.
+Apply these before the general router:
+
+- If the user has a vague paper topic, tentative title, broad research direction,
+  or graduate-portfolio research idea without a clear answerable research
+  question, route to `ars/deep-research/WORKFLOW.md` in `socratic` mode.
+- If the user asks how to design or compare model experiments, route to
+  `ars/experiment-agent/WORKFLOW.md` before drafting prose.
+- If the user asks to interpret training curves, AUC tables, Wasserstein
+  distances, ablations, or seeded-run results, route to `ars/experiment-agent/WORKFLOW.md`
+  and then, only if needed, `ars/academic-paper/WORKFLOW.md` for prose.
+- If the user asks for a literature review around OmniJet, OmniLearn, PET,
+  JetClass, top-tagging, anomaly detection, or jet generation, route to
+  `ars/deep-research/WORKFLOW.md` in literature-review mode.
+- If the user asks for a manuscript, proposal, or paper but lacks either a clear
+  research question, experiment plan, or preliminary results, do not draft a full
+  paper. First produce the missing research plan or evidence checklist.
+- If the user asks to prepare application-facing research material, keep the
+  output technically honest: distinguish completed work, planned experiments,
+  inferred significance, and speculative future direction.
+
+## Paper Topic Scoping Override
 
 If the user says they want to write a paper, thesis, proposal, article, journal
-article, or manuscript, but they only provide a broad topic, tentative title,
-research interest, or "題目/主題/方向" and do **not** provide a clear,
-answerable research question, route to `ars/deep-research/WORKFLOW.md` in
-`socratic` mode first. This matches the upstream ARS experience where vague
-paper-topic requests start with SCR/Socratic narrowing instead of immediate
-outline or drafting.
-
-Treat these as Socratic triggers even when the wording contains paper-writing
-intent:
-
-- "I want to write a paper on ..."
-- "I have a paper topic/title ..."
-- "我想做一篇論文，題目是..."
-- "我有一個研究方向/主題，但還不確定問題"
-- "幫我想論文題目/收斂研究問題"
+article, or manuscript, but provides only a broad topic, tentative title,
+research interest, or "topic/direction" without a clear answerable research
+question, route to `ars/deep-research/WORKFLOW.md` in `socratic` mode first.
 
 First response in this path:
 
 1. State that the request is being routed to `deep-research` `socratic` mode
    because the research question is not yet precise.
-2. Ask 3-5 Socratic narrowing questions using `socratic_mentor_agent` and
+2. Ask 3-5 narrowing questions using `socratic_mentor_agent` and
    `research_question_agent` guidance.
 3. Do not produce an outline, draft, literature review, or full pipeline
-   dashboard until the user has converged on at least one candidate RQ.
+   dashboard until the user has converged on at least one candidate research
+   question.
 
 Route directly to `ars/academic-paper/WORKFLOW.md` only when the user already
-has a clear RQ, approved study frame, data/results, literature matrix, draft,
-or explicitly asks to skip scoping and proceed to outline/drafting. Route to
-`ars/academic-pipeline/WORKFLOW.md` only when the user explicitly asks for the
-full research-to-paper pipeline or says to continue after Socratic scoping.
+has a clear research question, approved study frame, data/results, literature
+matrix, draft, or explicitly asks to skip scoping and proceed to outline or
+drafting.
 
 ## Claude-Style Alias Router
 
 Codex does not install Claude slash commands, but this package emulates their
 intent. If the user's request starts with a slash alias (`/ars-plan`) or a plain
-alias (`ars-plan`), treat it as a mode shortcut, strip the alias token from the
-task text, read the matching `ars/commands/ars-*.md` prompt recipe, then route
-to the workflow `WORKFLOW.md` below.
+alias (`ars-plan`), strip the alias token, read the matching command recipe, then
+route to the workflow below.
 
 The `model:` field in command frontmatter is a Claude routing hint only. Codex
 uses the current model unless the user explicitly requests another model.
@@ -110,7 +137,7 @@ uses the current model unless the user explicitly requests another model.
 | `/ars-plan`, `ars-plan` | `ars/commands/ars-plan.md` | `ars/academic-paper/WORKFLOW.md` in `plan` mode |
 | `/ars-outline`, `ars-outline` | `ars/commands/ars-outline.md` | `ars/academic-paper/WORKFLOW.md` in `outline-only` mode |
 | `/ars-abstract`, `ars-abstract` | `ars/commands/ars-abstract.md` | `ars/academic-paper/WORKFLOW.md` in `abstract-only` mode |
-| `/ars-lit-review`, `ars-lit-review` | `ars/commands/ars-lit-review.md` | `ars/academic-paper/WORKFLOW.md` in `lit-review` mode; if the user wants source discovery and synthesis instead, route to `ars/deep-research/WORKFLOW.md` in `lit-review` mode |
+| `/ars-lit-review`, `ars-lit-review` | `ars/commands/ars-lit-review.md` | `ars/academic-paper/WORKFLOW.md` in `lit-review` mode; if source discovery and synthesis are required, route to `ars/deep-research/WORKFLOW.md` in `lit-review` mode |
 | `/ars-citation-check`, `ars-citation-check` | `ars/commands/ars-citation-check.md` | `ars/academic-paper/WORKFLOW.md` in `citation-check` mode |
 | `/ars-disclosure`, `ars-disclosure` | `ars/commands/ars-disclosure.md` | `ars/academic-paper/WORKFLOW.md` in `disclosure` mode |
 | `/ars-format-convert`, `ars-format-convert` | `ars/commands/ars-format-convert.md` | `ars/academic-paper/WORKFLOW.md` in `format-convert` mode |
@@ -118,32 +145,30 @@ uses the current model unless the user explicitly requests another model.
 | `/ars-revision`, `ars-revision` | `ars/commands/ars-revision.md` | `ars/academic-paper/WORKFLOW.md` in `revision` mode |
 | `/ars-full`, `ars-full` | `ars/commands/ars-full.md` | `ars/academic-pipeline/WORKFLOW.md` |
 
-If the request body after the alias is a vague topic, tentative title, research
-direction, or "題目/主題/方向" without a clear research question, defer to the Paper Topic Scoping Override above before routing to the alias's target mode.
-This applies to `ars-plan`, `ars-outline`, `ars-abstract`, `ars-lit-review`,
-and `ars-full`.
+If the request body after the alias is a vague topic, tentative title, or broad
+direction without a clear research question, defer to the paper-topic scoping
+override before routing to the alias target mode.
 
 If the Codex client reserves slash-prefixed input before it reaches the model,
 tell the user to use the plain alias form, for example `ars-plan my topic`.
 
 ## Codex Runtime Mapping
 
-The upstream ARS files were written for Claude Code. Apply these mappings when
-using them in Codex:
+Apply these mappings when using upstream ARS files:
 
 | Upstream wording | Codex behavior |
 |---|---|
 | Agent Team, agent, dispatch, handoff | Read the referenced `agents/*.md` file as a role or phase prompt and perform that phase inline. |
 | Agent tool, Task tool, subagent | Do not spawn agents automatically. Only use Codex subagents when the user explicitly asks for delegation or parallel agents. |
-| AskUserQuestion | Ask concise clarification questions, or use Codex's structured user-input tool when available in the active mode. |
-| WebSearch | Use Codex web browsing for current facts, source verification, citation checks, and external evidence. Provide source links. |
-| Bash, Write, Edit | Treat as capability descriptions, not required tool names. Follow Codex safety rules and the user's filesystem constraints. |
+| AskUserQuestion | Ask concise clarification questions, or use Codex structured user input when available. |
+| WebSearch | Use Codex web browsing for current facts, source verification, citation checks, journal policies, and external evidence. Provide source links. |
+| Bash, Write, Edit | Treat as capability descriptions. Follow Codex safety rules and the user's filesystem constraints. |
 | Claude, Claude Code, model-specific wording | Interpret as "the current Codex agent" unless the text is part of a disclosure template or historical example. |
-| `ARS_CROSS_MODEL`, `ARS_CROSS_MODEL_SAMPLE_INTERVAL` | Treat upstream secondary-model dispatch instructions as no-op unless the user explicitly asks for cross-model review. When explicitly enabled in this Codex package, use Anthropic Claude Opus 4.7 via API (`ARS_CROSS_MODEL=claude-opus-4.7`, `ANTHROPIC_API_KEY`); do not route this reviewer through Codex/OpenAI APIs. Skip unconfigured cross-model report sections instead of inventing results. |
-| `S2_API_KEY`, `OPENALEX_POLITE_EMAIL`, `CROSSREF_POLITE_EMAIL` | These are optional upstream bibliographic lookup settings. Use them only when the user explicitly runs contamination-signal migration or programmatic reference verification; normal Codex routing does not require them. |
-| `fresh Claude Code session`, `Claude Code session` | Read as "a new Codex conversation". Material Passport reset semantics still apply; only the runtime changes. This rule covers `ars/academic-pipeline/WORKFLOW.md`, `ars/academic-pipeline/agents/pipeline_orchestrator_agent.md`, `ars/academic-pipeline/references/passport_as_reset_boundary.md`, `ars/experiment-agent/README.md`, `ars/experiment-agent/README.zh-TW.md`, and `ars/docs/PERFORMANCE.md`. |
-| `/ars-*` slash command, Claude plugin command | Treat `ars/commands/ars-*.md` as optional prompt recipes. Codex does not register slash commands from this package. |
-| SessionStart hook, SubagentStop hook, `hooks/hooks.json` | Treat as upstream Claude Code hook metadata only. Do not install or execute Claude hooks in Codex unless the user explicitly asks to inspect or port a hook. |
+| `ARS_CROSS_MODEL`, `ARS_CROSS_MODEL_SAMPLE_INTERVAL` | Treat as no-op unless the user explicitly asks for cross-model review. Skip unconfigured cross-model report sections instead of inventing results. |
+| `S2_API_KEY`, `OPENALEX_POLITE_EMAIL`, `CROSSREF_POLITE_EMAIL` | Treat as optional bibliographic lookup settings. Use only when programmatic reference verification is required. |
+| `fresh Claude Code session`, `Claude Code session` | Read as "a new Codex conversation"; preserve Material Passport reset semantics where referenced. |
+| `/ars-*` slash command, Claude plugin command | Treat `ars/commands/ars-*.md` as prompt recipes. Codex does not register native slash commands from this package. |
+| SessionStart hook, SubagentStop hook, `hooks/hooks.json` | Treat as upstream Claude Code hook metadata only. Do not install or execute Claude hooks unless the user explicitly asks to inspect or port a hook. |
 
 ## Agent Prompt Use
 
@@ -152,8 +177,10 @@ When a workflow lists agents:
 1. Read the workflow `WORKFLOW.md` to identify the mode and phase.
 2. Read the specific `agents/<name>.md` files for the current phase.
 3. Treat each agent file as a scoped role prompt with an input/output contract.
-4. Produce the phase output in the current conversation unless the user requested files.
-5. Use `ars/shared/handoff_schemas.md` when a phase hands material to another phase.
+4. Produce the phase output in the current conversation unless the user requests
+   files.
+5. Use `ars/shared/handoff_schemas.md` when a phase hands material to another
+   phase.
 
 For multi-review phases, preserve independence by writing each reviewer section
 before synthesizing. Do not let the final synthesis erase critical findings from
@@ -189,8 +216,8 @@ from memory.
 
 `ars/academic-pipeline/agents/`:
 `claim_ref_alignment_audit_agent.md`, `collaboration_depth_agent.md`,
-`integrity_verification_agent.md`,
-`pipeline_orchestrator_agent.md`, `state_tracker_agent.md`.
+`integrity_verification_agent.md`, `pipeline_orchestrator_agent.md`,
+`state_tracker_agent.md`.
 
 `ars/experiment-agent/agents/`:
 `code_runner_agent.md`, `study_manager_agent.md`.
@@ -201,48 +228,48 @@ Use `ars/shared/` for cross-workflow contracts and quality gates:
 
 - `ars/shared/handoff_schemas.md` defines inter-stage artifact schemas.
 - `ars/shared/style_calibration_protocol.md` defines writing voice calibration.
-- `ars/shared/mode_spectrum.md` defines fidelity, balanced, and originality modes.
+- `ars/shared/mode_spectrum.md` defines fidelity, balanced, and originality
+  modes.
 - `ars/shared/agents/compliance_agent.md` defines compliance checks.
-- `ars/shared/compliance_checkpoint_protocol.md`, `ars/shared/prisma_trAIce_protocol.md`, and `ars/shared/raise_framework.md` define integrity and reporting gates.
+- `ars/shared/compliance_checkpoint_protocol.md`, `ars/shared/prisma_trAIce_protocol.md`,
+  and `ars/shared/raise_framework.md` define integrity and reporting gates.
 - `ars/scripts/` contains upstream validators and reference adapters.
 - `ars/examples/` contains upstream non-PDF fixtures and templates.
 - `ars/docs/design/` contains upstream design specs referenced by ARS protocols.
-- `ars/commands/` contains upstream Claude slash-command prompt recipes.
+- `ars/commands/` contains upstream prompt recipes.
 - `ars/hooks/` contains upstream Claude hook metadata preserved for traceability.
 - `ars/tests/` contains upstream fixture corpora used by validator tests.
 
 When an ARS file points to `shared/...`, resolve it as `ars/shared/...`.
 When it points to another workflow, resolve it under `ars/<workflow>/...`.
-When it points to root-level `scripts/...`, `examples/...`, or `docs/...`, resolve
-it under `ars/scripts/...`, `ars/examples/...`, or `ars/docs/...`.
-
-## Inactive Upstream Scripts
-
-`manifest.json` lists `inactive_upstream_scripts` that are vendored for
-traceability but are not Codex package validation gates. Do not wire them into
-Codex CI or treat them as required runtime checks unless the missing upstream
-Claude Code inputs, especially `.claude/CLAUDE.md`, are deliberately supplied.
-
-`ars/scripts/run_codex_audit.sh` is vendored because upstream ARS uses it as a
-Codex audit wrapper, but follow its own guardrail: it must not be invoked from
-the same in-LLM session that produced the audited deliverable.
+When it points to root-level `scripts/...`, `examples/...`, or `docs/...`,
+resolve it under `ars/scripts/...`, `ars/examples/...`, or `ars/docs/...`.
 
 ## Verification Discipline
 
-For claims, citations, references, statistics, journal policies, API behavior, and
-current facts, verify against primary or authoritative sources. If verification is
-not possible, mark the item as unverified instead of inventing support.
-
-Never fabricate references. For citation existence checks, prefer DOI or official
-metadata lookup, then authoritative web search. Semantic Scholar, OpenAlex, and
-Crossref API instructions are in `ars/deep-research/references/`; use them only
-when the task needs programmatic reference verification.
+- Verify claims, citations, references, statistics, journal policies, API
+  behavior, and current facts against primary or authoritative sources.
+- Never fabricate references. If verification is not possible, mark the item as
+  unverified instead of inventing support.
+- For HEP and ML papers, prefer arXiv, INSPIRE, journal pages, official dataset
+  documentation, and paper repositories over secondary summaries.
+- For claims about this repository, inspect the local files and code before
+  asserting implementation status.
+- Separate evidence, inference, recommendation, and speculation in research
+  outputs.
+- Do not present planned experiments as completed results.
+- Do not overstate physics significance from benchmark deltas without
+  uncertainty, repeated seeds, and comparable baselines.
 
 ## Output Defaults
 
-- Default language follows the user's language.
-- For Chinese, use Traditional Chinese unless the user requests otherwise.
+- Default to the user's conversation language for explanations, but keep created
+  project files in English.
 - For staged workflows, show the current stage, required inputs, output artifact,
   and whether the next gate is optional or mandatory.
-- For paper/research outputs, keep uncertainty explicit and separate evidence,
-  inference, and recommendation.
+- For paper and research outputs, make uncertainty explicit and distinguish
+  evidence from interpretation.
+- For experiment plans, include dataset split assumptions, seeds, metrics,
+  baselines, ablations, compute constraints, and reproducibility checks.
+- For manuscript work, preserve a sober research tone suitable for physics or
+  computational science audiences.

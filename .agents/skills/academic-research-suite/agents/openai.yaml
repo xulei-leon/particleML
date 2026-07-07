@@ -1,8 +1,8 @@
 interface:
-  display_name: "Academic Research Suite"
-  short_description: "ARS workflows plus Claude-style ars-* aliases"
+  display_name: "particleML Research Suite"
+  short_description: "Research and paper workflows for particleML"
   brand_color: "#2563EB"
-  default_prompt: "Use $academic-research-suite with ars-plan to map my paper structure and missing evidence."
+  default_prompt: "Use $academic-research-suite to refine my jet-physics research question and map the evidence needed for a paper."
 
 policy:
   allow_implicit_invocation: true
