@@ -163,10 +163,12 @@ def format_authors(authors: list[str]) -> str:
 
 def format_reference(number: int, source: dict[str, Any]) -> str:
     authors = format_authors(source["authors"])
+    author_sentence = authors if authors.endswith(".") else f"{authors}."
     venue = source.get("venue", "")
     details: list[str] = []
-    if source.get("volume"):
-        details.append(str(source["volume"]))
+    volume = str(source.get("volume", ""))
+    if volume and not re.search(rf"(?<!\d){re.escape(volume)}(?!\d)", venue):
+        details.append(volume)
     if source.get("issue"):
         details[-1] = f"{details[-1]}.{source['issue']}" if details else str(source["issue"])
     if source.get("pages_or_article"):
@@ -185,7 +187,7 @@ def format_reference(number: int, source: dict[str, Any]) -> str:
         identifiers.append(f"arXiv: {source['arxiv']}")
     identifiers.append(f"url: {source['url']}")
     return (
-        f"[{number}] {authors}. \"{source['title']}.\" In: {publication}. "
+        f"[{number}] {author_sentence} \"{source['title']}.\" In: {publication}. "
         + ". ".join(identifiers)
         + "."
     )
@@ -523,7 +525,6 @@ def _source_type_label(source_type: str) -> str:
 
 
 def _add_annotated_catalogue(document: Document, sources: list[dict[str, Any]]) -> None:
-    document.add_page_break()
     document.add_heading("Annotated Source Catalogue", level=1)
     document.add_paragraph(
         "Entries are grouped by their primary evidence role. Source numbers match the formal reference "

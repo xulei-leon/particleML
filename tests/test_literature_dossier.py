@@ -118,6 +118,30 @@ class LiteratureDossierTests(unittest.TestCase):
             self.assertIn(f"arXiv: {source['arxiv']}", rendered)
         self.assertIn(f"url: {source['url']}", rendered)
 
+    def test_reference_formatter_does_not_repeat_volume_in_venue(self) -> None:
+        builder = load_builder()
+        source = next(
+            source
+            for source in load_corpus()["sources"]
+            if source["citation_key"] == "qu2022_particle_transformer"
+        )
+
+        rendered = builder.format_reference(7, source)
+
+        self.assertNotIn("PMLR 162 162", rendered)
+
+    def test_reference_formatter_avoids_double_period_after_et_al(self) -> None:
+        builder = load_builder()
+        source = next(
+            source
+            for source in load_corpus()["sources"]
+            if source["authors"][-1] == "et al."
+        )
+
+        rendered = builder.format_reference(6, source)
+
+        self.assertNotIn("et al..", rendered)
+
     def test_generated_docx_has_required_structure_and_preset(self) -> None:
         from docx import Document
         from docx.shared import Inches, Pt
@@ -154,6 +178,19 @@ class LiteratureDossierTests(unittest.TestCase):
         self.assertEqual(normal.font.name, "Calibri")
         self.assertEqual(normal.font.size, Pt(11))
         self.assertAlmostEqual(normal.paragraph_format.line_spacing, 1.25)
+
+    def test_catalogue_is_not_preceded_by_an_explicit_page_break(self) -> None:
+        from docx import Document
+
+        document = Document(OUTPUT)
+        catalogue_index = next(
+            index
+            for index, paragraph in enumerate(document.paragraphs)
+            if paragraph.text == "Annotated Source Catalogue"
+        )
+        preceding = document.paragraphs[catalogue_index - 1]
+
+        self.assertFalse(preceding._p.xpath('.//w:br[@w:type="page"]'))
 
 
 if __name__ == "__main__":
