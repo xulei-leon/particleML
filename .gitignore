@@ -222,6 +222,7 @@ __marimo__/
 
 # Claude Code worktrees
 .claude/worktrees/
+.worktrees/
 data/
 .codebase-memory/
 docs/4-Reviews/
