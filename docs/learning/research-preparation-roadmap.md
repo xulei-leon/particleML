@@ -1,6 +1,6 @@
 # Research Project Preparation Stage
 
-This document is based on `docs/plan/research-plan-v0.2.html`. It is written for a clear objective: reproduce and extend an OmniLearn/PET-style jet foundation model on the JetClass top-tagging task, and complete a systematic ablation study over input feature configurations A-D. The preparation stage is not about "learning deep learning in general"; it is about being able to reproduce experiments independently, read the reference code, and produce publication-quality experiment records reliably.
+This document is based on `docs/research/plans/research-plan-v0.2.html`. It is written for a clear objective: reproduce and extend an OmniLearn/PET-style jet foundation model on the JetClass top-tagging task, and complete a systematic ablation study over input feature configurations A-D. The preparation stage is not about "learning deep learning in general"; it is about being able to reproduce experiments independently, read the reference code, and produce publication-quality experiment records reliably.
 
 Recommended preparation time: 6-8 weeks. If time is tight, prioritize Weeks 1-4, because they determine whether the Week 2 Reproduction Gate can pass.
 
@@ -192,7 +192,7 @@ Passing criteria:
    Focus: class definitions, dataset size, file structure, and standard tasks.  
    Reading goal: extract top-vs-QCD correctly and design a leakage-free split manifest.
 
-4. `docs/references/Group-Report.pdf`  
+4. `docs/references/omnijet-omnilearn-group-report.pdf`  
    Focus: the comparison between OmniJet-alpha and OmniLearn, the effect of input representation on performance, and the project motivation.  
    Reading goal: confirm the project's core claim that input representation richness may be a better first-paper focus than a broad architecture comparison.
 
@@ -230,7 +230,7 @@ Passing criteria:
 
 By the end of the preparation stage, you should ideally have at least the following files or equivalent artifacts:
 
-1. `docs/preparation/reading-log.md`: a paper-reading log that records each paper's relationship to the project.
+1. `docs/learning/reading-log.md`: a paper-reading log that records each paper's relationship to the project.
 2. `notebooks/jetclass_eda.ipynb`: JetClass shape, label, constituent-count, and feature-distribution checks.
 3. `data/preprocess.py` or an equivalent module: generate A-D feature configs from the raw HDF5 files.
 4. `data/split_manifest.json`: a fixed train/validation/test split manifest.
@@ -238,8 +238,8 @@ By the end of the preparation stage, you should ideally have at least the follow
 6. `training/train_baseline.py`: a training script configurable by seed, data size, and feature config.
 7. `evaluation/metrics.py`: AUC, ROC, background rejection, and bootstrap CI.
 8. `evaluation/plots.py`: initial templates for Figures 1-4.
-9. `docs/preparation/reproduction-log.md`: a reproduction record for the OmniLearn reference workflow.
-10. `docs/preparation/pilot-report.md`: a time, memory, budget, and risk assessment for a reduced run matrix.
+9. `docs/learning/reproduction-log.md`: a reproduction record for the OmniLearn reference workflow.
+10. `docs/learning/pilot-report.md`: a time, memory, budget, and risk assessment for a reduced run matrix.
 
 These files do not need to be paper-quality yet, but they must show that the project has moved from "reading a plan" into "building an executable research system."
 

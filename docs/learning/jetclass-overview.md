@@ -1,7 +1,7 @@
 # JetClass Project Overview
 
 This document is a learning summary of JetClass, limited to content directly relevant to this project.  
-The goal of this project is not a general survey of JetClass, but to use it as the **data foundation for a jet foundation model**, serving the core tasks in `docs/plan/research-plan-v0.2.html`:
+The goal of this project is not a general survey of JetClass, but to use it as the **data foundation for a jet foundation model**, serving the core tasks in `docs/research/plans/research-plan-v0.2.html`:
 
 - Use **JetClass top-tagging** as the primary experimental task
 - Study the impact of **input representation** on model performance

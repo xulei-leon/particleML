@@ -14,7 +14,7 @@ This framing gives the study a clear analytical center. It also prevents the pro
 
 ## 2. Relationship to Research Plan v0.2
 
-The current [research-plan-v0.2.html](research-plan-v0.2.html) already resolves an important part of the earlier scope problem. In particular, v0.2:
+The current [research plan v0.2 proposal](../plans/research-plan-v0.2-proposal.md) already resolves an important part of the earlier scope problem. In particular, v0.2:
 
 - fixes binary top tagging on JetClass as the primary task,
 - adopts a pretrained PET-style backbone as the main experimental system,

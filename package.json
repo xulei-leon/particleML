@@ -1,0 +1,16 @@
+{
+  "name": "particleml-docs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "docs:dev": "vitepress docs",
+    "docs:build": "vitepress build docs",
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "vitepress": "1.6.4"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

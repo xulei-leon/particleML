@@ -16,7 +16,7 @@ This project is part of a computational physics research portfolio by a Universi
 
 This is a research project exploring foundation model architectures for jet physics in high-energy physics (HEP). The goal is to develop and compare neural network backbones that can perform multiple jet-physics tasks (tagging, generation, anomaly detection) via transfer learning.
 
-Reference paper: `docs/references/Group-Report.pdf` — a comparative study of OmniJet-α (autoregressive, VQ-VAE tokenization) vs. OmniLearn (Point-Edge-Transformer, continuous set-based) for jet foundation models.
+Reference paper: `docs/references/omnijet-omnilearn-group-report.pdf` — a comparative study of OmniJet-α (autoregressive, VQ-VAE tokenization) vs. OmniLearn (Point-Edge-Transformer, continuous set-based) for jet foundation models.
 
 ## Tech Stack
 

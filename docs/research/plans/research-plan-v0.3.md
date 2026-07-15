@@ -8,10 +8,10 @@
 - Verification Status: UNVERIFIED
 - Version Label: research_plan_v0.3.2
 - Source Inputs:
-  - `docs/plan/research-plan-v0.1.html`
-  - `docs/plan/research-plan-v0.2.html`
-  - `docs/plan/research-plan-v0.2-proposal.md`
-  - `docs/plan/research-plan-v0.2-eval-memo.md`
+  - `docs/research/plans/research-plan-v0.1.html`
+  - `docs/research/plans/research-plan-v0.2.html`
+  - `docs/research/plans/research-plan-v0.2-proposal.md`
+  - `docs/research/assessments/research-direction-evaluation-v0.2.md`
   - `var/draft-v0.3.md`
   - `docs/4-Reviews/research-plan-v0.3-review-confirm.md`
   - ARS compact editorial audit, 2026-07-01
