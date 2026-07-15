@@ -49,16 +49,59 @@ This project aims to explore and develop foundation model architectures for jet 
 
 The primary dataset used for training and evaluation is **JetClass**, a large-scale benchmark dataset of simulated jets spanning ten jet classes, widely used in HEP deep learning research.
 
+## Documentation Site
+
+The `docs/` directory is published as a VitePress site. VitePress renders the Markdown files, builds the navigation sidebar from the documentation tree, provides local search, and deploys the static output to GitHub Pages.
+
+Requirements:
+
+- Node.js 20 or newer
+- pnpm 10.33.0 or compatible
+
+Install dependencies:
+
+```bash
+pnpm install
+```
+
+Run the documentation site locally:
+
+```bash
+pnpm docs:dev
+```
+
+Build the static site:
+
+```bash
+pnpm docs:build
+```
+
+Run the documentation checks:
+
+```bash
+pnpm test
+```
+
+GitHub Pages deployment is handled by `.github/workflows/docs.yml` on pushes to `main` and manual workflow dispatch. The production site uses the `/particleML/` base path and is expected at:
+
+```text
+https://xulei-leon.github.io/particleML/
+```
+
 ## Project Structure
 
 ```
 particleML/
-├── docs/
-│   └── references/       # Reference papers and literature
+├── docs/                 # VitePress source: research docs, notes, references
+│   └── .vitepress/       # VitePress configuration
+├── project/              # Project planning and review documents
+│   └── superpowers/      # Superpowers specs and plans
 ├── data/                 # Data loading and preprocessing
 ├── models/               # Model architectures (OmniJet-α, OmniLearn, custom)
 ├── training/             # Training scripts and configurations
 ├── evaluation/           # Evaluation and benchmarking scripts
 ├── notebooks/            # Exploratory analysis and visualization
+├── package.json          # VitePress scripts and package metadata
+├── pnpm-lock.yaml        # pnpm dependency lockfile
 └── README.md
 ```
