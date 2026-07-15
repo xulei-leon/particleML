@@ -6,7 +6,7 @@
 
 **Architecture:** Store normalized and verified bibliographic records in a machine-readable JSON corpus, validate the corpus deterministically, and generate the DOCX from that corpus with a dedicated Python builder. Render the DOCX to PNG pages and audit both document structure and every rendered page before delivery.
 
-**Tech Stack:** Direct HTTPS requests to arXiv, INSPIRE-HEP, Crossref/DOI, publishers, and official repositories; bundled Python 3; `python-docx`; `pytest`; the Documents skill renderer; LibreOffice.
+**Tech Stack:** Direct HTTPS requests to arXiv, INSPIRE-HEP, Crossref/DOI, publishers, and official repositories; bundled Python 3; `python-docx`; standard-library `unittest`; the Documents skill renderer; LibreOffice.
 
 ## Global Constraints
 
@@ -19,6 +19,7 @@
 - Do not claim that planned experiments are complete.
 - Do not use subagents without explicit human confirmation; execute this plan inline by default.
 - Use the bundled Python runtime at `C:\Users\xulei\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe`.
+- Use standard-library `unittest` because neither available Python runtime includes `pytest`; run existing project tests with the system Python and DOCX-specific tests with the bundled Python runtime.
 - Render and visually inspect every final DOCX page before delivery.
 
 ---
@@ -48,6 +49,7 @@
 from pathlib import Path
 import json
 import re
+import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "docs" / "references" / "literature-dossier" / "source-corpus.json"
@@ -66,7 +68,8 @@ def load_corpus():
     return json.loads(CORPUS.read_text(encoding="utf-8"))
 
 
-def test_verified_corpus_contract():
+class LiteratureDossierTests(unittest.TestCase):
+  def test_verified_corpus_contract(self):
     corpus = load_corpus()
     sources = corpus["sources"]
     assert 28 <= len(sources) <= 35
@@ -100,10 +103,10 @@ def test_verified_corpus_contract():
 Run:
 
 ```powershell
-& 'C:\Users\xulei\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m pytest tests/test_literature_dossier.py::test_verified_corpus_contract -v
+python -m unittest tests.test_literature_dossier.LiteratureDossierTests.test_verified_corpus_contract -v
 ```
 
-Expected: FAIL because `source-corpus.json` does not exist.
+Expected: ERROR because `source-corpus.json` does not exist; this is the intentional RED state for the missing data artifact.
 
 - [ ] **Step 3: Use this exact candidate pool for direct verification**
 
@@ -181,7 +184,7 @@ Top-level metadata must record `title`, `scope`, `search_date` as `2026-07-15`, 
 
 - [ ] **Step 5: Run the corpus-contract test**
 
-Run the pytest command from Step 2.
+Run the `unittest` command from Step 2.
 
 Expected: PASS with one passed test.
 
@@ -208,7 +211,7 @@ git commit -m "docs: add verified particleML literature corpus"
 AUDIT = ROOT / "docs" / "references" / "literature-dossier" / "search-audit.md"
 
 
-def test_search_audit_covers_every_source():
+def test_search_audit_covers_every_source(self):
     audit = AUDIT.read_text(encoding="utf-8")
     corpus = load_corpus()
     for source in corpus["sources"]:
@@ -228,7 +231,7 @@ def test_search_audit_covers_every_source():
 Run:
 
 ```powershell
-& 'C:\Users\xulei\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m pytest tests/test_literature_dossier.py::test_search_audit_covers_every_source -v
+python -m unittest tests.test_literature_dossier.LiteratureDossierTests.test_search_audit_covers_every_source -v
 ```
 
 Expected: FAIL because `search-audit.md` does not exist.
@@ -242,7 +245,7 @@ The audit must list the search date, exact query families, endpoints, inclusion/
 Run:
 
 ```powershell
-& 'C:\Users\xulei\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m pytest tests/test_literature_dossier.py -v
+python -m unittest tests.test_literature_dossier -v
 ```
 
 Expected: both tests PASS.
@@ -282,7 +285,7 @@ def load_builder():
     return module
 
 
-def test_reference_formatter_matches_numbered_style():
+def test_reference_formatter_matches_numbered_style(self):
     builder = load_builder()
     source = load_corpus()["sources"][0]
     rendered = builder.format_reference(1, source)
@@ -294,7 +297,7 @@ def test_reference_formatter_matches_numbered_style():
         assert f"arXiv: {source['arxiv']}" in rendered
 
 
-def test_generated_docx_has_required_sections_and_reference_count():
+def test_generated_docx_has_required_sections_and_reference_count(self):
     document = Document(OUTPUT)
     text = "\n".join(paragraph.text for paragraph in document.paragraphs)
     for heading in (
@@ -315,7 +318,7 @@ def test_generated_docx_has_required_sections_and_reference_count():
 Run:
 
 ```powershell
-& 'C:\Users\xulei\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m pytest tests/test_literature_dossier.py::test_reference_formatter_matches_numbered_style -v
+& 'C:\Users\xulei\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m unittest tests.test_literature_dossier.LiteratureDossierTests.test_reference_formatter_matches_numbered_style -v
 ```
 
 Expected: FAIL because the builder does not exist.
@@ -372,7 +375,7 @@ Expected: exit code 0 and a non-empty `docs/references/particleml-literature-ref
 Run:
 
 ```powershell
-& 'C:\Users\xulei\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m pytest tests/test_literature_dossier.py -v
+& 'C:\Users\xulei\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m unittest tests.test_literature_dossier -v
 ```
 
 Expected: all tests PASS.
@@ -412,14 +415,14 @@ Check every page for clipped text, overlap, broken or over-wide tables, missing 
 
 - [ ] **Step 3: Revise and re-render until every page passes**
 
-Make layout fixes only in the builder, regenerate the DOCX, rerun pytest, rerender all pages, and reinspect every page. Repeat until no visual defect remains.
+Make layout fixes only in the builder, regenerate the DOCX, rerun `unittest`, rerender all pages, and reinspect every page. Repeat until no visual defect remains.
 
 - [ ] **Step 4: Run final requirement-by-requirement checks**
 
 Run:
 
 ```powershell
-& 'C:\Users\xulei\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m pytest tests/test_literature_dossier.py -v
+& 'C:\Users\xulei\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m unittest tests.test_literature_dossier -v
 Get-Item 'docs/references/particleml-literature-reference-dossier.docx' | Select-Object FullName,Length,LastWriteTime
 git status --short
 ```
