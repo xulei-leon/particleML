@@ -1,6 +1,6 @@
 # Research Project Preparation Stage
 
-This document is based on `docs/research/plans/research-plan-v0.2.html`. It is written for a clear objective: reproduce and extend an OmniLearn/PET-style jet foundation model on the JetClass top-tagging task, and complete a systematic ablation study over input feature configurations A-D. The preparation stage is not about "learning deep learning in general"; it is about being able to reproduce experiments independently, read the reference code, and produce publication-quality experiment records reliably.
+This document is based on Research Plan v0.2 (archived in Git history). It is written for a clear objective: reproduce and extend an OmniLearn/PET-style jet foundation model on the JetClass top-tagging task, and complete a systematic ablation study over input feature configurations A-D. The preparation stage is not about "learning deep learning in general"; it is about being able to reproduce experiments independently, read the reference code, and produce publication-quality experiment records reliably.
 
 Recommended preparation time: 6-8 weeks. If time is tight, prioritize Weeks 1-4, because they determine whether the Week 2 Reproduction Gate can pass.
 

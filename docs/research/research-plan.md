@@ -8,9 +8,9 @@
 - Verification Status: UNVERIFIED
 - Version Label: research_plan_v0.4.0
 - Source Inputs:
-  - `docs/research/plans/research-plan-v0.3.md`
+  - Research Plan v0.3 (archived in Git history)
   - `docs/research/assessments/cms-2015-miniaodsim-feasibility.md`
-- Supersedes: `docs/research/plans/research-plan-v0.3.md`
+- Supersedes: Research Plan v0.3 (archived in Git history)
 
 ## Title
 

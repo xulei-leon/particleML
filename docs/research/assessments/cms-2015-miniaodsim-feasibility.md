@@ -302,7 +302,7 @@ If the matched-top yield makes `10^5` signal jets impractical, reduce the larges
 
 ## 10. Required Changes to Research Plan v0.3
 
-The current [research plan v0.3](../plans/research-plan-v0.3.md) is still written around JetClass. Before implementation, a new revision must:
+The research plan v0.3 is still written around JetClass. Before implementation, a new revision must:
 
 1. replace JetClass with the frozen CMS 2015 record set;
 2. replace JetClass column names with the CMS-to-A-D mapping in this document;

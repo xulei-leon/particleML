@@ -12,7 +12,7 @@
 | Model | Official OmniLearned PET-style pretrained model |
 
 This design combines the controlled fine-tuning protocol in
-[Research Plan v0.3](../research/plans/research-plan-v0.3.md) with the data and
+[Research Plan v0.4](../research/research-plan.md) with the data and
 operations findings in
 [CMS 2015 MINIAODSIM Feasibility Analysis](../research/assessments/cms-2015-miniaodsim-feasibility.md).
 It supersedes the planned folder layout in the repository README for formal
