@@ -6,7 +6,8 @@
   "scripts": {
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
-    "test": "node --test"
+    "docs:check": "python scripts/validate_software_docs.py",
+    "test": "node --test && python scripts/validate_software_docs.py"
   },
   "devDependencies": {
     "vitepress": "1.6.4"
