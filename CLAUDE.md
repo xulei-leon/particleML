@@ -22,24 +22,24 @@ Reference paper: `docs/references/omnijet-omnilearn-group-report.pdf` — a comp
 
 - Python 3.x (ML research ecosystem)
 - TensorFlow or PyTorch (both used in reference implementations; prefer the one the target model uses)
-- h5py for JetClass dataset I/O
+- h5py for canonical CMS-derived HDF5 and model-view I/O
 - Jupyter notebooks for exploratory analysis
 
-## Planned Project Structure
+## Approved Target Project Structure
 
 ```
 particleML/
-├── data/          # Data loading, preprocessing, dataloader classes
-├── models/        # Model architectures (PET, autoregressive, custom)
-├── training/      # Training scripts and configs
-├── evaluation/    # Benchmarking: accuracy, AUC, Wasserstein distance
-├── notebooks/     # EDA and visualization
-└── docs/          # References and notes
+├── cmssw/ParticleMLExtractor/ # Pinned CMS extraction boundary
+├── src/particleml/             # Conversion, views, model integration, experiments
+├── configs/                    # Versioned experiment configurations
+├── schemas/                    # Run, split, and prediction contracts
+├── tests/                      # Unit, contract, and integration tests
+└── docs/                       # Research and authoritative software documentation
 ```
 
 ## Domain-Specific Conventions
 
 - **Jet representation**: Particles are represented as sets of 4-momentum features (pT, η, φ, mass) plus optional particle ID (charge, type). Models treat jets as either ordered sequences (by descending pT) or unordered point clouds.
-- **Primary dataset**: JetClass — simulated jets across 10 classes, stored as HDF5 files with `data` (particle features), `jet` (jet-level features), and `pid` (labels) datasets.
+- **Current formal dataset**: public CMS 2015 `RunIIFall15MiniAODv2` simulation, extracted through pinned CMSSW into one canonical full-D HDF5 dataset. JetClass remains learning and literature-comparison material, not the v0.4 production corpus.
 - **Core metrics**: Accuracy and AUC for classification; Wasserstein distance for generation quality. Report standard errors from 5-repeat runs with random seeding.
 - **Binary classification baseline**: Top-tagging (t→bqq') vs. QCD background is the standard benchmark task.
