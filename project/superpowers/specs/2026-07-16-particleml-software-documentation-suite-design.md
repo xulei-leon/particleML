@@ -4,7 +4,7 @@
 
 Create a publication-grade software documentation suite for the particleML
 research project. The suite must define the software needed to produce the
-evidence for the paper described in `docs/plan/research-plan-v0.3.md`, while
+evidence for the paper described in `docs/research/research-plan.md`, while
 clearly separating planned behavior from implemented behavior and completed
 experimental results.
 
@@ -24,7 +24,7 @@ Research question
 ## Audience
 
 The primary audience is the project researcher implementing and operating the
-JetClass feature-availability study. Secondary audiences are research
+CMS 2015 feature-availability study. Secondary audiences are research
 supervisors, collaborators, reviewers, and future maintainers who need to
 reproduce the experimental evidence without relying on undocumented notebook
 state.
@@ -53,9 +53,9 @@ schemas/
 ## Scope
 
 The suite specifies the minimum publication-supporting system defined by
-research plan v0.3:
+Research Plan v0.4:
 
-- JetClass hadronic-top-versus-QCD binary classification.
+- CMS 2015 generator-matched hadronic-top-versus-QCD binary classification.
 - Nested particle-level feature configurations A through D.
 - A pretrained OmniLearned PET-style primary model with an explicitly defined
   fallback when the checkpoint or adapter policy is incompatible.
@@ -74,7 +74,7 @@ benchmarking remain outside the first publication-supporting implementation.
 
 Conflicts are resolved in the following order:
 
-1. `docs/plan/research-plan-v0.3.md` controls the scientific question, claim
+1. `docs/research/research-plan.md` controls the scientific question, claim
    boundary, experimental matrix, and publication evidence.
 2. `docs/software/requirements.md` controls required software behavior and
    acceptance criteria.
@@ -148,7 +148,7 @@ contains:
 - error taxonomy and required failure records; and
 - test layers and required validation commands.
 
-Unknown JetClass physical columns are not guessed. The specification defines a
+Unknown CMS-decoded values, units, or model-compatibility properties are not guessed. The specification defines a
 blocking E0 discovery and approval contract: a formal run cannot begin until
 the selected source files, exact column mapping, units or transforms, mask
 source, label rule, and normalization source are recorded and validated.
@@ -179,7 +179,7 @@ defined object boundary, and include stable `$id`, `title`, `description`, and
 
 `schemas/run-record.schema.json` validates the provenance and outcome of one
 attempted experiment run. It includes the fields required by research plan
-v0.3: identifiers, Git and data hashes, preprocessing version, checkpoint
+v0.4: identifiers, Git and data hashes, preprocessing version, checkpoint
 source, feature configuration, model and initialization, seed, training size,
 hyperparameters, adapter policy, layer-loading audit, hardware, timing, memory,
 best epoch, metrics, prediction artifact, and failure status.
@@ -216,7 +216,7 @@ format-specific readers must produce the same logical columns.
 
 ```mermaid
 flowchart LR
-    RP["Research Plan v0.3"] --> REQ["Software Requirements"]
+    RP["Research Plan v0.4"] --> REQ["Software Requirements"]
     REQ --> ARCH["Architecture Design"]
     REQ --> SPEC["Detailed Specification"]
     ARCH --> SPEC

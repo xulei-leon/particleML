@@ -45,9 +45,21 @@ This project aims to explore and develop foundation model architectures for jet 
 - Mikuni, V. & Nachman, B. (2025). "OmniLearn: A Method to Simultaneously Facilitate All Jet Physics Tasks." *Physical Review D*, 111(5), 054015.
 - Bhimji, W. et al. (2025). "OmniLearned: A Foundation Model Framework for All Tasks Involving Jet Physics." arXiv:2510.24066.
 
-## Dataset
+## Current Formal Study and Dataset
 
-The primary dataset used for training and evaluation is **JetClass**, a large-scale benchmark dataset of simulated jets spanning ten jet classes, widely used in HEP deep learning research.
+The current publication-supporting study is defined by
+[`docs/research/research-plan.md`](docs/research/research-plan.md). It uses public
+CMS 2015 `RunIIFall15MiniAODv2` simulation for generator-matched hadronic-top
+versus declared QCD classification under nested particle-feature configurations
+A-D. JetClass remains preparation and literature-comparison material; it is not
+the production dataset for the v0.4 study.
+
+The authoritative software design suite is:
+
+- [`docs/software/requirements.md`](docs/software/requirements.md)
+- [`docs/software/architecture.md`](docs/software/architecture.md)
+- [`docs/software/specification.md`](docs/software/specification.md)
+- [`docs/software/traceability-matrix.md`](docs/software/traceability-matrix.md)
 
 ## Documentation Site
 
@@ -79,6 +91,7 @@ pnpm docs:build
 Run the documentation checks:
 
 ```bash
+python -m pip install -r requirements-docs.txt
 pnpm test
 ```
 
@@ -92,16 +105,19 @@ https://xulei-leon.github.io/particleML/
 
 ```
 particleML/
-├── docs/                 # VitePress source: research docs, notes, references
-│   └── .vitepress/       # VitePress configuration
-├── project/              # Project planning and review documents
-│   └── superpowers/      # Superpowers specs and plans
-├── data/                 # Data loading and preprocessing
-├── models/               # Model architectures (OmniJet-α, OmniLearn, custom)
-├── training/             # Training scripts and configurations
-├── evaluation/           # Evaluation and benchmarking scripts
-├── notebooks/            # Exploratory analysis and visualization
-├── package.json          # VitePress scripts and package metadata
-├── pnpm-lock.yaml        # pnpm dependency lockfile
+├── cmssw/ParticleMLExtractor/ # Planned pinned CMS extraction boundary
+├── src/particleml/             # Planned conversion, views, orchestration, metrics
+├── configs/                    # Planned versioned experiment configurations
+├── schemas/                    # Machine-readable artifact contracts
+├── tests/                      # Documentation checks and implementation tests
+├── docs/                       # VitePress research and software documentation
+│   ├── software/               # Authoritative requirements/architecture/specification
+│   └── .vitepress/             # VitePress configuration
+├── project/                    # Planning and review history
+├── package.json                # Documentation scripts and package metadata
+├── pnpm-lock.yaml              # pnpm dependency lockfile
 └── README.md
 ```
+
+The `cmssw/`, `src/particleml/`, and `configs/` entries describe the approved
+target architecture and are introduced only with tested implementation work.
