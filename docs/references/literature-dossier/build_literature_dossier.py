@@ -63,6 +63,15 @@ THEME_ROADMAP = {
     ),
 }
 
+SECTION_ORDER = [
+    "References",
+    "Annotated Source Catalogue",
+    "Coverage and Research Gaps",
+    "Thematic Roadmap",
+    "Search Strategy and Selection",
+    "Search Limitations and Disclosure",
+]
+
 
 def load_corpus(path: Path = CORPUS_PATH) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
@@ -193,6 +202,35 @@ def _source_type_label(source_type: str) -> str:
         "dataset": "Authoritative dataset record",
         "official_documentation": "Official documentation",
     }[source_type]
+
+
+def _reorder_top_level_sections(lines: list[str]) -> list[str]:
+    preamble: list[str] = []
+    sections: dict[str, list[str]] = {}
+    current_title: str | None = None
+
+    for line in lines:
+        if line.startswith("## "):
+            current_title = line.removeprefix("## ")
+            if current_title in sections:
+                raise ValueError(f"Duplicate top-level section: {current_title}")
+            sections[current_title] = [line]
+        elif current_title is None:
+            preamble.append(line)
+        else:
+            sections[current_title].append(line)
+
+    missing = [title for title in SECTION_ORDER if title not in sections]
+    unexpected = [title for title in sections if title not in SECTION_ORDER]
+    if missing or unexpected:
+        raise ValueError(
+            f"Top-level section mismatch; missing={missing}, unexpected={unexpected}"
+        )
+
+    ordered = preamble
+    for title in SECTION_ORDER:
+        ordered.extend(sections[title])
+    return ordered
 
 
 def render_markdown(corpus: dict[str, Any]) -> str:
@@ -397,7 +435,7 @@ def render_markdown(corpus: dict[str, Any]) -> str:
             "",
         ]
     )
-    return "\n".join(lines)
+    return "\n".join(_reorder_top_level_sections(lines))
 
 
 def build_markdown(

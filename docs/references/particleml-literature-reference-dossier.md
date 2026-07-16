@@ -9,33 +9,77 @@
 
 **How to use it:** Start with the thematic roadmap, use the annotations to select evidence for a manuscript section, then cite the formal numbered reference list after checking the complete source.
 
-## Search Strategy and Selection
+## References
 
-A targeted scoping search was conducted on 15 July 2026 using project seed sources and direct HTTPS queries to Crossref, arXiv, INSPIRE-HEP, Zenodo, and official proceedings or journal pages. The final corpus contains **34 sources**. Every final verification endpoint returned HTTP 200, and every DOI, arXiv identifier, title, author set, and year was checked against an authoritative record.
+Numbered format follows the reference presentation in Group-Report.pdf. DOI and arXiv fields are included only when confirmed in the verified corpus.
 
-**Inclusion:** Direct relevance to a planned paper section; resolvable authoritative metadata; a distinct scientific role; primary peer-reviewed evidence when available; and explicit preprint labels.
+[1] Vinicius Mikuni and Benjamin Nachman. "A Method to Simultaneously Facilitate All Jet Physics Tasks." In: Physical Review D 111.5, 054015 (2025). doi: 10.1103/PhysRevD.111.054015. arXiv: 2502.14652. url: https://doi.org/10.1103/PhysRevD.111.054015.
 
-**Exclusion:** Unresolved or mismatched metadata, duplicate versions, secondary summaries, indirect general relevance, and sources redundant with stronger project-aligned evidence.
+[2] Vinicius Mikuni and Benjamin Nachman. "Solving Key Challenges in Collider Physics with Foundation Models." In: Physical Review D 111.5, L051504 (2025). doi: 10.1103/PhysRevD.111.L051504. arXiv: 2404.16091. url: https://doi.org/10.1103/PhysRevD.111.L051504.
 
-**Verification boundary:** Bibliographic existence and record-level claims were checked. Full-text reading is not claimed for every source; core papers must be read before claim-level manuscript citation.
+[3] Joschka Birk, Anna Hallin, and Gregor Kasieczka. "OmniJet-alpha: The First Cross-Task Foundation Model for Particle Physics." In: Machine Learning: Science and Technology 5.3, 035031 (2024). doi: 10.1088/2632-2153/ad66ad. arXiv: 2403.05618. url: https://doi.org/10.1088/2632-2153/ad66ad.
 
-## Thematic Roadmap
+[4] Wahid Bhimji, Chris Harris, Vinicius Mikuni, and Benjamin Nachman. "Foundation Model Framework for All Tasks Involving Jet Physics." In: Physical Review D 113.3, 032020 (2026). doi: 10.1103/knmd-f5jm. arXiv: 2510.24066. url: https://doi.org/10.1103/knmd-f5jm.
 
-The themes below map the verified corpus to the planned paper. Counts refer to each source's primary theme; several sources can support more than one manuscript section.
+[5] Joschka Birk, Anna Hallin, Gregor Kasieczka, Nikol Madzharova, Ian Pang, and David Shih. "Enhancing Next Token Prediction Based Pre-Training for Jet Foundation Models." In: arXiv preprint (2025). arXiv: 2512.04149. url: https://arxiv.org/abs/2512.04149.
 
-**Table 1. Literature coverage by evidence theme.**
+[6] Oz Amram, Luca Anzalone, Joschka Birk, et al. "Aspen Open Jets: Unlocking LHC Data for Foundation Models in Particle Physics." In: Machine Learning: Science and Technology 6.3, 030601 (2025). doi: 10.1088/2632-2153/ade58f. arXiv: 2412.10504. url: https://doi.org/10.1088/2632-2153/ade58f.
 
-| Evidence theme | Sources | Primary contribution | Manuscript use |
-|---|---:|---|---|
-| Jet Foundation Models | 6 | Defines the OmniLearn/OmniLearned and OmniJet lineages, multi-task claims, and current pretraining directions. | Introduction; Related Work |
-| Datasets and Top Tagging | 5 | Establishes JetClass provenance, binary top-tagging context, and community benchmark expectations. | Introduction; Methods |
-| Particle-Set Architectures | 5 | Explains permutation-invariant, attention, graph, PET, and Lorentz-equivariant backbones. | Related Work; Methods |
-| Feature Representation and Physics Priors | 3 | Connects particle-level information, IRC safety, symmetry, and learned low-level representations. | Introduction; Methods |
-| Pretraining and Transfer | 4 | Supplies transfer-learning terminology, feature-transfer evidence, and the foundation-model frame. | Introduction; Methods |
-| Evaluation and Reproducibility | 5 | Supports AUC comparison, dependence-aware uncertainty, repeated runs, and reproducible reporting. | Evaluation; Limitations |
-| Generation and Anomaly Detection | 6 | Places the tagging study within the wider multi-task jet-foundation-model agenda. | Related Work; Future Work |
+[7] Huilin Qu, Congqiao Li, and Sitian Qian. "Particle Transformer for Jet Tagging." In: Proceedings of the 39th International Conference on Machine Learning, PMLR 162 18281-18292 (2022). arXiv: 2202.03772. url: https://proceedings.mlr.press/v162/qu22b.html.
 
-*Coverage is strongest for the model lineage, particle-set architectures, and evaluation methods. The central unresolved question is the controlled effect of downstream feature availability under a fixed pretrained checkpoint and data protocol.*
+[8] Huilin Qu, Congqiao Li, and Sitian Qian. "JetClass: A Large-Scale Dataset for Deep Learning in Jet Physics." In: Zenodo Record 6619768 (2022). doi: 10.5281/zenodo.6619768. url: https://zenodo.org/records/6619768.
+
+[9] Jesse Thaler and Ken Van Tilburg. "Maximizing Boosted Top Identification by Minimizing N-Subjettiness." In: Journal of High Energy Physics 2012.2, 093 (2012). doi: 10.1007/JHEP02(2012)093. arXiv: 1108.2701. url: https://doi.org/10.1007/JHEP02(2012)093.
+
+[10] Gregor Kasieczka, Tilman Plehn, Anja Butter, Kyle Cranmer, Dipsikha Debnath, et al. "The Machine Learning Landscape of Top Taggers." In: SciPost Physics 7.1, 014 (2019). doi: 10.21468/SciPostPhys.7.1.014. arXiv: 1902.09914. url: https://doi.org/10.21468/SciPostPhys.7.1.014.
+
+[11] Raghav Kansal, Carlos Pareja, Zichun Hao, and Javier Duarte. "JetNet: A Python Package for Accessing Open Datasets and Benchmarking Machine Learning Methods in High Energy Physics." In: Journal of Open Source Software 8.90, 5789 (2023). doi: 10.21105/joss.05789. url: https://doi.org/10.21105/joss.05789.
+
+[12] Manzil Zaheer, Satwik Kottur, Siamak Ravanbakhsh, Barnabas Poczos, Ruslan Salakhutdinov, and Alexander J. Smola. "Deep Sets." In: Advances in Neural Information Processing Systems 30 (2017). arXiv: 1703.06114. url: https://proceedings.neurips.cc/paper/2017/hash/f22e4747da1aa27e363d86d40ff442fe-Abstract.html.
+
+[13] Juho Lee, Yoonho Lee, Jungtaek Kim, Adam R. Kosiorek, Seungjin Choi, and Yee Whye Teh. "Set Transformer: A Framework for Attention-Based Permutation-Invariant Neural Networks." In: Proceedings of the 36th International Conference on Machine Learning, PMLR 97 3744-3753 (2019). arXiv: 1810.00825. url: https://proceedings.mlr.press/v97/lee19d.html.
+
+[14] Huilin Qu and Loukas Gouskos. "Jet Tagging via Particle Clouds." In: Physical Review D 101.5, 056019 (2020). doi: 10.1103/PhysRevD.101.056019. arXiv: 1902.08570. url: https://doi.org/10.1103/PhysRevD.101.056019.
+
+[15] Vinicius Mikuni and Florencia Canelli. "Point Cloud Transformers Applied to Collider Physics." In: Machine Learning: Science and Technology 2.3, 035027 (2021). doi: 10.1088/2632-2153/ac07f6. arXiv: 2102.05073. url: https://doi.org/10.1088/2632-2153/ac07f6.
+
+[16] Shiqi Gong, Qi Meng, Jue Zhang, et al. "An Efficient Lorentz Equivariant Graph Neural Network for Jet Tagging." In: Journal of High Energy Physics 2022.7, 030 (2022). doi: 10.1007/JHEP07(2022)030. arXiv: 2201.08187. url: https://doi.org/10.1007/JHEP07(2022)030.
+
+[17] Patrick T. Komiske, Eric M. Metodiev, and Jesse Thaler. "Energy Flow Networks: Deep Sets for Particle Jets." In: Journal of High Energy Physics 2019.1, 121 (2019). doi: 10.1007/JHEP01(2019)121. arXiv: 1810.05165. url: https://doi.org/10.1007/JHEP01(2019)121.
+
+[18] Patrick T. Komiske, Eric M. Metodiev, and Jesse Thaler. "Energy Flow Polynomials: A Complete Linear Basis for Jet Substructure." In: Journal of High Energy Physics 2018.4, 013 (2018). doi: 10.1007/JHEP04(2018)013. arXiv: 1712.07124. url: https://doi.org/10.1007/JHEP04(2018)013.
+
+[19] Barry M. Dillon, Gregor Kasieczka, Hans Olischlager, Tilman Plehn, Peter Sorrenson, and Lorenz Vogel. "Symmetries, Safety, and Self-Supervision." In: SciPost Physics 12.6, 188 (2022). doi: 10.21468/SciPostPhys.12.6.188. arXiv: 2108.04253. url: https://doi.org/10.21468/SciPostPhys.12.6.188.
+
+[20] Sinno Jialin Pan and Qiang Yang. "A Survey on Transfer Learning." In: IEEE Transactions on Knowledge and Data Engineering 22.10, 1345-1359 (2010). doi: 10.1109/TKDE.2009.191. url: https://doi.org/10.1109/TKDE.2009.191.
+
+[21] Jason Yosinski, Jeff Clune, Yoshua Bengio, and Hod Lipson. "How Transferable Are Features in Deep Neural Networks?." In: Advances in Neural Information Processing Systems 27, 3320-3328 (2014). arXiv: 1411.1792. url: https://arxiv.org/abs/1411.1792.
+
+[22] Rishi Bommasani, Drew A. Hudson, Ehsan Adeli, et al. "On the Opportunities and Risks of Foundation Models." In: arXiv preprint (2021). arXiv: 2108.07258. url: https://arxiv.org/abs/2108.07258.
+
+[23] Alexander Radovic, Mike Williams, David Rousseau, Michael Kagan, et al. "Machine Learning at the Energy and Intensity Frontiers of Particle Physics." In: Nature 560.7716, 41-48 (2018). doi: 10.1038/s41586-018-0361-2. arXiv: 1807.02876. url: https://doi.org/10.1038/s41586-018-0361-2.
+
+[24] Oona Rainio, Jarmo Teuho, and Riku Klen. "Evaluation Metrics and Statistical Tests for Machine Learning." In: Scientific Reports 14.1, 6086 (2024). doi: 10.1038/s41598-024-56706-x. url: https://doi.org/10.1038/s41598-024-56706-x.
+
+[25] Elizabeth R. DeLong, David M. DeLong, and Daniel L. Clarke-Pearson. "Comparing the Areas Under Two or More Correlated Receiver Operating Characteristic Curves: A Nonparametric Approach." In: Biometrics 44.3, 837-845 (1988). doi: 10.2307/2531595. url: https://doi.org/10.2307/2531595.
+
+[26] Thomas G. Dietterich. "Approximate Statistical Tests for Comparing Supervised Classification Learning Algorithms." In: Neural Computation 10.7, 1895-1923 (1998). doi: 10.1162/089976698300017197. url: https://doi.org/10.1162/089976698300017197.
+
+[27] Claude Nadeau and Yoshua Bengio. "Inference for the Generalization Error." In: Machine Learning 52.3, 239-281 (2003). doi: 10.1023/A:1024068626366. url: https://doi.org/10.1023/A:1024068626366.
+
+[28] Joelle Pineau, Philippe Vincent-Lamarre, Koustuv Sinha, et al. "Improving Reproducibility in Machine Learning Research: A Report from the NeurIPS 2019 Reproducibility Program." In: Journal of Machine Learning Research 22.164, 1-20 (2021). url: https://jmlr.org/papers/v22/20-303.html.
+
+[29] Jonathan Ho, Ajay Jain, and Pieter Abbeel. "Denoising Diffusion Probabilistic Models." In: Advances in Neural Information Processing Systems 33, 6840-6851 (2020). arXiv: 2006.11239. url: https://arxiv.org/abs/2006.11239.
+
+[30] Matthew Leigh, Debajyoti Sengupta, Guillaume Quetant, John Andrew Raine, Knut Zoch, and Tobias Golling. "PC-JeDi: Diffusion for Particle Cloud Generation in High Energy Physics." In: SciPost Physics 16.1, 018 (2024). doi: 10.21468/SciPostPhys.16.1.018. arXiv: 2303.05376. url: https://doi.org/10.21468/SciPostPhys.16.1.018.
+
+[31] Erik Buhmann, Gregor Kasieczka, and Jesse Thaler. "EPiC-GAN: Equivariant Point Cloud Generation for Particle Jets." In: SciPost Physics 15.4, 130 (2023). doi: 10.21468/SciPostPhys.15.4.130. arXiv: 2301.08128. url: https://doi.org/10.21468/SciPostPhys.15.4.130.
+
+[32] Breno Orzari, Nadezda Chernyavskaya, Raphael Cobe, Javier Duarte, Jefferson Fialho, et al. "LHC Hadronic Jet Generation Using Convolutional Variational Autoencoders with Normalizing Flows." In: Machine Learning: Science and Technology 4.4, 045023 (2023). doi: 10.1088/2632-2153/ad04ea. arXiv: 2310.13138. url: https://doi.org/10.1088/2632-2153/ad04ea.
+
+[33] Jack H. Collins, Kiel Howe, and Benjamin Nachman. "Anomaly Detection for Resonant New Physics with Machine Learning." In: Physical Review Letters 121.24, 241803 (2018). doi: 10.1103/PhysRevLett.121.241803. arXiv: 1805.02664. url: https://doi.org/10.1103/PhysRevLett.121.241803.
+
+[34] Gregor Kasieczka, Benjamin Nachman, David Shih, Oz Amram, Anders Andreassen, et al. "The LHC Olympics 2020: A Community Challenge for Anomaly Detection in High Energy Physics." In: Reports on Progress in Physics 84.12, 124201 (2021). doi: 10.1088/1361-6633/ac36b9. arXiv: 2101.08320. url: https://doi.org/10.1088/1361-6633/ac36b9.
 
 ## Annotated Source Catalogue
 
@@ -440,77 +484,33 @@ The literature strongly supports the existence of transferable jet representatio
 - **Uncertainty and dependence:** AUC intervals on one test set do not replace repeated-seed uncertainty. Nested data sizes and shared examples create dependence that must be reflected in comparisons.
 - **External and multi-task generalization:** Generation, anomaly detection, and transfer to other detector domains remain future work until the core JetClass feature-ablation result is stable.
 
-## References
+## Thematic Roadmap
 
-Numbered format follows the reference presentation in Group-Report.pdf. DOI and arXiv fields are included only when confirmed in the verified corpus.
+The themes below map the verified corpus to the planned paper. Counts refer to each source's primary theme; several sources can support more than one manuscript section.
 
-[1] Vinicius Mikuni and Benjamin Nachman. "A Method to Simultaneously Facilitate All Jet Physics Tasks." In: Physical Review D 111.5, 054015 (2025). doi: 10.1103/PhysRevD.111.054015. arXiv: 2502.14652. url: https://doi.org/10.1103/PhysRevD.111.054015.
+**Table 1. Literature coverage by evidence theme.**
 
-[2] Vinicius Mikuni and Benjamin Nachman. "Solving Key Challenges in Collider Physics with Foundation Models." In: Physical Review D 111.5, L051504 (2025). doi: 10.1103/PhysRevD.111.L051504. arXiv: 2404.16091. url: https://doi.org/10.1103/PhysRevD.111.L051504.
+| Evidence theme | Sources | Primary contribution | Manuscript use |
+|---|---:|---|---|
+| Jet Foundation Models | 6 | Defines the OmniLearn/OmniLearned and OmniJet lineages, multi-task claims, and current pretraining directions. | Introduction; Related Work |
+| Datasets and Top Tagging | 5 | Establishes JetClass provenance, binary top-tagging context, and community benchmark expectations. | Introduction; Methods |
+| Particle-Set Architectures | 5 | Explains permutation-invariant, attention, graph, PET, and Lorentz-equivariant backbones. | Related Work; Methods |
+| Feature Representation and Physics Priors | 3 | Connects particle-level information, IRC safety, symmetry, and learned low-level representations. | Introduction; Methods |
+| Pretraining and Transfer | 4 | Supplies transfer-learning terminology, feature-transfer evidence, and the foundation-model frame. | Introduction; Methods |
+| Evaluation and Reproducibility | 5 | Supports AUC comparison, dependence-aware uncertainty, repeated runs, and reproducible reporting. | Evaluation; Limitations |
+| Generation and Anomaly Detection | 6 | Places the tagging study within the wider multi-task jet-foundation-model agenda. | Related Work; Future Work |
 
-[3] Joschka Birk, Anna Hallin, and Gregor Kasieczka. "OmniJet-alpha: The First Cross-Task Foundation Model for Particle Physics." In: Machine Learning: Science and Technology 5.3, 035031 (2024). doi: 10.1088/2632-2153/ad66ad. arXiv: 2403.05618. url: https://doi.org/10.1088/2632-2153/ad66ad.
+*Coverage is strongest for the model lineage, particle-set architectures, and evaluation methods. The central unresolved question is the controlled effect of downstream feature availability under a fixed pretrained checkpoint and data protocol.*
 
-[4] Wahid Bhimji, Chris Harris, Vinicius Mikuni, and Benjamin Nachman. "Foundation Model Framework for All Tasks Involving Jet Physics." In: Physical Review D 113.3, 032020 (2026). doi: 10.1103/knmd-f5jm. arXiv: 2510.24066. url: https://doi.org/10.1103/knmd-f5jm.
+## Search Strategy and Selection
 
-[5] Joschka Birk, Anna Hallin, Gregor Kasieczka, Nikol Madzharova, Ian Pang, and David Shih. "Enhancing Next Token Prediction Based Pre-Training for Jet Foundation Models." In: arXiv preprint (2025). arXiv: 2512.04149. url: https://arxiv.org/abs/2512.04149.
+A targeted scoping search was conducted on 15 July 2026 using project seed sources and direct HTTPS queries to Crossref, arXiv, INSPIRE-HEP, Zenodo, and official proceedings or journal pages. The final corpus contains **34 sources**. Every final verification endpoint returned HTTP 200, and every DOI, arXiv identifier, title, author set, and year was checked against an authoritative record.
 
-[6] Oz Amram, Luca Anzalone, Joschka Birk, et al. "Aspen Open Jets: Unlocking LHC Data for Foundation Models in Particle Physics." In: Machine Learning: Science and Technology 6.3, 030601 (2025). doi: 10.1088/2632-2153/ade58f. arXiv: 2412.10504. url: https://doi.org/10.1088/2632-2153/ade58f.
+**Inclusion:** Direct relevance to a planned paper section; resolvable authoritative metadata; a distinct scientific role; primary peer-reviewed evidence when available; and explicit preprint labels.
 
-[7] Huilin Qu, Congqiao Li, and Sitian Qian. "Particle Transformer for Jet Tagging." In: Proceedings of the 39th International Conference on Machine Learning, PMLR 162 18281-18292 (2022). arXiv: 2202.03772. url: https://proceedings.mlr.press/v162/qu22b.html.
+**Exclusion:** Unresolved or mismatched metadata, duplicate versions, secondary summaries, indirect general relevance, and sources redundant with stronger project-aligned evidence.
 
-[8] Huilin Qu, Congqiao Li, and Sitian Qian. "JetClass: A Large-Scale Dataset for Deep Learning in Jet Physics." In: Zenodo Record 6619768 (2022). doi: 10.5281/zenodo.6619768. url: https://zenodo.org/records/6619768.
-
-[9] Jesse Thaler and Ken Van Tilburg. "Maximizing Boosted Top Identification by Minimizing N-Subjettiness." In: Journal of High Energy Physics 2012.2, 093 (2012). doi: 10.1007/JHEP02(2012)093. arXiv: 1108.2701. url: https://doi.org/10.1007/JHEP02(2012)093.
-
-[10] Gregor Kasieczka, Tilman Plehn, Anja Butter, Kyle Cranmer, Dipsikha Debnath, et al. "The Machine Learning Landscape of Top Taggers." In: SciPost Physics 7.1, 014 (2019). doi: 10.21468/SciPostPhys.7.1.014. arXiv: 1902.09914. url: https://doi.org/10.21468/SciPostPhys.7.1.014.
-
-[11] Raghav Kansal, Carlos Pareja, Zichun Hao, and Javier Duarte. "JetNet: A Python Package for Accessing Open Datasets and Benchmarking Machine Learning Methods in High Energy Physics." In: Journal of Open Source Software 8.90, 5789 (2023). doi: 10.21105/joss.05789. url: https://doi.org/10.21105/joss.05789.
-
-[12] Manzil Zaheer, Satwik Kottur, Siamak Ravanbakhsh, Barnabas Poczos, Ruslan Salakhutdinov, and Alexander J. Smola. "Deep Sets." In: Advances in Neural Information Processing Systems 30 (2017). arXiv: 1703.06114. url: https://proceedings.neurips.cc/paper/2017/hash/f22e4747da1aa27e363d86d40ff442fe-Abstract.html.
-
-[13] Juho Lee, Yoonho Lee, Jungtaek Kim, Adam R. Kosiorek, Seungjin Choi, and Yee Whye Teh. "Set Transformer: A Framework for Attention-Based Permutation-Invariant Neural Networks." In: Proceedings of the 36th International Conference on Machine Learning, PMLR 97 3744-3753 (2019). arXiv: 1810.00825. url: https://proceedings.mlr.press/v97/lee19d.html.
-
-[14] Huilin Qu and Loukas Gouskos. "Jet Tagging via Particle Clouds." In: Physical Review D 101.5, 056019 (2020). doi: 10.1103/PhysRevD.101.056019. arXiv: 1902.08570. url: https://doi.org/10.1103/PhysRevD.101.056019.
-
-[15] Vinicius Mikuni and Florencia Canelli. "Point Cloud Transformers Applied to Collider Physics." In: Machine Learning: Science and Technology 2.3, 035027 (2021). doi: 10.1088/2632-2153/ac07f6. arXiv: 2102.05073. url: https://doi.org/10.1088/2632-2153/ac07f6.
-
-[16] Shiqi Gong, Qi Meng, Jue Zhang, et al. "An Efficient Lorentz Equivariant Graph Neural Network for Jet Tagging." In: Journal of High Energy Physics 2022.7, 030 (2022). doi: 10.1007/JHEP07(2022)030. arXiv: 2201.08187. url: https://doi.org/10.1007/JHEP07(2022)030.
-
-[17] Patrick T. Komiske, Eric M. Metodiev, and Jesse Thaler. "Energy Flow Networks: Deep Sets for Particle Jets." In: Journal of High Energy Physics 2019.1, 121 (2019). doi: 10.1007/JHEP01(2019)121. arXiv: 1810.05165. url: https://doi.org/10.1007/JHEP01(2019)121.
-
-[18] Patrick T. Komiske, Eric M. Metodiev, and Jesse Thaler. "Energy Flow Polynomials: A Complete Linear Basis for Jet Substructure." In: Journal of High Energy Physics 2018.4, 013 (2018). doi: 10.1007/JHEP04(2018)013. arXiv: 1712.07124. url: https://doi.org/10.1007/JHEP04(2018)013.
-
-[19] Barry M. Dillon, Gregor Kasieczka, Hans Olischlager, Tilman Plehn, Peter Sorrenson, and Lorenz Vogel. "Symmetries, Safety, and Self-Supervision." In: SciPost Physics 12.6, 188 (2022). doi: 10.21468/SciPostPhys.12.6.188. arXiv: 2108.04253. url: https://doi.org/10.21468/SciPostPhys.12.6.188.
-
-[20] Sinno Jialin Pan and Qiang Yang. "A Survey on Transfer Learning." In: IEEE Transactions on Knowledge and Data Engineering 22.10, 1345-1359 (2010). doi: 10.1109/TKDE.2009.191. url: https://doi.org/10.1109/TKDE.2009.191.
-
-[21] Jason Yosinski, Jeff Clune, Yoshua Bengio, and Hod Lipson. "How Transferable Are Features in Deep Neural Networks?." In: Advances in Neural Information Processing Systems 27, 3320-3328 (2014). arXiv: 1411.1792. url: https://arxiv.org/abs/1411.1792.
-
-[22] Rishi Bommasani, Drew A. Hudson, Ehsan Adeli, et al. "On the Opportunities and Risks of Foundation Models." In: arXiv preprint (2021). arXiv: 2108.07258. url: https://arxiv.org/abs/2108.07258.
-
-[23] Alexander Radovic, Mike Williams, David Rousseau, Michael Kagan, et al. "Machine Learning at the Energy and Intensity Frontiers of Particle Physics." In: Nature 560.7716, 41-48 (2018). doi: 10.1038/s41586-018-0361-2. arXiv: 1807.02876. url: https://doi.org/10.1038/s41586-018-0361-2.
-
-[24] Oona Rainio, Jarmo Teuho, and Riku Klen. "Evaluation Metrics and Statistical Tests for Machine Learning." In: Scientific Reports 14.1, 6086 (2024). doi: 10.1038/s41598-024-56706-x. url: https://doi.org/10.1038/s41598-024-56706-x.
-
-[25] Elizabeth R. DeLong, David M. DeLong, and Daniel L. Clarke-Pearson. "Comparing the Areas Under Two or More Correlated Receiver Operating Characteristic Curves: A Nonparametric Approach." In: Biometrics 44.3, 837-845 (1988). doi: 10.2307/2531595. url: https://doi.org/10.2307/2531595.
-
-[26] Thomas G. Dietterich. "Approximate Statistical Tests for Comparing Supervised Classification Learning Algorithms." In: Neural Computation 10.7, 1895-1923 (1998). doi: 10.1162/089976698300017197. url: https://doi.org/10.1162/089976698300017197.
-
-[27] Claude Nadeau and Yoshua Bengio. "Inference for the Generalization Error." In: Machine Learning 52.3, 239-281 (2003). doi: 10.1023/A:1024068626366. url: https://doi.org/10.1023/A:1024068626366.
-
-[28] Joelle Pineau, Philippe Vincent-Lamarre, Koustuv Sinha, et al. "Improving Reproducibility in Machine Learning Research: A Report from the NeurIPS 2019 Reproducibility Program." In: Journal of Machine Learning Research 22.164, 1-20 (2021). url: https://jmlr.org/papers/v22/20-303.html.
-
-[29] Jonathan Ho, Ajay Jain, and Pieter Abbeel. "Denoising Diffusion Probabilistic Models." In: Advances in Neural Information Processing Systems 33, 6840-6851 (2020). arXiv: 2006.11239. url: https://arxiv.org/abs/2006.11239.
-
-[30] Matthew Leigh, Debajyoti Sengupta, Guillaume Quetant, John Andrew Raine, Knut Zoch, and Tobias Golling. "PC-JeDi: Diffusion for Particle Cloud Generation in High Energy Physics." In: SciPost Physics 16.1, 018 (2024). doi: 10.21468/SciPostPhys.16.1.018. arXiv: 2303.05376. url: https://doi.org/10.21468/SciPostPhys.16.1.018.
-
-[31] Erik Buhmann, Gregor Kasieczka, and Jesse Thaler. "EPiC-GAN: Equivariant Point Cloud Generation for Particle Jets." In: SciPost Physics 15.4, 130 (2023). doi: 10.21468/SciPostPhys.15.4.130. arXiv: 2301.08128. url: https://doi.org/10.21468/SciPostPhys.15.4.130.
-
-[32] Breno Orzari, Nadezda Chernyavskaya, Raphael Cobe, Javier Duarte, Jefferson Fialho, et al. "LHC Hadronic Jet Generation Using Convolutional Variational Autoencoders with Normalizing Flows." In: Machine Learning: Science and Technology 4.4, 045023 (2023). doi: 10.1088/2632-2153/ad04ea. arXiv: 2310.13138. url: https://doi.org/10.1088/2632-2153/ad04ea.
-
-[33] Jack H. Collins, Kiel Howe, and Benjamin Nachman. "Anomaly Detection for Resonant New Physics with Machine Learning." In: Physical Review Letters 121.24, 241803 (2018). doi: 10.1103/PhysRevLett.121.241803. arXiv: 1805.02664. url: https://doi.org/10.1103/PhysRevLett.121.241803.
-
-[34] Gregor Kasieczka, Benjamin Nachman, David Shih, Oz Amram, Anders Andreassen, et al. "The LHC Olympics 2020: A Community Challenge for Anomaly Detection in High Energy Physics." In: Reports on Progress in Physics 84.12, 124201 (2021). doi: 10.1088/1361-6633/ac36b9. arXiv: 2101.08320. url: https://doi.org/10.1088/1361-6633/ac36b9.
+**Verification boundary:** Bibliographic existence and record-level claims were checked. Full-text reading is not claimed for every source; core papers must be read before claim-level manuscript citation.
 
 ## Search Limitations and Disclosure
 
