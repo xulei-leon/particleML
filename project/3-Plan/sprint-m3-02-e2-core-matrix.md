@@ -53,14 +53,14 @@ Not included:
 
 ### 5.1 Work Package: Paired Statistics
 
-- [ ] Write failing deterministic golden bootstrap and identity-mismatch tests.
-- [ ] Implement exact ordered-identity/target validation and all five contrasts.
-- [ ] Use `PCG64`, class-stratified common indices, 1,000+ replicates, percentile intervals, and discard accounting.
-- [ ] Keep per-seed results, mean, and sample standard deviation separate.
+- [x] Write deterministic golden bootstrap and identity-mismatch tests.
+- [x] Implement exact ordered-identity/target validation and all five contrasts.
+- [x] Use `PCG64`, class-stratified common indices, 1,000+ replicates, percentile intervals, and discard accounting.
+- [x] Keep per-seed results, mean, and sample standard deviation separate.
 
 ### 5.2 Work Package: Matrix Freeze and Dry Run
 
-- [ ] Validate matrix cardinality against frozen A-D, scales, seeds, and model policy.
+- [x] Validate matrix cardinality against frozen A-D, scales, seeds, and model policy.
 - [ ] Verify every input/index/checkpoint/config hash and projected cost before launch.
 - [ ] Retain a reviewed dry-run ledger for all conditions.
 
@@ -91,6 +91,15 @@ pnpm docs:build
 
 Formal matrix commands are produced by `particleml run train --config <versioned-e2-config>` and `particleml evaluate`; exact dry-run argv and hashes are retained before RunPod execution.
 
+### Local Diagnostic Results (2026-07-17)
+
+- Targeted metrics/experiment suite: `12 passed`.
+- Full Python suite: `134 passed`; Ruff and strict mypy passed for 12 source modules.
+- Software documentation validation, Python package build, 3 Node tests, and VitePress build passed.
+- The E2 matrix regression resolves exactly 36 unique A-D × three-scale × three-seed conditions when supplied passed gates and real dependency hashes.
+- PCG64 paired bootstrap is deterministic, class-stratified, uses common indices, requires at least 1,000 replicates, enforces the 1% discard limit, and keeps model-seed variation separate.
+- Formal dry run, cost authorization, 36 RunPod attempts, predictions, comparisons, and AC-E2-001 were not attempted because E1 and its budget gate are not passed.
+
 ## 8. Risks and Recovery
 
 - Risk: identity misalignment invalidates paired inference. Control: exact ordered equality before any bootstrap.
@@ -100,7 +109,7 @@ Formal matrix commands are produced by `particleml run train --config <versioned
 
 ## 9. Deliverables
 
-- [ ] Deterministic paired-bootstrap implementation and tests.
+- [x] Deterministic paired-bootstrap implementation and tests.
 - [ ] Full E2 run/prediction ledger.
 - [ ] Required paired comparison and seed-variation artifacts.
 - [ ] AC-E2-001 gate record.
@@ -114,4 +123,4 @@ Formal matrix commands are produced by `particleml run train --config <versioned
 
 ## 11. Delivery Conclusion
 
-Pending implementation, review confirmation, RunPod execution, and E2 gate verification.
+Local M3-02 statistical and matrix-completeness software is implemented and tested. The complete formal E2 matrix remains unexecuted because E1 and E2 budget approval are unavailable. There are no scientific metrics, paired artifacts, seed outcomes, resource measurements, or AC-E2-001 pass claims in this delivery.

@@ -11,7 +11,10 @@ from particleml.metrics import (
     binary_roc_auc,
     data_efficiency_summary,
     evaluate_binary_predictions,
+    paired_stratified_bootstrap,
+    summarize_model_seeds,
     validate_prediction_arrays,
+    validate_required_contrasts,
 )
 
 
@@ -59,3 +62,50 @@ def test_nonfinite_single_class_and_unstable_ratio_fail_closed() -> None:
     assert summary["auc_gap_fraction"] is None
     assert summary["reason"] == "unstable_large_scale_denominator"
 
+
+def test_paired_bootstrap_is_deterministic_stratified_and_uses_common_indices() -> None:
+    labels = np.asarray([0, 0, 0, 0, 1, 1, 1, 1], dtype=np.int8)
+    left = validate_prediction_arrays(
+        [f"jet-{index}" for index in range(8)],
+        labels,
+        np.asarray([0.1, 0.2, 0.3, 0.4, 0.6, 0.7, 0.8, 0.9]),
+    )
+    right = validate_prediction_arrays(left.jet_ids, labels, left.scores.copy())
+    first = paired_stratified_bootstrap(
+        left, right, metric="roc_auc", replicate_count=1000, bootstrap_seed=17
+    )
+    second = paired_stratified_bootstrap(
+        left, right, metric="roc_auc", replicate_count=1000, bootstrap_seed=17
+    )
+    assert first == second
+    assert first.observed_delta == 0.0
+    assert first.interval_2p5_97p5 == (0.0, 0.0)
+    assert first.discarded_count == 0
+
+
+def test_paired_bootstrap_rejects_identity_mismatch_and_small_policy() -> None:
+    left = validate_prediction_arrays(
+        ["a", "b", "c", "d"], np.asarray([0, 0, 1, 1]), np.asarray([0.1, 0.2, 0.8, 0.9])
+    )
+    reordered = validate_prediction_arrays(
+        ["b", "a", "c", "d"], np.asarray([0, 0, 1, 1]), np.asarray([0.2, 0.1, 0.8, 0.9])
+    )
+    with pytest.raises(IntegrityError, match="PREDICTION_IDENTITY_MISMATCH"):
+        paired_stratified_bootstrap(
+            left, reordered, metric="roc_auc", replicate_count=1000, bootstrap_seed=1
+        )
+    with pytest.raises(IntegrityError, match="METRIC_BOOTSTRAP_POLICY"):
+        paired_stratified_bootstrap(
+            left, left, metric="roc_auc", replicate_count=999, bootstrap_seed=1
+        )
+
+
+def test_required_contrasts_and_seed_variation_remain_separate() -> None:
+    validate_required_contrasts({name: {} for name in ("A-B", "B-C", "C-D", "C-A", "D-A")})
+    with pytest.raises(IntegrityError, match="METRIC_CONTRAST_SET"):
+        validate_required_contrasts({"A-B": {}})
+    summary = summarize_model_seeds({3: 0.7, 1: 0.5, 2: 0.6})
+    assert [item["model_seed"] for item in summary["per_seed"]] == [1, 2, 3]
+    assert summary["mean"] == pytest.approx(0.6)
+    assert summary["sample_standard_deviation"] == pytest.approx(0.1)
+    assert summary["uncertainty_kind"] == "model_seed_variation"

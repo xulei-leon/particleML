@@ -109,3 +109,20 @@ def test_matrix_status_retains_missing_and_failed(tmp_path: Path) -> None:
     assert statuses[0]["status"] == "failed"
     assert sum(item["status"] == "missing" for item in statuses) == 3
 
+
+def test_e2_matrix_has_all_36_frozen_conditions(tmp_path: Path) -> None:
+    config = json.loads(_config(tmp_path / "e2.json").read_text(encoding="utf-8"))
+    config.update(
+        stage="E2",
+        feature_configs=["A", "B", "C", "D"],
+        train_sizes_per_class=[1000, 10000, 100000],
+        model_seeds=[1, 2, 3],
+    )
+    path = tmp_path / "e2.json"
+    path.write_text(json.dumps(config), encoding="utf-8")
+    gates = _gates()
+    gates["E1"] = {"status": "passed", "content_sha256": "e" * 64}
+    gates["E2_budget"] = {"status": "passed", "content_sha256": "f" * 64}
+    specs = resolve_matrix(path, gates)
+    assert len(specs) == 36
+    assert len({item.condition_id for item in specs}) == 36

@@ -50,7 +50,7 @@ mean the implementation, test, run, artifact, figure, or claim exists.
 | FR-TRAIN-004 | one-attempt lifecycle and matrix-status service | §9 Error Taxonomy | failure/interruption retention, no-auto-retry, and missing-condition tests | failed run records and logs | `implemented` |
 | FR-EVAL-001 | prediction array/payload validator | §7; prediction Schema | identity order, duplicate, target mismatch, finite-score, and payload-hash tests | prediction metadata and payload | `implemented` |
 | FR-EVAL-002 | centralized metrics service | §8.1 Per-Run Metrics | golden AUC/rejection/accuracy, zero-background, and unstable-ratio fixtures | E1-E3 run metrics | `implemented` |
-| FR-EVAL-003 | Metrics service | §8.2 Paired Comparisons | deterministic stratified paired-bootstrap fixtures | E2/E3 comparison artifacts | `specified` |
+| FR-EVAL-003 | `paired_stratified_bootstrap` and seed-summary service | §8.2 Paired Comparisons | deterministic PCG64 stratified/common-index bootstrap, mismatch, contrast-set, percentile, and seed-summary fixtures | E2/E3 comparison artifacts | `implemented` |
 | FR-EVAL-004 | Reporting service | §7-8 | aggregation completeness and ineligible-claim tests | generated reports, figures, claim ledger | `specified` |
 | FR-REP-001 | Contract validator/artifact lifecycle | architecture §8; spec §6.4-7 | content hash and stale-resume tests | hashes and `COMPLETED.json` | `specified` |
 | FR-REP-002 | Contract validator | §7 Serialized Contracts | `scripts/validate_software_docs.py`; schema fixtures | five JSON Schemas and validated artifacts | `implemented` |

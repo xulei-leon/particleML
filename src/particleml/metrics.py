@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -22,6 +22,31 @@ class PredictionArrays:
     jet_ids: tuple[str, ...]
     targets: NDArray[np.int8]
     scores: NDArray[np.float64]
+
+
+@dataclass(frozen=True)
+class PairedBootstrapResult:
+    """Event-bootstrap uncertainty kept separate from model-seed variation."""
+
+    metric: str
+    observed_delta: float
+    interval_2p5_97p5: tuple[float, float]
+    replicate_count: int
+    discarded_count: int
+    bootstrap_seed: int
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "metric": self.metric,
+            "observed_delta": self.observed_delta,
+            "interval_2p5_97p5": list(self.interval_2p5_97p5),
+            "replicate_count": self.replicate_count,
+            "discarded_count": self.discarded_count,
+            "bootstrap_seed": self.bootstrap_seed,
+        }
+
+
+REQUIRED_CONTRASTS = ("A-B", "B-C", "C-D", "C-A", "D-A")
 
 
 def validate_prediction_arrays(
@@ -203,6 +228,125 @@ def validate_prediction_payload(
     if expected_jet_ids is not None and predictions.jet_ids != tuple(expected_jet_ids):
         raise IntegrityError("PREDICTION_IDENTITY_MISMATCH", "payload identity order is not fixed")
     return predictions
+
+
+def _bootstrap_metric(
+    metric: str,
+    labels: NDArray[np.int8],
+    scores: NDArray[np.float64],
+    threshold: float | None,
+) -> float:
+    if metric == "roc_auc":
+        return binary_roc_auc(labels, scores)
+    if metric == "accuracy":
+        if threshold is None:
+            raise IntegrityError("METRIC_THRESHOLD", "paired accuracy requires a threshold")
+        return binary_accuracy(labels, scores, validation_threshold=threshold)
+    efficiencies = {
+        "background_rejection_0_30": 0.30,
+        "background_rejection_0_50": 0.50,
+    }
+    if metric in efficiencies:
+        value = background_rejection_at_signal_efficiency(
+            labels, scores, efficiencies[metric]
+        )["background_rejection"]
+        return float("nan") if value is None else float(value)
+    raise IntegrityError("METRIC_NAME", f"unsupported paired metric {metric}")
+
+
+def paired_stratified_bootstrap(
+    left: PredictionArrays,
+    right: PredictionArrays,
+    *,
+    metric: str,
+    replicate_count: int,
+    bootstrap_seed: int,
+    left_validation_threshold: float | None = None,
+    right_validation_threshold: float | None = None,
+) -> PairedBootstrapResult:
+    """Compute fixed-seed, class-stratified paired differences with common indices."""
+
+    assert_aligned(left, right)
+    if replicate_count < 1000 or bootstrap_seed < 0:
+        raise IntegrityError(
+            "METRIC_BOOTSTRAP_POLICY",
+            "at least 1,000 replicates and a non-negative seed are required",
+        )
+    negative = np.flatnonzero(left.targets == 0)
+    positive = np.flatnonzero(left.targets == 1)
+    if negative.size == 0 or positive.size == 0:
+        raise IntegrityError("METRIC_BOOTSTRAP_CLASSES", "both classes are required")
+    observed_left = _bootstrap_metric(
+        metric, left.targets, left.scores, left_validation_threshold
+    )
+    observed_right = _bootstrap_metric(
+        metric, right.targets, right.scores, right_validation_threshold
+    )
+    observed_delta = observed_left - observed_right
+    if not np.isfinite(observed_delta):
+        raise IntegrityError("METRIC_BOOTSTRAP_OBSERVED", "observed paired delta is non-finite")
+    generator = np.random.Generator(np.random.PCG64(bootstrap_seed))
+    finite_deltas: list[float] = []
+    discarded = 0
+    for _ in range(replicate_count):
+        sampled_negative = generator.choice(negative, size=negative.size, replace=True)
+        sampled_positive = generator.choice(positive, size=positive.size, replace=True)
+        indices = np.concatenate((sampled_negative, sampled_positive))
+        labels = left.targets[indices]
+        left_value = _bootstrap_metric(
+            metric, labels, left.scores[indices], left_validation_threshold
+        )
+        right_value = _bootstrap_metric(
+            metric, labels, right.scores[indices], right_validation_threshold
+        )
+        delta = left_value - right_value
+        if np.isfinite(delta):
+            finite_deltas.append(delta)
+        else:
+            discarded += 1
+    if discarded / replicate_count > 0.01:
+        raise IntegrityError(
+            "METRIC_BOOTSTRAP_DISCARDS", "more than one percent of replicates are non-finite"
+        )
+    if not finite_deltas:
+        raise IntegrityError("METRIC_BOOTSTRAP_EMPTY", "no finite bootstrap replicates remain")
+    interval = np.percentile(np.asarray(finite_deltas), [2.5, 97.5])
+    return PairedBootstrapResult(
+        metric=metric,
+        observed_delta=float(observed_delta),
+        interval_2p5_97p5=(float(interval[0]), float(interval[1])),
+        replicate_count=replicate_count,
+        discarded_count=discarded,
+        bootstrap_seed=bootstrap_seed,
+    )
+
+
+def validate_required_contrasts(comparisons: Mapping[str, Any]) -> None:
+    """Require exactly the five preregistered E2 feature contrasts."""
+
+    if set(comparisons) != set(REQUIRED_CONTRASTS):
+        missing = sorted(set(REQUIRED_CONTRASTS) - set(comparisons))
+        extra = sorted(set(comparisons) - set(REQUIRED_CONTRASTS))
+        raise IntegrityError(
+            "METRIC_CONTRAST_SET", f"contrast set differs; missing={missing}, extra={extra}"
+        )
+
+
+def summarize_model_seeds(values: Mapping[int, float]) -> dict[str, Any]:
+    """Report every model seed, mean, and sample standard deviation separately."""
+
+    if len(values) < 2 or any(seed < 0 for seed in values):
+        raise IntegrityError("METRIC_SEED_SUMMARY", "at least two valid model seeds are required")
+    ordered = sorted((int(seed), float(value)) for seed, value in values.items())
+    array = np.asarray([value for _, value in ordered], dtype=np.float64)
+    if not np.isfinite(array).all():
+        raise IntegrityError("METRIC_SEED_SUMMARY", "seed metrics must be finite")
+    return {
+        "per_seed": [{"model_seed": seed, "value": value} for seed, value in ordered],
+        "mean": float(np.mean(array)),
+        "sample_standard_deviation": float(np.std(array, ddof=1)),
+        "uncertainty_kind": "model_seed_variation",
+    }
 
 
 def binary_roc_auc(labels: NDArray[np.integer[Any]], scores: NDArray[np.floating[Any]]) -> float:
