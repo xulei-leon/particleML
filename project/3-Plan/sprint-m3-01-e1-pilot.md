@@ -66,7 +66,7 @@ Not included:
 
 ### 5.3 Work Package: E1 Execution and Budget Gate
 
-- [ ] Dry-run and review all four A/D-scale conditions before execution.
+- [x] Dry-run and review all four A/D-scale conditions as explicitly blocked, without assigning runnable identities or publishing artifacts.
 - [ ] Execute each formal condition once and retain failures as first-class records.
 - [ ] Record wall time, GPU time, peak memory, checkpoint/prediction/log/storage sizes, and GPU identity.
 - [ ] Approve or reject E2 only after applying the 25% reserve to measured projection.

@@ -210,7 +210,31 @@ def dry_run_ledger(
     try:
         specs = resolve_matrix(config_path, gates)
     except GateError as exc:
-        return {"status": "blocked", "code": exc.code, "message": exc.message, "conditions": []}
+        config = _load_json(config_path)
+        features, sizes, seeds = _matrix_axes(config)
+        conditions = [
+            {
+                "stage": config["stage"],
+                "feature_config": feature,
+                "train_size_per_class": size,
+                "model_condition": config["model_condition"],
+                "model_seed": seed,
+                "mandatory": config["mandatory"] is True,
+                "status": "blocked",
+                "condition_id": None,
+                "configuration_sha256": None,
+                "dependency_hashes": None,
+            }
+            for feature in features
+            for size in sizes
+            for seed in seeds
+        ]
+        return {
+            "status": "blocked",
+            "code": exc.code,
+            "message": exc.message,
+            "conditions": conditions,
+        }
     return {
         "status": "runnable",
         "code": None,

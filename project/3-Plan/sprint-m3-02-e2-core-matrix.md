@@ -97,6 +97,7 @@ Formal matrix commands are produced by `particleml run train --config <versioned
 - Full Python suite: `134 passed`; Ruff and strict mypy passed for 12 source modules.
 - Software documentation validation, Python package build, 3 Node tests, and VitePress build passed.
 - The E2 matrix regression resolves exactly 36 unique A-D × three-scale × three-seed conditions when supplied passed gates and real dependency hashes.
+- The repository E2 dry-run exposes all 36 planned conditions as blocked when gate records and dependency hashes are unavailable; it does not silently omit them.
 - PCG64 paired bootstrap is deterministic, class-stratified, uses common indices, requires at least 1,000 replicates, enforces the 1% discard limit, and keeps model-seed variation separate.
 - Formal dry run, cost authorization, 36 RunPod attempts, predictions, comparisons, and AC-E2-001 were not attempted because E1 and its budget gate are not passed.
 

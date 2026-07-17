@@ -66,7 +66,9 @@ def test_dry_run_is_nonpublishing_and_reports_gate_block(tmp_path: Path) -> None
     config = _config(tmp_path / "e1.json")
     blocked = dry_run_ledger(config, {})
     assert blocked["status"] == "blocked"
-    assert blocked["conditions"] == []
+    assert len(blocked["conditions"]) == 4
+    assert all(condition["status"] == "blocked" for condition in blocked["conditions"])
+    assert all(condition["condition_id"] is None for condition in blocked["conditions"])
     assert list(tmp_path.iterdir()) == [config]
 
 
