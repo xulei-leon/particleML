@@ -22,6 +22,7 @@ from particleml.experiment import dry_run_ledger, resolve_matrix
 from particleml.manifest import build_split_manifest, hash_source_manifest, load_source_manifest
 from particleml.metrics import evaluate_binary_predictions, validate_prediction_payload
 from particleml.model_integration import aggregate_e05, build_index_argv, validate_checkpoint
+from particleml.reporting import build_report
 from particleml.views import materialize_view
 
 
@@ -107,6 +108,13 @@ def build_parser() -> argparse.ArgumentParser:
     evaluate.add_argument("--metadata", required=True, type=Path)
     evaluate.add_argument("--payload", required=True, type=Path)
     evaluate.add_argument("--validation-threshold", required=True, type=float)
+
+    report = groups.add_parser("report", help="evidence-derived report operations")
+    report_commands = report.add_subparsers(dest="command", required=True)
+    report_build = report_commands.add_parser("build", help="build a deterministic report")
+    report_build.add_argument("--config", required=True, type=Path)
+    report_build.add_argument("--run-record", action="append", default=[], type=Path)
+    report_build.add_argument("--output", required=True, type=Path)
 
     view = groups.add_parser("view", help="model-view operations")
     view_commands = view.add_subparsers(dest="command", required=True)
@@ -205,6 +213,10 @@ def main(argv: Sequence[str] | None = None) -> int:
                 predictions, validation_threshold=arguments.validation_threshold
             )
             print(json.dumps(metrics, sort_keys=True, separators=(",", ":")))
+            return 0
+        if arguments.group == "report" and arguments.command == "build":
+            output = build_report(arguments.config, arguments.run_record, arguments.output)
+            print(f"valid evidence-derived report: {output}")
             return 0
         if arguments.group == "view" and arguments.command == "build":
             output = materialize_view(

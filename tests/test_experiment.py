@@ -126,3 +126,22 @@ def test_e2_matrix_has_all_36_frozen_conditions(tmp_path: Path) -> None:
     specs = resolve_matrix(path, gates)
     assert len(specs) == 36
     assert len({item.condition_id for item in specs}) == 36
+
+
+def test_e3_fixture_matrix_has_a_d_and_three_seeds(tmp_path: Path) -> None:
+    config = json.loads(_config(tmp_path / "e3.json").read_text(encoding="utf-8"))
+    config.update(
+        stage="E3",
+        feature_configs=["A", "D"],
+        train_sizes_per_class=[123],
+        model_seeds=[1, 2, 3],
+        model_condition="deep_sets_pfn",
+    )
+    path = tmp_path / "e3.json"
+    path.write_text(json.dumps(config), encoding="utf-8")
+    gates = _gates()
+    gates["E1"] = {"status": "passed", "content_sha256": "e" * 64}
+    gates["E2"] = {"status": "passed", "content_sha256": "f" * 64}
+    specs = resolve_matrix(path, gates)
+    assert len(specs) == 6
+    assert {item.feature_config.value for item in specs} == {"A", "D"}

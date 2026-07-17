@@ -5,8 +5,15 @@ from pathlib import Path
 
 import pytest
 
-from particleml.contracts import GateError, ModelCondition
+from particleml.artifacts import publish_artifact
+from particleml.contracts import GateError, IntegrityError, ModelCondition
 from particleml.model_integration import aggregate_e05, fallback_model_condition
+from particleml.reporting import (
+    build_claim_ledger,
+    build_report,
+    validate_status_monotonicity,
+)
+from tests.test_contracts import valid_run
 
 
 def test_local_fixture_cannot_promote_e05(tmp_path: Path) -> None:
@@ -46,3 +53,86 @@ def test_fallback_requires_explicit_approval_and_narrows_model_condition(tmp_pat
     path.write_text(json.dumps(policy), encoding="utf-8")
     assert fallback_model_condition(path) is ModelCondition.RANDOM_OMNILEARNED
 
+
+def test_status_monotonicity_and_fallback_narrow_claims() -> None:
+    with pytest.raises(IntegrityError, match="REPORT_STATUS_MONOTONICITY"):
+        validate_status_monotonicity(
+            {"upstream": "implemented", "claim": "verified"},
+            {"claim": ["upstream"]},
+        )
+    ledger = build_claim_ledger(
+        [
+            {
+                "claim_id": "transfer",
+                "text": "pretrained transfer claim",
+                "category": "pretrained_transfer",
+                "dependencies": ["AC-E2-001"],
+            }
+        ],
+        {"AC-E2-001": "verified"},
+        supervised_fallback=True,
+        e3_deferred=False,
+    )
+    assert ledger[0]["eligible"] is False
+    assert "supervised_fallback_removes_pretrained_transfer" in ledger[0]["reasons"]
+
+
+def _report_config(path: Path, expected: list[str]) -> Path:
+    document = {
+        "schema_version": "1.0.0",
+        "report_id": "fixture-report",
+        "expected_condition_ids": expected,
+        "evidence_statuses": {"AC-E2-001": "deferred"},
+        "status_dependencies": {},
+        "supervised_fallback": False,
+        "e3_deferred": True,
+        "claims": [],
+    }
+    path.write_text(json.dumps(document), encoding="utf-8")
+    return path
+
+
+def test_reports_are_deterministic_and_keep_failed_missing_visible(tmp_path: Path) -> None:
+    succeeded = valid_run("succeeded")
+    failed = valid_run("failed")
+    def publish_record(name: str, record: dict[str, object]) -> Path:
+        def writer(directory: Path) -> None:
+            (directory / "run-record.json").write_text(json.dumps(record), encoding="utf-8")
+
+        artifact = publish_artifact(
+            tmp_path / name,
+            writer,
+            lambda _directory: None,
+            {"fixture": "a" * 64},
+            "b" * 64,
+            "test-run-record",
+        )
+        return artifact.path / "run-record.json"
+
+    success_path = publish_record("success", succeeded)
+    failure_path = publish_record("failure", failed)
+    config = _report_config(
+        tmp_path / "report-config.json",
+        ["run-succeeded", "run-failed", "run-missing"],
+    )
+    first = build_report(config, [success_path, failure_path], tmp_path / "report-a")
+    second = build_report(config, [success_path, failure_path], tmp_path / "report-b")
+    first_bytes = (first / "report.json").read_bytes()
+    assert first_bytes == (second / "report.json").read_bytes()
+    report = json.loads(first_bytes)
+    assert [row["status"] for row in report["matrix_status"]] == [
+        "succeeded", "failed", "missing"
+    ]
+    assert len(report["successful_metrics"]) == 1
+    first_marker = json.loads((first / "COMPLETED.json").read_text(encoding="utf-8"))
+    second_marker = json.loads((second / "COMPLETED.json").read_text(encoding="utf-8"))
+    assert first_marker["artifact_sha256"] == second_marker["artifact_sha256"]
+
+
+def test_incomplete_report_never_invents_scientific_outputs(tmp_path: Path) -> None:
+    config = _report_config(tmp_path / "report-config.json", [])
+    output = build_report(config, [], tmp_path / "report")
+    report = json.loads((output / "report.json").read_text(encoding="utf-8"))
+    assert report["successful_metrics"] == []
+    assert report["outputs"]["F1"]["status"].startswith("ineligible")
+    assert report["outputs"]["T2"] == {"status": "generated", "rows": []}

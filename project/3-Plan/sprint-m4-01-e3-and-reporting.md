@@ -55,24 +55,24 @@ Not included:
 
 ### 5.1 Work Package: Deep Sets/PFN Control
 
-- [ ] Write failing mask, padding-invariance, shape, pooling, parameter-record, and train-smoke tests.
-- [ ] Freeze the per-particle MLP, pooling, head, optimizer, and stopping configuration before formal E3.
+- [x] Write mask, padding-invariance, shape, pooling, parameter-record, and optional-PyTorch boundary tests.
+- [x] Freeze the per-particle MLP, pooling, head, optimizer, and stopping configuration before formal E3.
 - [ ] Execute A and D at `n_max` for three seeds using the standard run/prediction/metric contracts.
 - [ ] Retain explicit failures and paired A-D statistics.
 
 ### 5.2 Work Package: Evidence Status and Claim Eligibility
 
-- [ ] Write failing status-monotonicity and fallback/deferred-claim tests.
-- [ ] Resolve every requirement/test/gate/artifact/figure/claim status from retained evidence.
-- [ ] Ensure `implemented` and `verified` cite concrete code/CI/gate identities.
-- [ ] Narrow claims automatically if supervised fallback or E3 deferral applies.
+- [x] Write status-monotonicity and fallback/deferred-claim tests.
+- [x] Resolve configured requirement/test/gate/artifact/figure/claim status from retained evidence.
+- [x] Ensure local `implemented` rows cite concrete code/tests while formal gates remain `deferred`.
+- [x] Narrow claims automatically if supervised fallback or E3 deferral applies.
 
 ### 5.3 Work Package: Reproducible Reports
 
-- [ ] Write failing schema/hash/matrix-completeness and deterministic-output tests.
+- [x] Write schema/hash/matrix-completeness and deterministic-output tests.
 - [ ] Generate T1 dataset/audit, F1 scale curves, F2 paired deltas, T2 matrix, T3 data efficiency, F3/T4 robustness/reproducibility outputs.
 - [ ] Show every seed, uncertainty convention, failed/missing condition, and eligibility state.
-- [ ] Rebuild from retained artifacts and compare output hashes.
+- [x] Rebuild from identical retained fixture artifacts and compare output hashes; formal cloud rebuild remains pending.
 
 ## 6. TDD and Test Plan
 
@@ -93,6 +93,15 @@ pnpm docs:build
 
 Formal E3 runs and `particleml report build` execute in the approved cloud environment with exact resolved configuration and artifact hashes retained.
 
+### Local Diagnostic Results (2026-07-17)
+
+- Baseline/reporting/metrics targeted suite: `14 passed, 1 skipped`; the PyTorch runtime test is skipped because PyTorch is not installed in the local environment.
+- Full Python suite: `142 passed, 1 skipped`; Ruff and strict mypy passed for 14 source modules.
+- Software documentation validation, Python package build, 3 Node tests, and VitePress build passed.
+- Mask/padding invariance, A/D frozen parameter counts, explicit missing-runtime failure, six-condition E3 fixture matrix, status monotonicity, claim narrowing, completed-input verification, failed/missing visibility, and deterministic report payload hashes are covered.
+- The repository report policy produces only explicit ineligible/incomplete T1-T4/F1-F3 states without validated scientific evidence.
+- Formal E3 training, aligned predictions, paired robustness evidence, figures/tables with scientific values, and AC-E3-001 were not run.
+
 ## 8. Risks and Recovery
 
 - Risk: baseline fails or gives incomplete E3 evidence. Control: retain failure/defer status and narrow claims rather than hiding the control.
@@ -102,18 +111,18 @@ Formal E3 runs and `particleml report build` execute in the approved cloud envir
 
 ## 9. Deliverables
 
-- [ ] Masked Deep Sets/PFN implementation and E3 A/D run records.
+- [x] Masked Deep Sets/PFN implementation and frozen configuration; E3 A/D run records remain deferred.
 - [ ] AC-E3-001 decision and paired robustness evidence.
-- [ ] Generated figures/tables/matrix status.
-- [ ] Claim-eligibility ledger and evidence-backed traceability update.
+- [x] Deterministic incomplete matrix/output status; scientific figures/tables remain ineligible without evidence.
+- [x] Claim-eligibility ledger and evidence-backed traceability update.
 
 ## 10. Completion Criteria
 
-- [ ] AC-E3-001 passes, or deferral and narrowed claims are explicit.
+- [x] AC-E3-001 deferral and narrowed claims are explicit.
 - [ ] Every report input is schema-valid, hash-verified, and status-eligible.
-- [ ] Rebuild from identical evidence reproduces outputs.
-- [ ] Publication framing stays within the approved CMS 2015 feature-availability claim boundary.
+- [x] Rebuild from identical completed fixture evidence reproduces report payload hashes.
+- [x] Publication framing stays within the approved CMS 2015 feature-availability claim boundary.
 
 ## 11. Delivery Conclusion
 
-Pending implementation, review confirmation, RunPod execution, E3 gate verification, and report regeneration.
+Local M4-01 baseline and evidence-derived reporting software is implemented and tested. AC-E3-001 is formally deferred because AC-E2-001, frozen measured `n_max`, a qualified PyTorch/RunPod environment, and E3 run/prediction/comparison artifacts are absent. The generated policy therefore marks all scientific T1-T4/F1-F3 outputs ineligible or incomplete and narrows cross-architecture claims; it does not invent values.
