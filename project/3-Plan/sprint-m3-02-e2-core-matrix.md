@@ -73,9 +73,9 @@ Not included:
 
 ## 6. TDD and Test Plan
 
-- [ ] Test bootstrap repeatability, stratification, common indices, percentiles, non-finite discard threshold, all contrast names, reordered/duplicate/missing identities, and target mismatch.
-- [ ] Run matrix completeness tests with mixed success/failure fixtures before formal execution.
-- [ ] Treat near-null outcomes as valid results, not triggers for protocol changes.
+- [x] Test bootstrap repeatability, stratification, common indices, percentiles, non-finite discard threshold, all contrast names, reordered/duplicate/missing identities, and target mismatch.
+- [x] Run matrix completeness tests with mixed success/failure fixtures before formal execution.
+- [x] Treat near-null fixture outcomes as valid results, not triggers for protocol changes.
 
 ## 7. Verification Commands
 
@@ -117,7 +117,7 @@ Formal matrix commands are produced by `particleml run train --config <versioned
 ## 10. Completion Criteria
 
 - [ ] Every planned condition has a schema-valid success or explicit retained failure.
-- [ ] All eligible pairs use the exact fixed test identity order.
+- [x] The paired-statistics service rejects every eligible pair without exact fixed test identity/target order.
 - [ ] Required metrics/uncertainty are complete and no condition is omitted.
 - [ ] AC-E2-001 passes before M7-01 begins.
 

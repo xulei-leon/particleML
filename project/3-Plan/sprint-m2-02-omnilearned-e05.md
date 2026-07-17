@@ -75,7 +75,7 @@ Not included:
 
 - [ ] Cloud CI covers command construction, subprocess safety, index invalidation, checkpoint metadata, tensor audit, and fallback status.
 - [ ] RunPod covers official dataloader/index and GPU forward/backward/tiny training.
-- [ ] No local model execution counts as evidence.
+- [x] No local model execution counts as evidence; local fixtures deterministically remain blocked.
 
 ## 7. Verification Commands
 

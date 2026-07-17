@@ -120,7 +120,13 @@ def _report_payload(
         matrix.append({"condition_id": condition_id, "status": status})
         if record is not None and status == "succeeded":
             successful_metrics.append(
-                {"condition_id": condition_id, "metrics": deepcopy(record["metrics"])}
+                {
+                    "condition_id": condition_id,
+                    "feature_config": record["condition"]["feature_config"],
+                    "train_size_per_class": record["condition"]["train_size_per_class"],
+                    "model_seed": record["condition"]["model_seed"],
+                    "metrics": deepcopy(record["metrics"]),
+                }
             )
     statuses = config.get("evidence_statuses")
     dependencies = config.get("status_dependencies")
@@ -131,6 +137,12 @@ def _report_payload(
         or not isinstance(claims, list)
     ):
         raise ConfigurationError("REPORT_CONFIG", "status or claim configuration is invalid")
+    conventions = config.get("uncertainty_conventions")
+    if not isinstance(conventions, dict) or set(conventions) != {
+        "event_level",
+        "model_seed_level",
+    }:
+        raise ConfigurationError("REPORT_CONFIG", "uncertainty conventions are invalid")
     normalized_statuses = {str(key): str(value) for key, value in statuses.items()}
     normalized_dependencies = {
         str(key): [str(item) for item in value]
@@ -152,6 +164,7 @@ def _report_payload(
         "matrix_status": matrix,
         "successful_metrics": successful_metrics,
         "claim_eligibility": claim_ledger,
+        "uncertainty_conventions": deepcopy(conventions),
         "outputs": {
             "T1": {"status": "ineligible_without_validated_audit_evidence"},
             "T2": {"status": "generated", "rows": matrix},

@@ -86,31 +86,36 @@ def _report_config(path: Path, expected: list[str]) -> Path:
         "status_dependencies": {},
         "supervised_fallback": False,
         "e3_deferred": True,
+        "uncertainty_conventions": {
+            "event_level": "paired bootstrap percentile interval",
+            "model_seed_level": "per-seed mean and sample standard deviation",
+        },
         "claims": [],
     }
     path.write_text(json.dumps(document), encoding="utf-8")
     return path
 
 
+def _publish_record(root: Path, name: str, record: dict[str, object]) -> Path:
+    def writer(directory: Path) -> None:
+        (directory / "run-record.json").write_text(json.dumps(record), encoding="utf-8")
+
+    artifact = publish_artifact(
+        root / name,
+        writer,
+        lambda _directory: None,
+        {"fixture": "a" * 64},
+        "b" * 64,
+        "test-run-record",
+    )
+    return artifact.path / "run-record.json"
+
+
 def test_reports_are_deterministic_and_keep_failed_missing_visible(tmp_path: Path) -> None:
     succeeded = valid_run("succeeded")
     failed = valid_run("failed")
-    def publish_record(name: str, record: dict[str, object]) -> Path:
-        def writer(directory: Path) -> None:
-            (directory / "run-record.json").write_text(json.dumps(record), encoding="utf-8")
-
-        artifact = publish_artifact(
-            tmp_path / name,
-            writer,
-            lambda _directory: None,
-            {"fixture": "a" * 64},
-            "b" * 64,
-            "test-run-record",
-        )
-        return artifact.path / "run-record.json"
-
-    success_path = publish_record("success", succeeded)
-    failure_path = publish_record("failure", failed)
+    success_path = _publish_record(tmp_path, "success", succeeded)
+    failure_path = _publish_record(tmp_path, "failure", failed)
     config = _report_config(
         tmp_path / "report-config.json",
         ["run-succeeded", "run-failed", "run-missing"],
@@ -136,3 +141,11 @@ def test_incomplete_report_never_invents_scientific_outputs(tmp_path: Path) -> N
     assert report["successful_metrics"] == []
     assert report["outputs"]["F1"]["status"].startswith("ineligible")
     assert report["outputs"]["T2"] == {"status": "generated", "rows": []}
+
+
+def test_report_rejects_mutated_completed_input(tmp_path: Path) -> None:
+    record_path = _publish_record(tmp_path, "run", valid_run("succeeded"))
+    record_path.write_text("{}", encoding="utf-8")
+    config = _report_config(tmp_path / "report-config.json", ["run-succeeded"])
+    with pytest.raises(IntegrityError, match="ARTIFACT_HASH_MISMATCH"):
+        build_report(config, [record_path], tmp_path / "report")

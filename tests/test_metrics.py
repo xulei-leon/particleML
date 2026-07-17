@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import numpy as np
 import pytest
 
+from particleml.artifacts import verify_artifact_payload
 from particleml.contracts import IntegrityError
 from particleml.metrics import (
     assert_aligned,
@@ -12,10 +15,12 @@ from particleml.metrics import (
     data_efficiency_summary,
     evaluate_binary_predictions,
     paired_stratified_bootstrap,
+    publish_prediction_artifact,
     summarize_model_seeds,
     validate_prediction_arrays,
     validate_required_contrasts,
 )
+from tests.test_contracts import valid_prediction
 
 
 def test_golden_auc_rejection_and_accuracy() -> None:
@@ -109,3 +114,33 @@ def test_required_contrasts_and_seed_variation_remain_separate() -> None:
     assert summary["mean"] == pytest.approx(0.6)
     assert summary["sample_standard_deviation"] == pytest.approx(0.1)
     assert summary["uncertainty_kind"] == "model_seed_variation"
+
+
+def test_prediction_publication_is_deterministic_completed_and_hashed(tmp_path: Path) -> None:
+    predictions = validate_prediction_arrays(
+        ["jet-a", "jet-b", "jet-c", "jet-d"],
+        np.asarray([0, 0, 1, 1]),
+        np.asarray([0.1, 0.2, 0.8, 0.9]),
+    )
+    first = publish_prediction_artifact(tmp_path / "prediction-a", valid_prediction(), predictions)
+    second = publish_prediction_artifact(tmp_path / "prediction-b", valid_prediction(), predictions)
+    assert (first / "payload.npz").read_bytes() == (second / "payload.npz").read_bytes()
+    assert (first / "prediction.json").read_bytes() == (second / "prediction.json").read_bytes()
+    first_artifact = verify_artifact_payload(first / "prediction.json")
+    second_artifact = verify_artifact_payload(second / "prediction.json")
+    assert first_artifact.sha256 == second_artifact.sha256
+
+
+def test_bootstrap_excess_nonfinite_discard_fails() -> None:
+    labels = np.asarray([0, 0, 1, 1], dtype=np.int8)
+    predictions = validate_prediction_arrays(
+        ["a", "b", "c", "d"], labels, np.asarray([0.1, 0.9, 0.8, 0.7])
+    )
+    with pytest.raises(IntegrityError, match="METRIC_BOOTSTRAP_DISCARDS"):
+        paired_stratified_bootstrap(
+            predictions,
+            predictions,
+            metric="background_rejection_0_50",
+            replicate_count=1000,
+            bootstrap_seed=4,
+        )

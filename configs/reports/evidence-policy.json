@@ -13,6 +13,10 @@
   },
   "supervised_fallback": false,
   "e3_deferred": true,
+  "uncertainty_conventions": {
+    "event_level": "class-stratified paired PCG64 bootstrap percentile interval",
+    "model_seed_level": "per-seed values with mean and sample standard deviation"
+  },
   "claims": [
     {
       "claim_id": "CLAIM-RQ1-PRETRAINED",

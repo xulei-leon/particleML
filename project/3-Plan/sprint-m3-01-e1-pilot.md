@@ -61,7 +61,7 @@ Not included:
 ### 5.2 Work Package: Predictions and Metrics
 
 - [x] Write identity/order/payload and golden AUC/rejection/accuracy tests.
-- [ ] Publish one score/target/jet ID per fixed test jet with a payload hash.
+- [x] Publish one score/target/jet ID per fixed test jet with deterministic NPZ bytes, payload hash, metadata hash, and completion marker.
 - [x] Implement specified interpolation, zero-background `null`, validation threshold, and unstable-ratio fallback.
 
 ### 5.3 Work Package: E1 Execution and Budget Gate
@@ -75,7 +75,7 @@ Not included:
 
 - [ ] Cloud CI covers gate/matrix/lifecycle/contracts/metrics with tiny fixtures.
 - [ ] RunPod covers clean-command training/evaluation and resource collection.
-- [ ] Verify exact A/D test identities before any comparison.
+- [x] Verify exact ordered A/D test identities and targets before any comparison.
 
 ## 7. Verification Commands
 

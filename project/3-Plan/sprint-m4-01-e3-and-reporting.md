@@ -71,7 +71,7 @@ Not included:
 
 - [x] Write schema/hash/matrix-completeness and deterministic-output tests.
 - [ ] Generate T1 dataset/audit, F1 scale curves, F2 paired deltas, T2 matrix, T3 data efficiency, F3/T4 robustness/reproducibility outputs.
-- [ ] Show every seed, uncertainty convention, failed/missing condition, and eligibility state.
+- [x] Show every retained successful seed, both uncertainty conventions, failed/missing condition, and eligibility state.
 - [x] Rebuild from identical retained fixture artifacts and compare output hashes; formal cloud rebuild remains pending.
 
 ## 6. TDD and Test Plan
@@ -95,8 +95,8 @@ Formal E3 runs and `particleml report build` execute in the approved cloud envir
 
 ### Local Diagnostic Results (2026-07-17)
 
-- Baseline/reporting/metrics targeted suite: `14 passed, 1 skipped`; the PyTorch runtime test is skipped because PyTorch is not installed in the local environment.
-- Full Python suite: `142 passed, 1 skipped`; Ruff and strict mypy passed for 14 source modules.
+- Baseline/reporting/metrics targeted suite after final gap audit: `18 passed, 1 skipped`; the PyTorch runtime test is skipped because PyTorch is not installed in the local environment.
+- Full Python suite after final gap audit: `145 passed, 1 skipped`; Ruff and strict mypy passed for 14 source modules.
 - Software documentation validation, Python package build, 3 Node tests, and VitePress build passed.
 - Mask/padding invariance, A/D frozen parameter counts, explicit missing-runtime failure, six-condition E3 fixture matrix, status monotonicity, claim narrowing, completed-input verification, failed/missing visibility, and deterministic report payload hashes are covered.
 - The repository report policy produces only explicit ineligible/incomplete T1-T4/F1-F3 states without validated scientific evidence.
@@ -119,7 +119,7 @@ Formal E3 runs and `particleml report build` execute in the approved cloud envir
 ## 10. Completion Criteria
 
 - [x] AC-E3-001 deferral and narrowed claims are explicit.
-- [ ] Every report input is schema-valid, hash-verified, and status-eligible.
+- [x] Every consumed run-record input is schema-valid and completion/hash-verified; only explicit successes enter metric aggregates.
 - [x] Rebuild from identical completed fixture evidence reproduces report payload hashes.
 - [x] Publication framing stays within the approved CMS 2015 feature-availability claim boundary.
 

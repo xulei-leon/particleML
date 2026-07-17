@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 import hashlib
+import io
 import json
+import zipfile
 from collections.abc import Mapping, Sequence
+from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -12,7 +15,8 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from particleml.contracts import ContractError, IntegrityError
+from particleml.artifacts import publish_artifact
+from particleml.contracts import ContractError, IntegrityError, compute_document_hash
 
 
 @dataclass(frozen=True)
@@ -228,6 +232,87 @@ def validate_prediction_payload(
     if expected_jet_ids is not None and predictions.jet_ids != tuple(expected_jet_ids):
         raise IntegrityError("PREDICTION_IDENTITY_MISMATCH", "payload identity order is not fixed")
     return predictions
+
+
+def _deterministic_npz(arrays: Mapping[str, NDArray[Any]]) -> bytes:
+    output = io.BytesIO()
+    with zipfile.ZipFile(output, mode="w") as archive:
+        for name in sorted(arrays):
+            array_output = io.BytesIO()
+            np.lib.format.write_array(  # type: ignore[no-untyped-call]
+                array_output, np.asarray(arrays[name]), allow_pickle=False
+            )
+            info = zipfile.ZipInfo(f"{name}.npy", date_time=(1980, 1, 1, 0, 0, 0))
+            info.compress_type = zipfile.ZIP_DEFLATED
+            info.external_attr = 0o600 << 16
+            archive.writestr(info, array_output.getvalue())
+    return output.getvalue()
+
+
+def publish_prediction_artifact(
+    output: Path,
+    metadata_template: Mapping[str, Any],
+    predictions: PredictionArrays,
+) -> Path:
+    """Publish deterministic NPZ predictions and schema-valid metadata immutably."""
+
+    metadata = deepcopy(dict(metadata_template))
+    payload_bytes = _deterministic_npz(
+        {
+            "jet_id": np.asarray(predictions.jet_ids, dtype=np.str_),
+            "target": predictions.targets.astype(np.int8, copy=False),
+            "signal_score": predictions.scores.astype(np.float32),
+        }
+    )
+    metadata["row_count"] = len(predictions.jet_ids)
+    metadata["class_counts"] = {
+        "qcd": int(np.count_nonzero(predictions.targets == 0)),
+        "top": int(np.count_nonzero(predictions.targets == 1)),
+    }
+    row_order = ("\n".join(predictions.jet_ids) + "\n").encode()
+    metadata["row_order_sha256"] = hashlib.sha256(row_order).hexdigest()
+    metadata["payload"] = {
+        "format": "npz",
+        "path": "payload.npz",
+        "sha256": hashlib.sha256(payload_bytes).hexdigest(),
+        "byte_size": len(payload_bytes),
+        "compression": "zip",
+    }
+    if not isinstance(metadata.get("content_hash"), dict):
+        raise ContractError("PREDICTION_METADATA", "content_hash template is required")
+    metadata["content_hash"]["metadata_sha256"] = compute_document_hash(
+        metadata, ("content_hash", "metadata_sha256")
+    )
+    from particleml.contracts import validate_contract_document
+
+    validate_contract_document(metadata, "prediction")
+    config_hash = hashlib.sha256(
+        (json.dumps(metadata_template, sort_keys=True, separators=(",", ":")) + "\n").encode()
+    ).hexdigest()
+    input_hashes = {
+        "split_manifest": str(metadata["split_manifest_sha256"]),
+        "view": str(metadata["view_sha256"]),
+    }
+
+    def writer(partial: Path) -> None:
+        (partial / "payload.npz").write_bytes(payload_bytes)
+        (partial / "prediction.json").write_text(
+            json.dumps(metadata, sort_keys=True, separators=(",", ":")) + "\n",
+            encoding="utf-8",
+        )
+
+    def validator(partial: Path) -> None:
+        validate_prediction_payload(partial / "prediction.json", partial / "payload.npz")
+
+    artifact = publish_artifact(
+        output,
+        writer,
+        validator,
+        input_hashes,
+        config_hash,
+        "particleml-prediction-v1",
+    )
+    return artifact.path
 
 
 def _bootstrap_metric(
