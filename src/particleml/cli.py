@@ -18,7 +18,9 @@ from particleml.contracts import (
 )
 from particleml.dataset import convert_compact_root
 from particleml.e0 import build_e0_audit
+from particleml.experiment import dry_run_ledger, resolve_matrix
 from particleml.manifest import build_split_manifest, hash_source_manifest, load_source_manifest
+from particleml.metrics import evaluate_binary_predictions, validate_prediction_payload
 from particleml.model_integration import aggregate_e05, build_index_argv, validate_checkpoint
 from particleml.views import materialize_view
 
@@ -93,6 +95,18 @@ def build_parser() -> argparse.ArgumentParser:
     checkpoint_audit = checkpoint_commands.add_parser("audit", help="audit checkpoint provenance")
     checkpoint_audit.add_argument("--checkpoint", required=True, type=Path)
     checkpoint_audit.add_argument("--metadata", required=True, type=Path)
+
+    run = groups.add_parser("run", help="stage-gated experiment operations")
+    run_commands = run.add_subparsers(dest="command", required=True)
+    run_train = run_commands.add_parser("train", help="resolve a frozen training matrix")
+    run_train.add_argument("--config", required=True, type=Path)
+    run_train.add_argument("--gates", required=True, type=Path)
+    run_train.add_argument("--dry-run", action="store_true")
+
+    evaluate = groups.add_parser("evaluate", help="evaluate aligned predictions")
+    evaluate.add_argument("--metadata", required=True, type=Path)
+    evaluate.add_argument("--payload", required=True, type=Path)
+    evaluate.add_argument("--validation-threshold", required=True, type=float)
 
     view = groups.add_parser("view", help="model-view operations")
     view_commands = view.add_subparsers(dest="command", required=True)
@@ -169,6 +183,28 @@ def main(argv: Sequence[str] | None = None) -> int:
         if arguments.group == "checkpoint" and arguments.command == "audit":
             metadata = validate_checkpoint(arguments.checkpoint, arguments.metadata)
             print(f"valid checkpoint: {metadata['sha256']}")
+            return 0
+        if arguments.group == "run" and arguments.command == "train":
+            try:
+                gates = json.loads(arguments.gates.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError) as exc:
+                raise ConfigurationError("RUN_GATES_INVALID", "cannot load gate records") from exc
+            if not isinstance(gates, dict):
+                raise ConfigurationError("RUN_GATES_INVALID", "gate records must be an object")
+            if arguments.dry_run:
+                print(json.dumps(dry_run_ledger(arguments.config, gates), sort_keys=True))
+                return 0
+            specs = resolve_matrix(arguments.config, gates)
+            raise ConfigurationError(
+                "RUN_EXECUTION_EXPLICIT_COMMAND_REQUIRED",
+                f"resolved {len(specs)} conditions; execution must use retained commands",
+            )
+        if arguments.group == "evaluate":
+            predictions = validate_prediction_payload(arguments.metadata, arguments.payload)
+            metrics = evaluate_binary_predictions(
+                predictions, validation_threshold=arguments.validation_threshold
+            )
+            print(json.dumps(metrics, sort_keys=True, separators=(",", ":")))
             return 0
         if arguments.group == "view" and arguments.command == "build":
             output = materialize_view(

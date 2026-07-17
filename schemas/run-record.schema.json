@@ -40,7 +40,7 @@
       "enum": ["E0.5", "E1", "E2", "E3"]
     },
     "status": {
-      "enum": ["succeeded", "failed"]
+      "enum": ["succeeded", "failed", "timed_out", "interrupted"]
     },
     "created_at": {
       "$ref": "#/$defs/timestamp"
@@ -106,7 +106,7 @@
     },
     {
       "if": {
-        "properties": { "status": { "const": "failed" } },
+        "properties": { "status": { "enum": ["failed", "timed_out", "interrupted"] } },
         "required": ["status"]
       },
       "then": {

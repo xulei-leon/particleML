@@ -2,12 +2,207 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
+from collections.abc import Sequence
+from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 import numpy as np
 from numpy.typing import NDArray
 
-from particleml.contracts import IntegrityError
+from particleml.contracts import ContractError, IntegrityError
+
+
+@dataclass(frozen=True)
+class PredictionArrays:
+    """Aligned per-jet identities, binary targets, and finite signal scores."""
+
+    jet_ids: tuple[str, ...]
+    targets: NDArray[np.int8]
+    scores: NDArray[np.float64]
+
+
+def validate_prediction_arrays(
+    jet_ids: Sequence[str],
+    targets: NDArray[np.integer[Any]],
+    scores: NDArray[np.floating[Any]],
+) -> PredictionArrays:
+    """Validate the exact one-row-per-fixed-test-jet numerical contract."""
+
+    identities = tuple(jet_ids)
+    target_array = np.asarray(targets, dtype=np.int8).reshape(-1)
+    score_array = np.asarray(scores, dtype=np.float64).reshape(-1)
+    if (
+        len(identities) == 0
+        or len(identities) != target_array.size
+        or target_array.shape != score_array.shape
+    ):
+        raise IntegrityError("PREDICTION_ROW_COUNT", "prediction arrays have unequal row counts")
+    if len(set(identities)) != len(identities) or any(not item for item in identities):
+        raise IntegrityError("PREDICTION_IDENTITY", "jet identities must be non-empty and unique")
+    if not np.isin(target_array, (0, 1)).all():
+        raise IntegrityError("PREDICTION_TARGET", "targets must be binary")
+    if not np.isfinite(score_array).all():
+        raise IntegrityError("PREDICTION_SCORE", "scores must be finite")
+    return PredictionArrays(identities, target_array, score_array)
+
+
+def assert_aligned(left: PredictionArrays, right: PredictionArrays) -> None:
+    """Require exact ordered identities and targets before paired evaluation."""
+
+    if left.jet_ids != right.jet_ids:
+        raise IntegrityError("PREDICTION_IDENTITY_MISMATCH", "ordered jet identities differ")
+    if not np.array_equal(left.targets, right.targets):
+        raise IntegrityError("PREDICTION_TARGET_MISMATCH", "aligned targets differ")
+
+
+def background_rejection_at_signal_efficiency(
+    labels: NDArray[np.integer[Any]],
+    scores: NDArray[np.floating[Any]],
+    target_signal_efficiency: float,
+) -> dict[str, float | int | None]:
+    """Interpolate background efficiency on the full tied-score ROC points."""
+
+    if not 0.0 < target_signal_efficiency < 1.0:
+        raise IntegrityError("METRIC_TARGET_EFFICIENCY", "target signal efficiency is invalid")
+    label_array = np.asarray(labels).reshape(-1)
+    score_array = np.asarray(scores, dtype=np.float64).reshape(-1)
+    binary_roc_auc(label_array, score_array)
+    positives = int(np.count_nonzero(label_array == 1))
+    negatives = int(np.count_nonzero(label_array == 0))
+    order = np.argsort(-score_array, kind="stable")
+    ordered_labels = label_array[order]
+    ordered_scores = score_array[order]
+    true_positives = 0
+    false_positives = 0
+    tpr = [0.0]
+    fpr = [0.0]
+    start = 0
+    while start < ordered_scores.size:
+        stop = start + 1
+        while stop < ordered_scores.size and ordered_scores[stop] == ordered_scores[start]:
+            stop += 1
+        group = ordered_labels[start:stop]
+        true_positives += int(np.count_nonzero(group == 1))
+        false_positives += int(np.count_nonzero(group == 0))
+        tpr.append(true_positives / positives)
+        fpr.append(false_positives / negatives)
+        start = stop
+    upper = next(index for index, value in enumerate(tpr) if value >= target_signal_efficiency)
+    if tpr[upper] == target_signal_efficiency or upper == 0:
+        epsilon_b = fpr[upper]
+    else:
+        lower = upper - 1
+        fraction = (target_signal_efficiency - tpr[lower]) / (tpr[upper] - tpr[lower])
+        epsilon_b = fpr[lower] + fraction * (fpr[upper] - fpr[lower])
+    rejection = None if epsilon_b == 0.0 else 1.0 / epsilon_b
+    return {
+        "target_signal_efficiency": target_signal_efficiency,
+        "background_efficiency": epsilon_b,
+        "background_rejection": rejection,
+        "background_count": negatives,
+        "signal_count": positives,
+    }
+
+
+def binary_accuracy(
+    labels: NDArray[np.integer[Any]],
+    scores: NDArray[np.floating[Any]],
+    *,
+    validation_threshold: float,
+) -> float:
+    """Compute accuracy using only a caller-supplied validation threshold."""
+
+    if not np.isfinite(validation_threshold):
+        raise IntegrityError("METRIC_THRESHOLD", "validation threshold must be finite")
+    label_array = np.asarray(labels).reshape(-1)
+    score_array = np.asarray(scores, dtype=np.float64).reshape(-1)
+    binary_roc_auc(label_array, score_array)
+    return float(np.mean((score_array >= validation_threshold).astype(np.int8) == label_array))
+
+
+def evaluate_binary_predictions(
+    predictions: PredictionArrays, *, validation_threshold: float
+) -> dict[str, Any]:
+    """Compute the preregistered deterministic per-run metrics."""
+
+    at_30 = background_rejection_at_signal_efficiency(
+        predictions.targets, predictions.scores, 0.30
+    )
+    at_50 = background_rejection_at_signal_efficiency(
+        predictions.targets, predictions.scores, 0.50
+    )
+    return {
+        "roc_auc": binary_roc_auc(predictions.targets, predictions.scores),
+        "accuracy": binary_accuracy(
+            predictions.targets,
+            predictions.scores,
+            validation_threshold=validation_threshold,
+        ),
+        "validation_threshold": validation_threshold,
+        "background_at_signal_efficiency_0_30": at_30,
+        "background_at_signal_efficiency_0_50": at_50,
+    }
+
+
+def data_efficiency_summary(
+    *, small_scale_auc_gap: float, large_scale_auc_gap: float, minimum_denominator: float
+) -> dict[str, Any]:
+    """Guard a gap ratio and retain raw differences when the denominator is unstable."""
+
+    values = (small_scale_auc_gap, large_scale_auc_gap, minimum_denominator)
+    if not all(np.isfinite(value) for value in values) or minimum_denominator <= 0:
+        raise IntegrityError("METRIC_DATA_EFFICIENCY", "data-efficiency inputs are invalid")
+    result: dict[str, Any] = {
+        "small_scale_auc_gap": small_scale_auc_gap,
+        "large_scale_auc_gap": large_scale_auc_gap,
+    }
+    if abs(large_scale_auc_gap) < minimum_denominator:
+        result["auc_gap_fraction"] = None
+        result["reason"] = "unstable_large_scale_denominator"
+    else:
+        result["auc_gap_fraction"] = small_scale_auc_gap / large_scale_auc_gap
+        result["reason"] = None
+    return result
+
+
+def validate_prediction_payload(
+    metadata_path: Path, payload_path: Path, *, expected_jet_ids: Sequence[str] | None = None
+) -> PredictionArrays:
+    """Validate NPZ bytes, metadata, identities, and row counts before consumption."""
+
+    try:
+        metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+        payload_bytes = payload_path.read_bytes()
+    except OSError as exc:
+        raise ContractError(
+            "PREDICTION_INPUT", "prediction metadata or payload is unreadable"
+        ) from exc
+    if not isinstance(metadata, dict):
+        raise ContractError("PREDICTION_METADATA", "prediction metadata must be an object")
+    from particleml.contracts import validate_contract_document
+
+    validate_contract_document(metadata, "prediction")
+    if hashlib.sha256(payload_bytes).hexdigest() != metadata["payload"]["sha256"]:
+        raise IntegrityError("PREDICTION_PAYLOAD_HASH", "prediction payload hash mismatch")
+    try:
+        with np.load(payload_path, allow_pickle=False) as payload:
+            required = {"jet_id", "target", "signal_score"}
+            if not required.issubset(payload.files):
+                raise ContractError("PREDICTION_COLUMNS", "prediction payload columns are missing")
+            ids = tuple(str(item) for item in payload["jet_id"].tolist())
+            predictions = validate_prediction_arrays(
+                ids, payload["target"], payload["signal_score"]
+            )
+    except (OSError, ValueError) as exc:
+        raise ContractError("PREDICTION_PAYLOAD", "prediction NPZ payload is invalid") from exc
+    if len(predictions.jet_ids) != metadata["row_count"]:
+        raise IntegrityError("PREDICTION_ROW_COUNT", "payload row count differs from metadata")
+    if expected_jet_ids is not None and predictions.jet_ids != tuple(expected_jet_ids):
+        raise IntegrityError("PREDICTION_IDENTITY_MISMATCH", "payload identity order is not fixed")
+    return predictions
 
 
 def binary_roc_auc(labels: NDArray[np.integer[Any]], scores: NDArray[np.floating[Any]]) -> float:

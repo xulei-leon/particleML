@@ -44,12 +44,12 @@ mean the implementation, test, run, artifact, figure, or claim exists.
 | FR-MODEL-004 | checkpoint validator, E0.5 contract, and gate aggregator | §5.1-5.3 | `tests/test_checkpoint.py`; A-D RunPod smoke still pending | E0.5 checkpoint audit | `implemented` |
 | FR-MODEL-005 | explicit fallback resolver and E0.5 model condition | §5.3 and claim eligibility | `tests/test_reporting.py::test_fallback_requires_explicit_approval_and_narrows_model_condition`; formal approval absent | E0.5 policy decision | `implemented` |
 | FR-MODEL-006 | Deep Sets/PFN component | §5.4 Baseline | `tests/test_baseline.py` mask, shape, and train smoke | E3 baseline run records | `specified` |
-| FR-TRAIN-001 | Experiment orchestrator | §6; architecture §6.3 | `tests/test_experiment.py::test_gate_order_and_matrix` | E0-E3 gate ledger | `specified` |
-| FR-TRAIN-002 | Experiment orchestrator | §6.1-6.4 | clean CLI, dry-run, resume mismatch tests | resolved configs and completion records | `specified` |
-| FR-TRAIN-003 | Contract validator/orchestrator | §7 and run-record Schema | valid success/failure schema fixtures | every `runs/*/run-record.json` | `specified` |
-| FR-TRAIN-004 | Experiment orchestrator | §9 Error Taxonomy | failure/interruption retention tests | failed run records and logs | `specified` |
-| FR-EVAL-001 | Metrics service | §7; prediction Schema | identity order, duplicate, target mismatch, payload hash tests | prediction metadata and payload | `specified` |
-| FR-EVAL-002 | Metrics service | §8.1 Per-Run Metrics | known AUC/rejection/zero-background fixtures | E1-E3 run metrics | `specified` |
+| FR-TRAIN-001 | `src/particleml/experiment.py` gate and matrix resolver | §6; architecture §6.3 | `tests/test_experiment.py::test_gate_order_and_matrix`; formal gates remain blocked | E0-E3 gate ledger | `implemented` |
+| FR-TRAIN-002 | experiment CLI and deterministic dry-run ledger | §6.1-6.4 | dry-run, exact-key, stable-identity, and no-overwrite tests | resolved configs and completion records | `implemented` |
+| FR-TRAIN-003 | run-record contract and immutable publisher | §7 and run-record Schema | successful, failed, timed-out, and interrupted schema fixtures | every `runs/*/run-record.json` | `implemented` |
+| FR-TRAIN-004 | one-attempt lifecycle and matrix-status service | §9 Error Taxonomy | failure/interruption retention, no-auto-retry, and missing-condition tests | failed run records and logs | `implemented` |
+| FR-EVAL-001 | prediction array/payload validator | §7; prediction Schema | identity order, duplicate, target mismatch, finite-score, and payload-hash tests | prediction metadata and payload | `implemented` |
+| FR-EVAL-002 | centralized metrics service | §8.1 Per-Run Metrics | golden AUC/rejection/accuracy, zero-background, and unstable-ratio fixtures | E1-E3 run metrics | `implemented` |
 | FR-EVAL-003 | Metrics service | §8.2 Paired Comparisons | deterministic stratified paired-bootstrap fixtures | E2/E3 comparison artifacts | `specified` |
 | FR-EVAL-004 | Reporting service | §7-8 | aggregation completeness and ineligible-claim tests | generated reports, figures, claim ledger | `specified` |
 | FR-REP-001 | Contract validator/artifact lifecycle | architecture §8; spec §6.4-7 | content hash and stale-resume tests | hashes and `COMPLETED.json` | `specified` |

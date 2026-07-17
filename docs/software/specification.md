@@ -469,8 +469,8 @@ creates a new run ID or content-addressed derived path.
 
 Serialized contracts use JSON Schema Draft 2020-12:
 
-- `schemas/run-record.schema.json` validates one final successful or failed
-  training attempt;
+- `schemas/run-record.schema.json` validates one final successful, failed,
+  timed-out, or interrupted training attempt;
 - `schemas/split-manifest.schema.json` validates source/split/subset provenance;
   disjointness remains a semantic code check; and
 - `schemas/prediction.schema.json` validates prediction metadata and the logical

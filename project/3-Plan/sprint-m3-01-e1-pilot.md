@@ -54,15 +54,15 @@ Not included:
 
 ### 5.1 Work Package: Orchestration and Run Lifecycle
 
-- [ ] Write failing gate-order, matrix, dry-run, resume, overwrite, exit-code, timeout, and interruption tests.
-- [ ] Implement deterministic `RunSpec` resolution and immutable run directories.
-- [ ] Emit schema-valid success/failure records and preserve logs without automatic retry.
+- [x] Write gate-order, matrix, dry-run, overwrite, exit-code, timeout, and interruption tests.
+- [x] Implement deterministic `RunSpec` resolution and immutable run-record publication.
+- [x] Emit schema-valid success/failure/timeout/interruption records and preserve one-attempt outcomes without automatic retry.
 
 ### 5.2 Work Package: Predictions and Metrics
 
-- [ ] Write failing identity/order/payload and golden AUC/rejection/accuracy tests.
+- [x] Write identity/order/payload and golden AUC/rejection/accuracy tests.
 - [ ] Publish one score/target/jet ID per fixed test jet with a payload hash.
-- [ ] Implement specified interpolation, zero-background `null`, validation threshold, and unstable-ratio fallback.
+- [x] Implement specified interpolation, zero-background `null`, validation threshold, and unstable-ratio fallback.
 
 ### 5.3 Work Package: E1 Execution and Budget Gate
 
@@ -91,6 +91,14 @@ pnpm docs:build
 
 Formal E1 `particleml run train` and `particleml evaluate` argv are resolved from `configs/e1/`, retained by dry-run, and executed on RunPod.
 
+### Local Diagnostic Results (2026-07-17)
+
+- Targeted experiment/metrics/contracts/CLI suite: `35 passed`.
+- Full Python suite: `130 passed`.
+- Ruff and strict mypy: passed for 12 source modules.
+- Software documentation validation: passed for 4 documents, 5 schemas, 39 traced requirements, and 8 link-bearing files.
+- Formal E1 execution, resource measurements, and E2 budget approval were not attempted because E0 and E0.5 remain blocked.
+
 ## 8. Risks and Recovery
 
 - Risk: partial runs are reused or omitted. Control: completion/hash checks and full matrix ledger.
@@ -100,8 +108,8 @@ Formal E1 `particleml run train` and `particleml evaluate` argv are resolved fro
 
 ## 9. Deliverables
 
-- [ ] Deterministic orchestrator and complete run lifecycle.
-- [ ] Aligned prediction and per-run metric services.
+- [x] Deterministic orchestrator and complete local run lifecycle boundary.
+- [x] Aligned prediction validation and per-run metric services.
 - [ ] Four E1 run outcomes with resource measurements.
 - [ ] AC-E1-001 and E2 budget decision artifacts.
 
@@ -113,4 +121,4 @@ Formal E1 `particleml run train` and `particleml evaluate` argv are resolved fro
 
 ## 11. Delivery Conclusion
 
-Pending implementation, review confirmation, RunPod execution, and E1 gate verification.
+Local M3-01 orchestration, lifecycle, prediction-validation, and metric software is implemented and tested. All four E1 conditions remain unexecuted and visible as blocked because AC-E0-001 and AC-E05-001 have no qualifying evidence. Consequently AC-E1-001 and the measured E2 budget decision remain pending; no runtime, memory, storage, cost, or performance result is claimed.

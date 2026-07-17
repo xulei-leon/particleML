@@ -548,6 +548,14 @@ def main() -> int:
             "message": "fixture failure",
         }
         expect_valid(validators["run"], failed_run, "failed run", errors)
+        timed_out_run = copy.deepcopy(failed_run)
+        timed_out_run["status"] = "timed_out"
+        timed_out_run["failure"]["code"] = "RUN_TIMEOUT"
+        expect_valid(validators["run"], timed_out_run, "timed-out run", errors)
+        interrupted_run = copy.deepcopy(failed_run)
+        interrupted_run["status"] = "interrupted"
+        interrupted_run["failure"]["code"] = "RUN_INTERRUPTED"
+        expect_valid(validators["run"], interrupted_run, "interrupted run", errors)
         missing_metrics = copy.deepcopy(run)
         missing_metrics.pop("metrics")
         expect_invalid(validators["run"], missing_metrics, "successful run without metrics", errors)
