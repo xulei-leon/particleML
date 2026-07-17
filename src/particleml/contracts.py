@@ -19,6 +19,7 @@ SCHEMA_PATHS = {
     "run": "run-record.schema.json",
     "split": "split-manifest.schema.json",
     "prediction": "prediction.schema.json",
+    "e0_audit": "e0-audit.schema.json",
 }
 
 
@@ -282,6 +283,18 @@ def _validate_split_semantics(document: dict[str, Any]) -> None:
     _validate_embedded_hash(document, ("hash_metadata", "content_sha256"))
 
 
+def _validate_e0_audit_semantics(document: dict[str, Any]) -> None:
+    status = document["status"]
+    eligible = document["formal_gate_eligible"]
+    if eligible != (status == "passed"):
+        raise ContractError("CONTRACT_GATE_STATUS", "E0 eligibility does not match status")
+    if status == "passed" and (document["missing_evidence"] or document["failed_gates"]):
+        raise ContractError("CONTRACT_GATE_STATUS", "passed E0 audit retains blocking items")
+    if status == "blocked_external_evidence" and not document["missing_evidence"]:
+        raise ContractError("CONTRACT_GATE_STATUS", "blocked E0 audit needs missing evidence")
+    _validate_embedded_hash(document, ("content_sha256",))
+
+
 def validate_contract_document(document: dict[str, Any], kind: str) -> dict[str, Any]:
     """Run JSON Schema and cross-field semantic validation."""
 
@@ -290,6 +303,8 @@ def validate_contract_document(document: dict[str, Any], kind: str) -> dict[str,
         _validate_prediction_semantics(document)
     elif kind == "split":
         _validate_split_semantics(document)
+    elif kind == "e0_audit":
+        _validate_e0_audit_semantics(document)
     return document
 
 
@@ -302,6 +317,7 @@ def detect_contract_kind(document: dict[str, Any]) -> str:
             ("run", "run_id"),
             ("split", "manifest_id"),
             ("prediction", "prediction_id"),
+            ("e0_audit", "e0_audit_id"),
         )
         if identifier in document
     ]

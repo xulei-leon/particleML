@@ -410,6 +410,7 @@ The `particleml` entry point provides:
 | `split build --canonical PATH --config PATH --output PATH` | Create and semantically validate the split/subset manifest. |
 | `convert --inputs ... --manifest PATH --policy PATH --output PATH` | Convert compact ROOT files into canonical HDF5. |
 | `audit data --canonical PATH --split-manifest PATH --output PATH` | Run E0 data/leakage/cost checks and write a structured audit. |
+| `audit e0 --evidence PATH --policy PATH --output PATH` | Aggregate cross-artifact E0 evidence as passed, failed, or blocked on external evidence. |
 | `view build --canonical PATH --split-manifest PATH --config A-D --subset ID --output PATH` | Materialize one immutable view. |
 | `checkpoint audit --checkpoint PATH --views ROOT --policy PATH --output PATH` | Run the E0.5 checkpoint/adapter gate. |
 | `index build --view PATH --output PATH` | Run and validate the OmniLearned custom-data index step. |
@@ -455,6 +456,7 @@ creates a new run ID or content-addressed derived path.
 |-- views/<subset-id>/<config>/view.h5
 |-- views/<subset-id>/<config>/omnilearned-index/
 |-- audits/e0/data-audit.json
+|-- audits/e0/e0-audit.json
 |-- audits/e0.5/checkpoint-audit.json
 |-- runs/<run-id>/resolved-config.yaml
 |-- runs/<run-id>/run-record.json
@@ -472,7 +474,13 @@ Serialized contracts use JSON Schema Draft 2020-12:
 - `schemas/split-manifest.schema.json` validates source/split/subset provenance;
   disjointness remains a semantic code check; and
 - `schemas/prediction.schema.json` validates prediction metadata and the logical
-  row contract for an external NPZ, Parquet, or HDF5 payload.
+  row contract for an external NPZ, Parquet, or HDF5 payload; and
+- `schemas/e0-audit.schema.json` validates cross-artifact E0 status, missing
+  qualified-host evidence, failed gates, resource projections, and eligibility.
+
+The E0 status vocabulary is `passed`, `failed`, and
+`blocked_external_evidence`. Only retained qualified-host evidence can produce
+`passed`; complete local fixtures remain blocked and cannot promote AC-E0-001.
 
 All defined object boundaries reject unknown properties. Schema version 1.0.0
 is exact; readers reject unsupported major versions.

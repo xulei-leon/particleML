@@ -16,6 +16,7 @@ from particleml.contracts import (
     validate_contract,
 )
 from particleml.dataset import convert_compact_root
+from particleml.e0 import build_e0_audit
 from particleml.manifest import build_split_manifest, hash_source_manifest, load_source_manifest
 from particleml.views import materialize_view
 
@@ -66,6 +67,10 @@ def build_parser() -> argparse.ArgumentParser:
     audit_data.add_argument("--field", action="append", default=[])
     audit_data.add_argument("--policy", required=True, type=Path)
     audit_data.add_argument("--output", required=True, type=Path)
+    audit_e0 = audit_commands.add_parser("e0", help="aggregate the cross-artifact E0 gate")
+    audit_e0.add_argument("--evidence", required=True, type=Path)
+    audit_e0.add_argument("--policy", required=True, type=Path)
+    audit_e0.add_argument("--output", required=True, type=Path)
 
     view = groups.add_parser("view", help="model-view operations")
     view_commands = view.add_subparsers(dest="command", required=True)
@@ -121,6 +126,10 @@ def main(argv: Sequence[str] | None = None) -> int:
                 arguments.output,
             )
             print(f"data audit {report['status']}: {arguments.output}")
+            return 0
+        if arguments.group == "audit" and arguments.command == "e0":
+            report = build_e0_audit(arguments.evidence, arguments.policy, arguments.output)
+            print(f"E0 audit {report['status']}: {arguments.output}")
             return 0
         if arguments.group == "view" and arguments.command == "build":
             output = materialize_view(

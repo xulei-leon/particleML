@@ -46,6 +46,7 @@ SCHEMAS = {
     "run": ROOT / "schemas/run-record.schema.json",
     "split": ROOT / "schemas/split-manifest.schema.json",
     "prediction": ROOT / "schemas/prediction.schema.json",
+    "e0_audit": ROOT / "schemas/e0-audit.schema.json",
 }
 
 OBSOLETE_VIEW_PATTERNS = (
@@ -477,6 +478,7 @@ def main() -> int:
         "run": "https://xulei-leon.github.io/particleML/schemas/run-record.schema.json",
         "split": "https://xulei-leon.github.io/particleML/schemas/split-manifest.schema.json",
         "prediction": "https://xulei-leon.github.io/particleML/schemas/prediction.schema.json",
+        "e0_audit": "https://xulei-leon.github.io/particleML/schemas/e0-audit.schema.json",
     }
     for name, path in SCHEMAS.items():
         try:

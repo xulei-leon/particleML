@@ -37,7 +37,7 @@ mean the implementation, test, run, artifact, figure, or claim exists.
 | FR-DATA-007 | Dataset service | §4.1 Fitted State | `tests/test_dataset.py::test_fit_uses_train_only` | E0/E0.5 preprocessing policy | `specified` |
 | FR-DATA-008 | Manifest/view services | §4.2 Training Subsets | `tests/test_views.py::test_balanced_nested_subsets` | split-manifest subset payloads | `specified` |
 | FR-DATA-009 | Manifest/dataset services | §4.2 and preprocessing contract | `tests/test_dataset.py::test_qcd_round_robin_and_no_audit_inputs` | E0 mixture/confound report | `specified` |
-| FR-DATA-010 | Dataset and metrics services | §3.2-3.3; §8 | `tests/test_audit.py` including shuffled-label probe | E0 data/yield/leakage/cost audit | `specified` |
+| FR-DATA-010 | Dataset, metrics, and E0 aggregation services | §3.2-3.3; §6.2; §7-8 | `tests/test_audit.py` and `tests/test_e0.py` including shuffled-label, resource, and external-evidence gates | Schema-valid E0 data/yield/leakage/cost audit | `specified` |
 | FR-MODEL-001 | Model integration service | §5.1 Pinned External Dependency | `tests/test_model_integration.py::test_subprocess_boundary` | E0.5 dependency audit | `specified` |
 | FR-MODEL-002 | Model integration service | §5.2 Custom-Data Index | `tests/test_model_integration.py::test_index_required_and_hashed` | E0.5 index completion records | `specified` |
 | FR-MODEL-003 | Model integration service | §5.3 Adapter and Training Command | adapter shape/load tests; exact A-D native PID/additional-feature argv snapshots; conditional-flag rejection | E0.5 layer-loading audit | `specified` |
@@ -53,7 +53,7 @@ mean the implementation, test, run, artifact, figure, or claim exists.
 | FR-EVAL-003 | Metrics service | §8.2 Paired Comparisons | deterministic stratified paired-bootstrap fixtures | E2/E3 comparison artifacts | `specified` |
 | FR-EVAL-004 | Reporting service | §7-8 | aggregation completeness and ineligible-claim tests | generated reports, figures, claim ledger | `specified` |
 | FR-REP-001 | Contract validator/artifact lifecycle | architecture §8; spec §6.4-7 | content hash and stale-resume tests | hashes and `COMPLETED.json` | `specified` |
-| FR-REP-002 | Contract validator | §7 Serialized Contracts | `scripts/validate_software_docs.py`; schema fixtures | three JSON Schemas and validated artifacts | `specified` |
+| FR-REP-002 | Contract validator | §7 Serialized Contracts | `scripts/validate_software_docs.py`; schema fixtures | four JSON Schemas and validated artifacts | `specified` |
 | FR-REP-003 | Reporting/traceability | requirements §3; reporting contract | status monotonicity tests | matrix and claim ledger | `specified` |
 | NFR-COR-001 | All fail-closed boundaries | §9 Error Taxonomy | negative contract/leakage/unit/identity fixtures | failed gate/run records | `specified` |
 | NFR-DET-001 | Manifest, views, orchestration, metrics | §2.2, §4.2, §8.2 | repeated hash/subset/bootstrap regression tests | deterministic hashes and seed records | `specified` |
@@ -62,7 +62,7 @@ mean the implementation, test, run, artifact, figure, or claim exists.
 | NFR-ROB-001 | Artifact lifecycle | architecture §8; spec §6.4 | partial-output and completion-sentinel tests | `COMPLETED.json` and retained failures | `specified` |
 | NFR-MNT-001 | Component model | architecture §4 | import-boundary and thin-CLI tests | package/test structure | `specified` |
 | NFR-PUB-001 | Reporting and traceability | architecture §7; spec §7-8 | planned/failed/incomplete claim-eligibility tests | claim ledger and generated evidence | `specified` |
-| AC-E0-001 | E0 control path | requirements §6; architecture §6.3 | aggregate E0 acceptance test | completed, schema-valid E0 audit | `specified` |
+| AC-E0-001 | E0 control path | requirements §6; architecture §6.3; specification §6.2 and §7 | `tests/test_e0.py` aggregate status and fixture non-promotion tests; qualified-host acceptance run | completed, schema-valid E0 audit | `specified` |
 | AC-E05-001 | E0.5 control path | requirements §6; spec §5 | aggregate checkpoint/adapter acceptance test | completed, schema-valid E0.5 audit | `specified` |
 | AC-E1-001 | E1 control path | requirements §6; spec §6-8 | tiny matrix end-to-end fixture | pilot run/prediction records and budget | `specified` |
 | AC-E2-001 | E2 control path | requirements §6; spec §8 | matrix completeness and paired-statistics test | core run matrix and comparison artifacts | `specified` |
