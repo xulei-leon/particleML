@@ -225,7 +225,7 @@
       "required": ["record_id", "role", "canonical_pfn", "pfn_sha256", "adler32", "size_bytes", "bucket", "split"],
       "properties": {
         "record_id": { "type": "integer", "minimum": 1 },
-        "role": { "enum": ["signal", "qcd_active", "qcd_excluded_after_e0"] },
+        "role": { "enum": ["signal", "qcd_candidate", "qcd_active", "qcd_excluded_after_e0"] },
         "canonical_pfn": { "type": "string", "minLength": 1 },
         "pfn_sha256": { "$ref": "#/$defs/sha256" },
         "adler32": { "type": "string", "pattern": "^[0-9a-fA-F]{8}$" },

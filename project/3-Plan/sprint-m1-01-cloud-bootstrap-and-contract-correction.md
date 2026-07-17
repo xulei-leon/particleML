@@ -170,11 +170,11 @@ pnpm docs:build
 
 ## 11. Delivery Conclusion
 
-Implementation, document review confirmation, code review confirmation, and local diagnostics are complete. Local results remain diagnostic-only. Authoritative GitHub Actions verification on the tested commit SHA and the final Sprint commit gate are pending.
+Implementation, document review confirmation, code review confirmation, local diagnostics, and the Sprint commit are complete. Local results remain diagnostic-only. The user prohibited GitHub pushes on 2026-07-17, so authoritative GitHub Actions verification remains explicitly deferred and no requirement or experiment status advances to `verified`.
 
 ## 12. Workflow State
 
-- Current phase: verification gate; local diagnostics complete, authoritative cloud CI pending.
+- Current phase: local workflow complete; cloud verification explicitly deferred by the user's no-push instruction.
 - Target FR documents: `FR-DATA-005`, `FR-MODEL-003`, and `FR-REP-002`.
 - Target Sprint document: `project/3-Plan/sprint-m1-01-cloud-bootstrap-and-contract-correction.md`.
 - Document review reports: `project/4-Reviews/sprint-m1-01-cloud-bootstrap-and-contract-correction-review-by-opencode-go-kimi-k2.7-code.md` and `project/4-Reviews/sprint-m1-01-cloud-bootstrap-and-contract-correction-review-by-ark-code-latest.md`.
@@ -184,5 +184,5 @@ Implementation, document review confirmation, code review confirmation, and loca
 - Implementation target: the M1-01 documentation-contract, package/CLI, CI, dependency-lock, RunPod-definition, and test files listed in Section 4.
 - Local diagnostic results on 2026-07-17: `ruff check`, `mypy src/particleml`, `pytest`, package build, `python scripts/validate_software_docs.py`, `pnpm test`, `pnpm docs:build`, and `git diff --check` passed. These results do not advance acceptance status.
 - Open blocker: GitHub Actions requires a pushed commit/ref. No remote branch or commit has been created because external push authorization has not been granted.
-- Commit status: not created; the required message remains `feat: complete sprint-m1-01-cloud-bootstrap-and-contract-correction code and change base on reviews` after the cloud verification gate succeeds.
-- Multi-Sprint stop state: M1-01 is paused at the authoritative cloud-verification phase. Unstarted targets are M1-02, M1-03, M2-01, M2-02, M3-01, M3-02, and M4-01; none may start until this gate succeeds.
+- Commit status: created locally as `df2b60e` with message `feat: complete sprint-m1-01-cloud-bootstrap-and-contract-correction code and change base on reviews`; not pushed.
+- Multi-Sprint state: M1-01 is complete under the explicit no-push/cloud-deferral override. M1-02 is active; M1-03, M2-01, M2-02, M3-01, M3-02, and M4-01 remain unstarted.

@@ -19,7 +19,7 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Topic :: Scientific/Engineering :: Physics",
 ]
-dependencies = []
+dependencies = ["jsonschema>=4.23,<5"]
 
 [project.optional-dependencies]
 ci = [
@@ -32,6 +32,7 @@ ci = [
   "packaging>=26,<27",
   "pytest>=8.3,<9",
   "ruff>=0.9,<1",
+  "types-jsonschema>=4.23,<5",
 ]
 runpod = [
   "h5py>=3.11,<4",
