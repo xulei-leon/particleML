@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from collections.abc import Sequence
 from pathlib import Path
@@ -18,6 +19,7 @@ from particleml.contracts import (
 from particleml.dataset import convert_compact_root
 from particleml.e0 import build_e0_audit
 from particleml.manifest import build_split_manifest, hash_source_manifest, load_source_manifest
+from particleml.model_integration import aggregate_e05, build_index_argv, validate_checkpoint
 from particleml.views import materialize_view
 
 
@@ -71,6 +73,26 @@ def build_parser() -> argparse.ArgumentParser:
     audit_e0.add_argument("--evidence", required=True, type=Path)
     audit_e0.add_argument("--policy", required=True, type=Path)
     audit_e0.add_argument("--output", required=True, type=Path)
+    audit_e05 = audit_commands.add_parser("e05", help="aggregate the E0.5 model gate")
+    audit_e05.add_argument("--evidence", required=True, type=Path)
+    audit_e05.add_argument("--policy", required=True, type=Path)
+    audit_e05.add_argument("--output", required=True, type=Path)
+
+    index = groups.add_parser("index", help="OmniLearned custom-index operations")
+    index_commands = index.add_subparsers(dest="command", required=True)
+    index_build = index_commands.add_parser("build", help="resolve an official index command")
+    index_build.add_argument("--executable", required=True, type=Path)
+    index_build.add_argument("--view", required=True, type=Path)
+    index_build.add_argument("--output", required=True, type=Path)
+    index_build.add_argument(
+        "--feature-config", required=True, choices=[item.value for item in FeatureConfig]
+    )
+
+    checkpoint = groups.add_parser("checkpoint", help="checkpoint integrity operations")
+    checkpoint_commands = checkpoint.add_subparsers(dest="command", required=True)
+    checkpoint_audit = checkpoint_commands.add_parser("audit", help="audit checkpoint provenance")
+    checkpoint_audit.add_argument("--checkpoint", required=True, type=Path)
+    checkpoint_audit.add_argument("--metadata", required=True, type=Path)
 
     view = groups.add_parser("view", help="model-view operations")
     view_commands = view.add_subparsers(dest="command", required=True)
@@ -130,6 +152,23 @@ def main(argv: Sequence[str] | None = None) -> int:
         if arguments.group == "audit" and arguments.command == "e0":
             report = build_e0_audit(arguments.evidence, arguments.policy, arguments.output)
             print(f"E0 audit {report['status']}: {arguments.output}")
+            return 0
+        if arguments.group == "audit" and arguments.command == "e05":
+            report = aggregate_e05(arguments.evidence, arguments.policy, arguments.output)
+            print(f"E0.5 audit {report['status']}: {arguments.output}")
+            return 0
+        if arguments.group == "index" and arguments.command == "build":
+            resolved = build_index_argv(
+                arguments.executable,
+                arguments.view,
+                arguments.output,
+                FeatureConfig(arguments.feature_config),
+            )
+            print(json.dumps(list(resolved), separators=(",", ":")))
+            return 0
+        if arguments.group == "checkpoint" and arguments.command == "audit":
+            metadata = validate_checkpoint(arguments.checkpoint, arguments.metadata)
+            print(f"valid checkpoint: {metadata['sha256']}")
             return 0
         if arguments.group == "view" and arguments.command == "build":
             output = materialize_view(

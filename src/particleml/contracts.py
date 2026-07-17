@@ -20,6 +20,7 @@ SCHEMA_PATHS = {
     "split": "split-manifest.schema.json",
     "prediction": "prediction.schema.json",
     "e0_audit": "e0-audit.schema.json",
+    "e05_audit": "e05-audit.schema.json",
 }
 
 
@@ -295,6 +296,33 @@ def _validate_e0_audit_semantics(document: dict[str, Any]) -> None:
     _validate_embedded_hash(document, ("content_sha256",))
 
 
+def _validate_e05_audit_semantics(document: dict[str, Any]) -> None:
+    status = document["status"]
+    eligible = document["formal_gate_eligible"]
+    if eligible != (status in {"passed", "fallback_approved"}):
+        raise ContractError("CONTRACT_GATE_STATUS", "E0.5 eligibility does not match status")
+    if status == "passed":
+        if document["missing_evidence"] or document["failed_checks"]:
+            raise ContractError("CONTRACT_GATE_STATUS", "passed E0.5 audit retains blockers")
+        if document["evidence_origin"] != "qualified_runpod":
+            raise ContractError("CONTRACT_GATE_STATUS", "passed E0.5 is not qualified evidence")
+        if document["model_condition"] != ModelCondition.PRETRAINED_OMNILEARNED.value:
+            raise ContractError(
+                "CONTRACT_GATE_STATUS", "passed E0.5 uses the wrong model condition"
+            )
+    if status == "blocked_external_evidence" and not document["missing_evidence"]:
+        if document["evidence_origin"] == "qualified_runpod":
+            raise ContractError("CONTRACT_GATE_STATUS", "blocked E0.5 lacks an external blocker")
+    if status == "fallback_approved" and (
+        document["model_condition"] != ModelCondition.RANDOM_OMNILEARNED.value
+        or not document["failed_checks"]
+    ):
+        raise ContractError(
+            "CONTRACT_GATE_STATUS", "fallback E0.5 lacks failed checks or condition"
+        )
+    _validate_embedded_hash(document, ("content_sha256",))
+
+
 def validate_contract_document(document: dict[str, Any], kind: str) -> dict[str, Any]:
     """Run JSON Schema and cross-field semantic validation."""
 
@@ -305,6 +333,8 @@ def validate_contract_document(document: dict[str, Any], kind: str) -> dict[str,
         _validate_split_semantics(document)
     elif kind == "e0_audit":
         _validate_e0_audit_semantics(document)
+    elif kind == "e05_audit":
+        _validate_e05_audit_semantics(document)
     return document
 
 
@@ -318,6 +348,7 @@ def detect_contract_kind(document: dict[str, Any]) -> str:
             ("split", "manifest_id"),
             ("prediction", "prediction_id"),
             ("e0_audit", "e0_audit_id"),
+            ("e05_audit", "e05_audit_id"),
         )
         if identifier in document
     ]

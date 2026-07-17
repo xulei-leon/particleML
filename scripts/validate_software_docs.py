@@ -8,6 +8,7 @@ instances. It does not verify E0-E3 implementation or scientific results.
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import re
 import sys
@@ -47,6 +48,7 @@ SCHEMAS = {
     "split": ROOT / "schemas/split-manifest.schema.json",
     "prediction": ROOT / "schemas/prediction.schema.json",
     "e0_audit": ROOT / "schemas/e0-audit.schema.json",
+    "e05_audit": ROOT / "schemas/e05-audit.schema.json",
 }
 
 OBSOLETE_VIEW_PATTERNS = (
@@ -387,6 +389,24 @@ def sample_prediction() -> dict[str, object]:
     }
 
 
+def sample_e05_audit() -> dict[str, object]:
+    document: dict[str, object] = {
+        "schema_version": SCHEMA_VERSION,
+        "e05_audit_id": "e05-local-software-fixture",
+        "status": "blocked_external_evidence",
+        "formal_gate_eligible": False,
+        "evidence_origin": "local_fixture",
+        "dependency_revision": "5091595d226b6021e967ab2ecfff832f40c026f6",
+        "missing_evidence": [],
+        "failed_checks": [],
+        "model_condition": "pretrained_omnilearned",
+        "policy_sha256": HASH,
+    }
+    payload = json.dumps(document, sort_keys=True, separators=(",", ":")) + "\n"
+    document["content_sha256"] = hashlib.sha256(payload.encode()).hexdigest()
+    return document
+
+
 def markdown_link_errors(path: Path) -> list[str]:
     errors: list[str] = []
     text = path.read_text(encoding="utf-8")
@@ -479,6 +499,7 @@ def main() -> int:
         "split": "https://xulei-leon.github.io/particleML/schemas/split-manifest.schema.json",
         "prediction": "https://xulei-leon.github.io/particleML/schemas/prediction.schema.json",
         "e0_audit": "https://xulei-leon.github.io/particleML/schemas/e0-audit.schema.json",
+        "e05_audit": "https://xulei-leon.github.io/particleML/schemas/e05-audit.schema.json",
     }
     for name, path in SCHEMAS.items():
         try:
@@ -545,6 +566,8 @@ def main() -> int:
         unordered = copy.deepcopy(prediction)
         unordered["ordered"] = False
         expect_invalid(validators["prediction"], unordered, "unordered prediction", errors)
+
+        expect_valid(validators["e05_audit"], sample_e05_audit(), "E0.5 audit", errors)
 
     requirements_text = DOCS[0].read_text(encoding="utf-8")
     matrix_text = DOCS[3].read_text(encoding="utf-8")

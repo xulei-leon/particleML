@@ -476,11 +476,17 @@ Serialized contracts use JSON Schema Draft 2020-12:
 - `schemas/prediction.schema.json` validates prediction metadata and the logical
   row contract for an external NPZ, Parquet, or HDF5 payload; and
 - `schemas/e0-audit.schema.json` validates cross-artifact E0 status, missing
-  qualified-host evidence, failed gates, resource projections, and eligibility.
+  qualified-host evidence, failed gates, resource projections, and eligibility;
+  and
+- `schemas/e05-audit.schema.json` validates the E0.5 dependency/checkpoint gate,
+  qualified RunPod evidence origin, explicit fallback, and model condition.
 
 The E0 status vocabulary is `passed`, `failed`, and
 `blocked_external_evidence`. Only retained qualified-host evidence can produce
 `passed`; complete local fixtures remain blocked and cannot promote AC-E0-001.
+The E0.5 vocabulary additionally includes `fallback_approved`; this state is
+eligible only for the explicitly approved supervised condition and removes all
+pretrained-transfer claim eligibility. Local fixtures cannot promote E0.5.
 
 All defined object boundaries reject unknown properties. Schema version 1.0.0
 is exact; readers reject unsupported major versions.

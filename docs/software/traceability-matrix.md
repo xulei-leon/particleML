@@ -38,11 +38,11 @@ mean the implementation, test, run, artifact, figure, or claim exists.
 | FR-DATA-008 | Manifest/view services | §4.2 Training Subsets | `tests/test_views.py::test_balanced_nested_subsets` | split-manifest subset payloads | `specified` |
 | FR-DATA-009 | Manifest/dataset services | §4.2 and preprocessing contract | `tests/test_dataset.py::test_qcd_round_robin_and_no_audit_inputs` | E0 mixture/confound report | `specified` |
 | FR-DATA-010 | Dataset, metrics, and E0 aggregation services | §3.2-3.3; §6.2; §7-8 | `tests/test_audit.py` and `tests/test_e0.py` including shuffled-label, resource, and external-evidence gates | Schema-valid E0 data/yield/leakage/cost audit | `specified` |
-| FR-MODEL-001 | Model integration service | §5.1 Pinned External Dependency | `tests/test_model_integration.py::test_subprocess_boundary` | E0.5 dependency audit | `specified` |
-| FR-MODEL-002 | Model integration service | §5.2 Custom-Data Index | `tests/test_model_integration.py::test_index_required_and_hashed` | E0.5 index completion records | `specified` |
-| FR-MODEL-003 | Model integration service | §5.3 Adapter and Training Command | adapter shape/load tests; exact A-D native PID/additional-feature argv snapshots; conditional-flag rejection | E0.5 layer-loading audit | `specified` |
-| FR-MODEL-004 | Model integration service | §5.1-5.3 | `tests/test_checkpoint.py`; A-D smoke training | E0.5 checkpoint audit | `specified` |
-| FR-MODEL-005 | Model integration/reporting | §5.3 and claim eligibility | `tests/test_reporting.py::test_fallback_narrows_claims` | E0.5 policy decision | `specified` |
+| FR-MODEL-001 | `src/particleml/model_integration.py` external boundary | §5.1 Pinned External Dependency | `tests/test_model_integration.py::test_subprocess_boundary_uses_argument_array_shell_false_and_redacts`; formal environment pending | E0.5 dependency audit | `implemented` |
+| FR-MODEL-002 | `src/particleml/model_integration.py` index validator and CLI resolver | §5.2 Custom-Data Index | `tests/test_model_integration.py::test_index_required_and_hashed_and_stale_view_rejected`; official RunPod index pending | E0.5 index completion records | `implemented` |
+| FR-MODEL-003 | `adapter_flags`, `build_train_argv`, and tensor audit | §5.3 Adapter and Training Command | exact A-D native PID/additional-feature argv snapshots; conditional-flag rejection; tensor-shape report | E0.5 layer-loading audit | `implemented` |
+| FR-MODEL-004 | checkpoint validator, E0.5 contract, and gate aggregator | §5.1-5.3 | `tests/test_checkpoint.py`; A-D RunPod smoke still pending | E0.5 checkpoint audit | `implemented` |
+| FR-MODEL-005 | explicit fallback resolver and E0.5 model condition | §5.3 and claim eligibility | `tests/test_reporting.py::test_fallback_requires_explicit_approval_and_narrows_model_condition`; formal approval absent | E0.5 policy decision | `implemented` |
 | FR-MODEL-006 | Deep Sets/PFN component | §5.4 Baseline | `tests/test_baseline.py` mask, shape, and train smoke | E3 baseline run records | `specified` |
 | FR-TRAIN-001 | Experiment orchestrator | §6; architecture §6.3 | `tests/test_experiment.py::test_gate_order_and_matrix` | E0-E3 gate ledger | `specified` |
 | FR-TRAIN-002 | Experiment orchestrator | §6.1-6.4 | clean CLI, dry-run, resume mismatch tests | resolved configs and completion records | `specified` |
@@ -53,7 +53,7 @@ mean the implementation, test, run, artifact, figure, or claim exists.
 | FR-EVAL-003 | Metrics service | §8.2 Paired Comparisons | deterministic stratified paired-bootstrap fixtures | E2/E3 comparison artifacts | `specified` |
 | FR-EVAL-004 | Reporting service | §7-8 | aggregation completeness and ineligible-claim tests | generated reports, figures, claim ledger | `specified` |
 | FR-REP-001 | Contract validator/artifact lifecycle | architecture §8; spec §6.4-7 | content hash and stale-resume tests | hashes and `COMPLETED.json` | `specified` |
-| FR-REP-002 | Contract validator | §7 Serialized Contracts | `scripts/validate_software_docs.py`; schema fixtures | four JSON Schemas and validated artifacts | `specified` |
+| FR-REP-002 | Contract validator | §7 Serialized Contracts | `scripts/validate_software_docs.py`; schema fixtures | five JSON Schemas and validated artifacts | `implemented` |
 | FR-REP-003 | Reporting/traceability | requirements §3; reporting contract | status monotonicity tests | matrix and claim ledger | `specified` |
 | NFR-COR-001 | All fail-closed boundaries | §9 Error Taxonomy | negative contract/leakage/unit/identity fixtures | failed gate/run records | `specified` |
 | NFR-DET-001 | Manifest, views, orchestration, metrics | §2.2, §4.2, §8.2 | repeated hash/subset/bootstrap regression tests | deterministic hashes and seed records | `specified` |
