@@ -6,9 +6,9 @@
 |---|---|
 | Status | Approved architecture baseline; implementation not yet verified |
 | Document version | 1.1.0 |
-| Software documentation suite | 1.0.0 |
+| Software documentation suite | 1.1.0 |
 | Research baseline | Research Plan v0.4.0 |
-| Date | 2026-07-16 |
+| Date | 2026-07-17 |
 | Primary study | CMS 2015 top-versus-QCD feature-availability fine-tuning |
 
 This is the single authoritative architecture for the publication-supporting
@@ -217,17 +217,21 @@ impact-parameter transforms are derived from training data only. E0.5 must
 either reproduce the documented checkpoint convention or approve an explicit
 training-only fitted transform. There is no ad hoc `tanh` fallback.
 
-A-D views are immutable projections:
+A-D views are immutable projections. Canonical storage keeps `charge` before
+`pid_type`, while view construction deliberately reorders the native integer
+PID to index 4 for the pinned OmniLearned interface:
 
-| Configuration | Fields |
-|---|---|
-| A | `delta_eta`, `delta_phi`, `log_pt`, `log_energy` |
-| B | A + `charge` |
-| C | B + `pid_type` |
-| D | C + four raw/approved-transformed impact-parameter fields |
+| Configuration | `F` | Ordered fields | OmniLearned flags |
+|---|---:|---|---|
+| A | 4 | `delta_eta`, `delta_phi`, `log_pt`, `log_energy` | none |
+| B | 5 | A + `charge` | `--use-add --num-add 1` |
+| C | 6 | A + `pid_type` at index 4 + `charge` | `--use-pid --pid_idx 4 --use-add --num-add 1` |
+| D | 10 | C + `dxy_raw`, `dxy_error_raw`, `dz_raw`, `dz_error_raw` | `--use-pid --pid_idx 4 --use-add --num-add 5` |
 
-Categorical PID is stored as an integer category and converted to the frozen
-one-hot representation at the adapter boundary.
+The project passes the integer PID column and continuous additional fields to
+the pinned OmniLearned interface. It does not expand PID into project-owned
+indicator columns in a materialized HDF5 view; any internal categorical
+encoding remains an implementation detail of the pinned external package.
 
 ## 6. Model and Training Architecture
 
@@ -361,4 +365,3 @@ Verification details and commands are specified in
 [Implementation Specification](./specification.md), while requirement-to-test
 and requirement-to-evidence mappings are maintained in the
 [Traceability Matrix](./traceability-matrix.md).
-

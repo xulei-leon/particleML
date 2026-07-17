@@ -324,13 +324,14 @@ Full-feature training followed by test-time feature masking is not a primary res
 ### 7.2 Preferred Input Adapter
 
 1. Build a configuration-specific input projection.
-2. Use normalized continuous inputs plus one-hot categorical PID by default.
+2. Pass normalized continuous inputs and the integer categorical PID column
+   through OmniLearned's native PID/additional-feature interface.
 3. Randomly initialize the configuration-specific adapter and binary output head.
 4. Load every shape-compatible non-input backbone weight from the same checkpoint.
 5. Log every loaded, skipped, and mismatched tensor.
 6. Fine-tune the full model end to end with fixed optimization rules.
 
-If adapter replacement is impossible, fixed full-dimension neutralization is allowed only after E0.5 records the failure. Standardized unavailable continuous inputs and unavailable charge are set to zero; unavailable PID bits are all zero. The resulting input-layer contamination risk must be stated.
+If adapter replacement is impossible, fixed full-dimension neutralization is allowed only after E0.5 records the failure. Standardized unavailable continuous inputs and unavailable charge are set to zero; unavailable PID uses the recorded neutral category. The resulting input-layer contamination risk must be stated.
 
 ### 7.3 E0.5 Adapter Gate
 

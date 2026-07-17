@@ -6,9 +6,9 @@
 |---|---|
 | Status | Approved requirements baseline; implementation and experiments not yet verified |
 | Document version | 1.0.0 |
-| Software documentation suite | 1.0.0 |
+| Software documentation suite | 1.1.0 |
 | Research baseline | Research Plan v0.4.0 |
-| Date | 2026-07-16 |
+| Date | 2026-07-17 |
 | Language | English |
 
 This document defines what the publication-supporting particleML software must
@@ -458,4 +458,3 @@ training matrix, primary endpoint, or claim boundary requires a Research Plan
 v0.4.x amendment before dependent formal runs. Other contract changes require a
 documentation-suite version increment, synchronized schema changes where
 applicable, a traceability update, and a successful consistency check.
-

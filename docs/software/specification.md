@@ -5,10 +5,10 @@
 | Field | Value |
 |---|---|
 | Status | Approved implementation contract; implementation not yet verified |
-| Document version | 1.0.0 |
-| Software documentation suite | 1.0.0 |
+| Document version | 1.1.0 |
+| Software documentation suite | 1.1.0 |
 | Research baseline | Research Plan v0.4.0 |
-| Date | 2026-07-16 |
+| Date | 2026-07-17 |
 | Target Python | 3.10 or newer in the pinned ML environment |
 
 This document makes the behavior in the
@@ -310,19 +310,25 @@ Every view HDF5 contains:
 | `pid` | `[N]`, `int8` |
 | `jet_id` | `[N]`, UTF-8 |
 
-View dimensions after one-hot PID expansion are:
+The `data` dataset uses the following native integer-PID view contract. The
+`pid_type` values remain integer-valued category codes even though the shared
+HDF5 tensor dtype is `float32`; the pinned loader selects column 4 through
+`--pid_idx 4` and converts it to the categorical dtype it owns.
 
-| Config | `F` | Ordered fields |
-|---|---:|---|
-| A | 4 | normalized kinematics |
-| B | 5 | A + charge |
-| C | 11 | B + six PID one-hot channels |
-| D | 15 | C + four approved D channels |
+| Config | `F` | Ordered fields | OmniLearned flags |
+|---|---:|---|---|
+| A | 4 | `delta_eta`, `delta_phi`, `log_pt`, `log_energy` | none |
+| B | 5 | A + `charge` | `--use-add --num-add 1` |
+| C | 6 | A + `pid_type` at index 4 + `charge` | `--use-pid --pid_idx 4 --use-add --num-add 1` |
+| D | 10 | C + `dxy_raw`, `dxy_error_raw`, `dz_raw`, `dz_error_raw` | `--use-pid --pid_idx 4 --use-add --num-add 5` |
 
-For valid unknown particles, the unknown PID bit is one. For configs A/B, PID
-channels are absent rather than zero-filled unless E0.5 explicitly approves the
-full-dimensional neutralization fallback. View metadata includes canonical,
-split, subset, and preprocessing hashes; configuration; ordered field names;
+Canonical HDF5 storage remains `kinematics, charge, pid_type, D fields`; view
+construction performs the documented reordering. Valid unknown particles keep
+PID code 0 and remain distinguishable from padding through `mask`. Configs A/B
+omit the PID field unless E0.5 explicitly approves the full-dimensional
+neutralization fallback. No materialized view contains project-expanded PID
+indicator columns. View metadata includes canonical, split, subset, and
+preprocessing hashes; configuration; ordered field names; exact external argv;
 and view SHA-256.
 
 Identity equality across views is byte-for-byte equality of ordered `jet_id`,

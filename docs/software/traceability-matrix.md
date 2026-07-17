@@ -5,10 +5,10 @@
 | Field | Value |
 |---|---|
 | Status | Approved traceability baseline; implementation and experiment evidence not yet verified |
-| Document version | 1.0.0 |
-| Software documentation suite | 1.0.0 |
+| Document version | 1.1.0 |
+| Software documentation suite | 1.1.0 |
 | Research baseline | Research Plan v0.4.0 |
-| Date | 2026-07-16 |
+| Date | 2026-07-17 |
 
 This matrix maps the [Software Requirements Specification](./requirements.md)
 to the [Software Architecture](./architecture.md),
@@ -32,7 +32,7 @@ mean the implementation, test, run, artifact, figure, or claim exists.
 | FR-DATA-002 | CMSSW extractor | §3.1 CMSSW Output | `cmssw/.../test/test_extractor_cfg.py`; CMSSW fixture job | E0 compact ROOT and extraction report | `specified` |
 | FR-DATA-003 | CMSSW extractor | §3.1; Research Plan §4.3-4.4 | hand-inspected truth fixtures and `test_truth_matching` | E0 label/cutflow audit | `specified` |
 | FR-DATA-004 | Dataset service | §3.3 Canonical HDF5 | `tests/test_dataset.py::test_canonical_layout` | E0 canonical full-D HDF5 | `specified` |
-| FR-DATA-005 | View service | §4.3 Materialized Views | `tests/test_views.py::test_ad_identity_equivalence`; PID sign test | E0 A-D view audit | `specified` |
+| FR-DATA-005 | View service | §4.3 Materialized Views | `tests/test_views.py::test_ad_identity_equivalence`; PID sign/order test; `tests/test_software_document_contract.py` native integer-PID/obsolete-contract regression | E0 A-D view audit | `specified` |
 | FR-DATA-006 | Manifest service | §2.2 Split Algorithm | `tests/test_manifest.py::test_exact_pfn_split`; overlap fixtures | E0 split manifest and overlap report | `specified` |
 | FR-DATA-007 | Dataset service | §4.1 Fitted State | `tests/test_dataset.py::test_fit_uses_train_only` | E0/E0.5 preprocessing policy | `specified` |
 | FR-DATA-008 | Manifest/view services | §4.2 Training Subsets | `tests/test_views.py::test_balanced_nested_subsets` | split-manifest subset payloads | `specified` |
@@ -40,7 +40,7 @@ mean the implementation, test, run, artifact, figure, or claim exists.
 | FR-DATA-010 | Dataset and metrics services | §3.2-3.3; §8 | `tests/test_audit.py` including shuffled-label probe | E0 data/yield/leakage/cost audit | `specified` |
 | FR-MODEL-001 | Model integration service | §5.1 Pinned External Dependency | `tests/test_model_integration.py::test_subprocess_boundary` | E0.5 dependency audit | `specified` |
 | FR-MODEL-002 | Model integration service | §5.2 Custom-Data Index | `tests/test_model_integration.py::test_index_required_and_hashed` | E0.5 index completion records | `specified` |
-| FR-MODEL-003 | Model integration service | §5.3 Adapter and Training Command | adapter shape/load tests and conditional-flag rejection | E0.5 layer-loading audit | `specified` |
+| FR-MODEL-003 | Model integration service | §5.3 Adapter and Training Command | adapter shape/load tests; exact A-D native PID/additional-feature argv snapshots; conditional-flag rejection | E0.5 layer-loading audit | `specified` |
 | FR-MODEL-004 | Model integration service | §5.1-5.3 | `tests/test_checkpoint.py`; A-D smoke training | E0.5 checkpoint audit | `specified` |
 | FR-MODEL-005 | Model integration/reporting | §5.3 and claim eligibility | `tests/test_reporting.py::test_fallback_narrows_claims` | E0.5 policy decision | `specified` |
 | FR-MODEL-006 | Deep Sets/PFN component | §5.4 Baseline | `tests/test_baseline.py` mask, shape, and train smoke | E3 baseline run records | `specified` |

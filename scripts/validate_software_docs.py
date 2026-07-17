@@ -11,6 +11,7 @@ import copy
 import json
 import re
 import sys
+from collections.abc import Mapping
 from pathlib import Path
 from urllib.parse import unquote
 
@@ -19,12 +20,14 @@ try:
     from jsonschema.exceptions import SchemaError
 except ImportError as exc:  # pragma: no cover - environment diagnostic
     raise SystemExit(
-        "jsonschema is required; install requirements-docs.txt before running this check"
+        "jsonschema is required; install requirements-ci.lock or the docs-only "
+        "requirements-docs.txt before running this check"
     ) from exc
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SUITE_VERSION = "1.0.0"
+DOCUMENT_SUITE_VERSION = "1.1.0"
+SCHEMA_VERSION = "1.0.0"
 RESEARCH_VERSION = "Research Plan v0.4.0"
 
 DOCS = (
@@ -45,6 +48,80 @@ SCHEMAS = {
     "prediction": ROOT / "schemas/prediction.schema.json",
 }
 
+OBSOLETE_VIEW_PATTERNS = (
+    r"view dimensions after one-hot PID expansion",
+    r"six PID one-hot channels",
+    r"converted to the frozen one-hot representation",
+    r"unknown PID bit",
+)
+
+REQUIRED_VIEW_MARKERS = {
+    "docs/software/architecture.md": (
+        (
+            "C native integer-PID dimension and order",
+            "| C | 6 | A + `pid_type` at index 4 + `charge` |",
+        ),
+        (
+            "D OmniLearned flags",
+            "`--use-pid --pid_idx 4 --use-add --num-add 5`",
+        ),
+    ),
+    "docs/software/specification.md": (
+        (
+            "C native integer-PID dimension and order",
+            "| C | 6 | A + `pid_type` at index 4 + `charge` |",
+        ),
+        (
+            "D native integer-PID dimension",
+            "| D | 10 | C + `dxy_raw`, `dxy_error_raw`, `dz_raw`, `dz_error_raw` |",
+        ),
+        (
+            "C OmniLearned flags",
+            "`--use-pid --pid_idx 4 --use-add --num-add 1`",
+        ),
+        (
+            "D OmniLearned flags",
+            "`--use-pid --pid_idx 4 --use-add --num-add 5`",
+        ),
+    ),
+    "docs/software/traceability-matrix.md": (
+        (
+            "FR-DATA-005 native integer-PID regression mapping",
+            "native integer-PID/obsolete-contract regression",
+        ),
+        (
+            "FR-MODEL-003 exact argv mapping",
+            "exact A-D native PID/additional-feature argv snapshots",
+        ),
+    ),
+}
+
+
+def view_contract_errors(documents: Mapping[str, str]) -> list[str]:
+    """Return native integer-PID contract errors for software documents."""
+
+    errors: list[str] = []
+    normalized = {path.replace("\\", "/"): text for path, text in documents.items()}
+
+    for path, text in normalized.items():
+        for pattern in OBSOLETE_VIEW_PATTERNS:
+            match = re.search(pattern, text, re.IGNORECASE)
+            if match:
+                errors.append(
+                    f"{path}: obsolete one-hot PID view contract: {match.group(0)!r}"
+                )
+
+    for path, markers in REQUIRED_VIEW_MARKERS.items():
+        text = normalized.get(path)
+        if text is None:
+            errors.append(f"{path}: missing from native integer-PID contract validation")
+            continue
+        for label, marker in markers:
+            if marker not in text:
+                errors.append(f"{path}: missing {label}: {marker!r}")
+
+    return errors
+
 HASH = "a" * 64
 OTHER_HASH = "b" * 64
 COMMIT = "c" * 40
@@ -57,7 +134,7 @@ def artifact(path: str, digest: str = HASH, byte_size: int = 1) -> dict[str, obj
 
 def sample_run() -> dict[str, object]:
     return {
-        "schema_version": SUITE_VERSION,
+        "schema_version": SCHEMA_VERSION,
         "run_id": "e1-deepsets-a-n1000-s1",
         "study_id": "cms2015-feature-availability-v04",
         "stage": "E1",
@@ -147,7 +224,7 @@ def sample_run() -> dict[str, object]:
 
 def sample_split() -> dict[str, object]:
     return {
-        "schema_version": SUITE_VERSION,
+        "schema_version": SCHEMA_VERSION,
         "manifest_id": "cms2015-split-v1",
         "study_id": "cms2015-feature-availability-v04",
         "created_at": TIMESTAMP,
@@ -253,7 +330,10 @@ def sample_split() -> dict[str, object]:
         },
         "hash_metadata": {
             "algorithm": "sha256",
-            "canonicalization": "utf8-sorted-keys-compact-json-lf-excluding-hash_metadata.content_sha256",
+            "canonicalization": (
+                "utf8-sorted-keys-compact-json-lf-excluding-"
+                "hash_metadata.content_sha256"
+            ),
             "content_sha256": HASH,
         },
     }
@@ -265,7 +345,7 @@ def column(name: str, dtype: str, **extra: object) -> dict[str, object]:
 
 def sample_prediction() -> dict[str, object]:
     return {
-        "schema_version": SUITE_VERSION,
+        "schema_version": SCHEMA_VERSION,
         "prediction_id": "pred-e1-deepsets-a-n1000-s1",
         "run_id": "e1-deepsets-a-n1000-s1",
         "created_at": TIMESTAMP,
@@ -297,7 +377,10 @@ def sample_prediction() -> dict[str, object]:
         },
         "content_hash": {
             "algorithm": "sha256",
-            "canonicalization": "utf8-sorted-keys-compact-json-lf-excluding-content_hash.metadata_sha256",
+            "canonicalization": (
+                "utf8-sorted-keys-compact-json-lf-excluding-"
+                "content_hash.metadata_sha256"
+            ),
             "metadata_sha256": HASH,
         },
     }
@@ -321,14 +404,24 @@ def markdown_link_errors(path: Path) -> list[str]:
     return errors
 
 
-def expect_valid(validator: Draft202012Validator, instance: dict[str, object], name: str, errors: list[str]) -> None:
+def expect_valid(
+    validator: Draft202012Validator,
+    instance: dict[str, object],
+    name: str,
+    errors: list[str],
+) -> None:
     found = sorted(validator.iter_errors(instance), key=lambda error: list(error.path))
     for error in found:
         location = ".".join(str(part) for part in error.path) or "<root>"
         errors.append(f"{name} sample at {location}: {error.message}")
 
 
-def expect_invalid(validator: Draft202012Validator, instance: dict[str, object], name: str, errors: list[str]) -> None:
+def expect_invalid(
+    validator: Draft202012Validator,
+    instance: dict[str, object],
+    name: str,
+    errors: list[str],
+) -> None:
     if validator.is_valid(instance):
         errors.append(f"negative schema fixture unexpectedly passed: {name}")
 
@@ -344,11 +437,16 @@ def main() -> int:
         print("\n".join(errors), file=sys.stderr)
         return 1
 
-    canonical_text = "\n".join(path.read_text(encoding="utf-8") for path in DOCS)
+    document_text = {
+        path.relative_to(ROOT).as_posix(): path.read_text(encoding="utf-8") for path in DOCS
+    }
+    canonical_text = "\n".join(document_text.values())
     for path in DOCS:
         text = path.read_text(encoding="utf-8")
-        if f"Software documentation suite | {SUITE_VERSION}" not in text:
-            errors.append(f"{path.relative_to(ROOT)}: missing suite version {SUITE_VERSION}")
+        if f"Software documentation suite | {DOCUMENT_SUITE_VERSION}" not in text:
+            errors.append(
+                f"{path.relative_to(ROOT)}: missing suite version {DOCUMENT_SUITE_VERSION}"
+            )
         if RESEARCH_VERSION not in text:
             errors.append(f"{path.relative_to(ROOT)}: missing research baseline {RESEARCH_VERSION}")
         if "CMS 2015" not in text:
@@ -364,6 +462,8 @@ def main() -> int:
         match = re.search(pattern, canonical_text)
         if match:
             errors.append(f"canonical documentation contains {reason}: {match.group(0)!r}")
+
+    errors.extend(view_contract_errors(document_text))
 
     for path in LINK_DOCUMENTS:
         if not path.exists():
@@ -390,17 +490,21 @@ def main() -> int:
         if schema.get("$id") != expected_ids[name]:
             errors.append(f"{path.relative_to(ROOT)}: unexpected $id")
         if schema.get("additionalProperties") is not False:
-            errors.append(f"{path.relative_to(ROOT)}: top-level unknown properties are not rejected")
+            errors.append(
+                f"{path.relative_to(ROOT)}: top-level unknown properties are not rejected"
+            )
         version = schema.get("properties", {}).get("schema_version", {}).get("const")
-        if version != SUITE_VERSION:
-            errors.append(f"{path.relative_to(ROOT)}: schema_version is not {SUITE_VERSION}")
+        if version != SCHEMA_VERSION:
+            errors.append(f"{path.relative_to(ROOT)}: schema_version is not {SCHEMA_VERSION}")
         remote_refs = [
             value
             for value in re.findall(r'"\$ref"\s*:\s*"([^"]+)"', path.read_text(encoding="utf-8"))
             if not value.startswith("#/")
         ]
         if remote_refs:
-            errors.append(f"{path.relative_to(ROOT)}: unresolved/non-local $ref values {remote_refs}")
+            errors.append(
+                f"{path.relative_to(ROOT)}: unresolved/non-local $ref values {remote_refs}"
+            )
         try:
             Draft202012Validator.check_schema(schema)
             validators[name] = Draft202012Validator(schema, format_checker=FormatChecker())
