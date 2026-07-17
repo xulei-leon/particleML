@@ -4,20 +4,34 @@ attrs==26.1.0
     # via
     #   jsonschema
     #   referencing
+awkward==2.10.0
+    # via
+    #   particleml-research (pyproject.toml)
+    #   uproot
+awkward-cpp==54
+    # via awkward
 build==1.5.0
     # via particleml-research (pyproject.toml)
 colorama==0.4.6 ; os_name == 'nt' or sys_platform == 'win32'
     # via
     #   build
     #   pytest
+cramjam==2.11.0
+    # via uproot
 exceptiongroup==1.3.1 ; python_full_version < '3.11'
     # via pytest
+fsspec==2026.6.0
+    # via
+    #   awkward
+    #   uproot
 h5py==3.16.0
     # via particleml-research (pyproject.toml)
 hatchling==1.31.0
     # via particleml-research (pyproject.toml)
-importlib-metadata==9.0.0 ; python_full_version < '3.10.2'
-    # via build
+importlib-metadata==9.0.0 ; python_full_version < '3.12'
+    # via
+    #   awkward
+    #   build
 iniconfig==2.3.0
     # via pytest
 jsonschema==4.26.0
@@ -33,13 +47,18 @@ mypy-extensions==1.1.0
 numpy==1.26.4
     # via
     #   particleml-research (pyproject.toml)
+    #   awkward
+    #   awkward-cpp
     #   h5py
+    #   uproot
 packaging==26.2
     # via
     #   particleml-research (pyproject.toml)
+    #   awkward
     #   build
     #   hatchling
     #   pytest
+    #   uproot
 pathspec==1.1.1
     # via
     #   hatchling
@@ -81,8 +100,14 @@ types-jsonschema==4.26.0.20260518
     # via particleml-research (pyproject.toml)
 typing-extensions==4.16.0
     # via
+    #   awkward
     #   exceptiongroup
     #   mypy
     #   referencing
-zipp==4.1.0 ; python_full_version < '3.10.2'
+    #   uproot
+uproot==5.7.5
+    # via particleml-research (pyproject.toml)
+xxhash==3.8.1
+    # via uproot
+zipp==4.1.0 ; python_full_version < '3.12'
     # via importlib-metadata

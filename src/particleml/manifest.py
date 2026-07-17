@@ -369,7 +369,9 @@ def _parse_split_config(path: Path) -> dict[str, Any]:
     return config
 
 
-def _rank_identity(seed: int, jet_id: str) -> tuple[int, str]:
+def rank_jet_id(seed: int, jet_id: str) -> tuple[int, str]:
+    """Return the exact unsigned SHA-256 subset rank and textual tie-break."""
+
     digest = hashlib.sha256(f"{seed}\0{jet_id}".encode()).digest()
     return int.from_bytes(digest, "big", signed=False), jet_id
 
@@ -379,7 +381,7 @@ def _select_qcd(jets: list[JetIdentity], size: int, seed: int) -> list[JetIdenti
     for jet in jets:
         queues.setdefault(jet.record_id, []).append(jet)
     for queue in queues.values():
-        queue.sort(key=lambda jet: _rank_identity(seed, jet.jet_id))
+        queue.sort(key=lambda jet: rank_jet_id(seed, jet.jet_id))
     selected: list[JetIdentity] = []
     positions = {record_id: 0 for record_id in queues}
     while len(selected) < size:
@@ -480,7 +482,7 @@ def build_split_manifest(canonical_path: Path, config_path: Path, output_path: P
     for subset in config["training_subsets"]:
         size = subset["train_size_per_class"]
         seed = subset["subset_seed"]
-        selected_top = sorted(train_top, key=lambda jet: _rank_identity(seed, jet.jet_id))[:size]
+        selected_top = sorted(train_top, key=lambda jet: rank_jet_id(seed, jet.jet_id))[:size]
         selected_qcd = _select_qcd(train_qcd, size, seed)
         if len(selected_top) != size:
             raise IntegrityError(

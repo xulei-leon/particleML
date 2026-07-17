@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 import particleml.artifacts as artifacts_module
-from particleml.artifacts import publish_artifact, resume_artifact
+from particleml.artifacts import publish_artifact, resume_artifact, verify_artifact_payload
 from particleml.contracts import IntegrityError
 
 INPUTS = {"source_manifest": "1" * 64}
@@ -31,6 +31,7 @@ def test_completed_marker_controls_resume(tmp_path: Path) -> None:
     assert published == resumed
     assert marker["artifact_sha256"] == published.sha256
     assert marker["input_hashes"] == INPUTS
+    assert verify_artifact_payload(final / "payload.txt") == published
 
 
 def test_partial_output_is_not_complete(tmp_path: Path) -> None:

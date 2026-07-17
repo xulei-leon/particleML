@@ -136,3 +136,31 @@ def resume_artifact(
             "published payload does not match completion marker",
         )
     return Artifact(final, digest, str(marker.get("schema_version", "1.0.0")))
+
+
+def verify_artifact(final: Path) -> Artifact:
+    """Validate a published directory marker and every retained payload hash."""
+
+    marker = _load_marker(final)
+    records = _payload_records(final)
+    digest = _artifact_hash(records)
+    if marker.get("payloads") != records or marker.get("artifact_sha256") != digest:
+        raise IntegrityError(
+            "ARTIFACT_HASH_MISMATCH",
+            "published payload does not match completion marker",
+        )
+    return Artifact(final, digest, str(marker.get("schema_version", "1.0.0")))
+
+
+def verify_artifact_payload(path: Path) -> Artifact:
+    """Validate the completed directory that authoritatively contains one payload file."""
+
+    artifact = verify_artifact(path.parent)
+    relative = path.relative_to(path.parent).as_posix()
+    marker = _load_marker(path.parent)
+    payloads = marker.get("payloads")
+    if not isinstance(payloads, list) or relative not in {
+        record.get("path") for record in payloads if isinstance(record, dict)
+    }:
+        raise IntegrityError("ARTIFACT_INCOMPLETE", f"payload is absent from marker: {path}")
+    return artifact

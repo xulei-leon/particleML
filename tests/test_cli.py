@@ -4,8 +4,13 @@ import hashlib
 import json
 from pathlib import Path
 
+import h5py
+
 from particleml.cli import main
 from particleml.contracts import validate_contract_document
+from particleml.dataset import fit_preprocessing_state
+from tests.fixtures.generate_compact_root import default_jets, write_compact_root
+from tests.test_dataset import _manifest, _policy
 
 
 def test_manifest_validate_prints_exact_hash(tmp_path: Path, capsys: object) -> None:
@@ -187,3 +192,101 @@ def test_split_build_rejects_insufficient_active_qcd(tmp_path: Path, capsys: obj
 
     assert main(_split_argv(canonical, config, output)) == 5
     assert "SPLIT_INSUFFICIENT_CLASS_YIELD" in capsys.readouterr().err  # type: ignore[attr-defined]
+
+
+def test_data_pipeline_cli_commands(tmp_path: Path, capsys: object) -> None:
+    jets = default_jets()
+    root = write_compact_root(tmp_path / "compact.root", jets)
+    source = _manifest(tmp_path / "source.tsv", jets)
+    policy = _policy(tmp_path / "policy.json")
+    canonical = tmp_path / "canonical.h5"
+
+    assert (
+        main(
+            [
+                "convert",
+                "--input",
+                str(root),
+                "--source-manifest",
+                str(source),
+                "--policy",
+                str(policy),
+                "--output",
+                str(canonical),
+            ]
+        )
+        == 0
+    )
+    preprocessing = tmp_path / "preprocessing.json"
+    fit_preprocessing_state(canonical, policy, preprocessing)
+    with h5py.File(canonical, "r") as handle:
+        ids = handle["identity/jet_id"].asstr()[:2].tolist()
+    identities = tmp_path / "identities.json"
+    identities.write_text(
+        json.dumps({"qcd": [ids[0]], "top": [ids[1]]}) + "\n", encoding="utf-8"
+    )
+    subset_sha256 = hashlib.sha256(identities.read_bytes()).hexdigest()
+    views: list[Path] = []
+    for feature_config in ("A", "B", "C", "D"):
+        view = tmp_path / f"view-{feature_config}.h5"
+        views.append(view)
+        assert (
+            main(
+                [
+                    "view",
+                    "build",
+                    "--canonical",
+                    str(canonical),
+                    "--preprocessing",
+                    str(preprocessing),
+                    "--identities",
+                    str(identities),
+                    "--split-manifest-sha256",
+                    "f" * 64,
+                    "--subset-sha256",
+                    subset_sha256,
+                    "--feature-config",
+                    feature_config,
+                    "--allow-unpublished-diagnostics",
+                    "--output",
+                    str(view),
+                ]
+            )
+            == 0
+        )
+    audit_policy = tmp_path / "audit-policy.json"
+    audit_policy.write_text(
+        json.dumps(
+            {
+                "schema_version": "1.0.0",
+                "missing_track_fraction_max": 1.0,
+                "shuffled_label_seed": 7,
+                "shuffled_label_auc_max": 1.0,
+                "expected_qcd_mixture_counts": {"18355": 1},
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    audit_output = tmp_path / "audit.json"
+    assert (
+        main(
+            [
+                "audit",
+                "data",
+                "--canonical",
+                str(canonical),
+                "--field",
+                "delta_eta",
+                "--policy",
+                str(audit_policy),
+                "--output",
+                str(audit_output),
+            ]
+        )
+        == 0
+    )
+    output = capsys.readouterr().out  # type: ignore[attr-defined]
+    assert f"valid canonical dataset: {canonical}" in output
+    assert f"valid D view: {views[-1]}" in output
+    assert f"data audit passed: {audit_output}" in output

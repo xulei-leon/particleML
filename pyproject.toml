@@ -19,10 +19,17 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Topic :: Scientific/Engineering :: Physics",
 ]
-dependencies = ["jsonschema>=4.23,<5"]
+dependencies = [
+  "awkward>=2.7,<3",
+  "h5py>=3.11,<4",
+  "jsonschema>=4.23,<5",
+  "numpy>=1.26,<2",
+  "uproot>=5.4,<6",
+]
 
 [project.optional-dependencies]
 ci = [
+  "awkward>=2.7,<3",
   "build>=1.2,<2",
   "hatchling>=1.27,<2",
   "h5py>=3.11,<4",
@@ -33,12 +40,15 @@ ci = [
   "pytest>=8.3,<9",
   "ruff>=0.9,<1",
   "types-jsonschema>=4.23,<5",
+  "uproot>=5.4,<6",
 ]
 runpod = [
+  "awkward>=2.7,<3",
   "h5py>=3.11,<4",
   "jsonschema>=4.23,<5",
   "numpy>=1.26,<2",
   "pyyaml>=6.0,<7",
+  "uproot>=5.4,<6",
 ]
 
 [project.scripts]
