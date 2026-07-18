@@ -4,11 +4,11 @@
 
 | Field | Value |
 |---|---|
-| Status | Approved traceability baseline; implementation and experiment evidence not yet verified |
-| Document version | 1.1.0 |
-| Software documentation suite | 1.1.0 |
+| Status | Approved traceability baseline; local implementation present; formal experiments deferred |
+| Document version | 1.2.0 |
+| Software documentation suite | 1.2.0 |
 | Research baseline | Research Plan v0.4.0 |
-| Date | 2026-07-17 |
+| Date | 2026-07-18 |
 
 This matrix maps the [Software Requirements Specification](./requirements.md)
 to the [Software Architecture](./architecture.md),
@@ -28,16 +28,16 @@ mean the implementation, test, run, artifact, figure, or claim exists.
 
 | Requirement | Architecture component | Specification contract | Planned automated test | Gate/artifact | Status |
 |---|---|---|---|---|---|
-| FR-DATA-001 | Manifest service | §2.1 Source Manifest | `tests/test_manifest.py::test_canonical_manifest_bytes_and_hash` | E0 `manifests/source-manifest.tsv` | `specified` |
-| FR-DATA-002 | CMSSW extractor | §3.1 CMSSW Output | `cmssw/.../test/test_extractor_cfg.py`; CMSSW fixture job | E0 compact ROOT and extraction report | `specified` |
-| FR-DATA-003 | CMSSW extractor | §3.1; Research Plan §4.3-4.4 | hand-inspected truth fixtures and `test_truth_matching` | E0 label/cutflow audit | `specified` |
-| FR-DATA-004 | Dataset service | §3.3 Canonical HDF5 | `tests/test_dataset.py::test_canonical_layout` | E0 canonical full-D HDF5 | `specified` |
-| FR-DATA-005 | View service | §4.3 Materialized Views | `tests/test_views.py::test_ad_identity_equivalence`; PID sign/order test; `tests/test_software_document_contract.py` native integer-PID/obsolete-contract regression | E0 A-D view audit | `specified` |
-| FR-DATA-006 | Manifest service | §2.2 Split Algorithm | `tests/test_manifest.py::test_exact_pfn_split`; overlap fixtures | E0 split manifest and overlap report | `specified` |
-| FR-DATA-007 | Dataset service | §4.1 Fitted State | `tests/test_dataset.py::test_fit_uses_train_only` | E0/E0.5 preprocessing policy | `specified` |
-| FR-DATA-008 | Manifest/view services | §4.2 Training Subsets | `tests/test_views.py::test_balanced_nested_subsets` | split-manifest subset payloads | `specified` |
-| FR-DATA-009 | Manifest/dataset services | §4.2 and preprocessing contract | `tests/test_dataset.py::test_qcd_round_robin_and_no_audit_inputs` | E0 mixture/confound report | `specified` |
-| FR-DATA-010 | Dataset, metrics, and E0 aggregation services | §3.2-3.3; §6.2; §7-8 | `tests/test_audit.py` and `tests/test_e0.py` including shuffled-label, resource, and external-evidence gates | Schema-valid E0 data/yield/leakage/cost audit | `specified` |
+| FR-DATA-001 | Manifest service | §2.1 Source Manifest | `tests/test_manifest.py::test_canonical_manifest_bytes_and_hash` | E0 `manifests/source-manifest.tsv` | `implemented` |
+| FR-DATA-002 | CMSSW extractor | §3.1 CMSSW Output | `tests/test_cmssw_contract.py`; qualified-host CMSSW fixture job pending | E0 compact ROOT and extraction report | `implemented` |
+| FR-DATA-003 | CMSSW extractor | §3.1; Research Plan §4.3-4.4 | `tests/test_cmssw_contract.py`; hand-inspected qualified-host truth fixtures pending | E0 label/cutflow audit | `implemented` |
+| FR-DATA-004 | Dataset service | §3.3 Canonical HDF5 | `tests/test_dataset.py::test_canonical_layout` | E0 canonical full-D HDF5 | `implemented` |
+| FR-DATA-005 | View service | §4.3 Materialized Views | `tests/test_views.py::test_ad_identity_equivalence`; PID sign/order test; `tests/test_software_document_contract.py` native integer-PID/obsolete-contract regression | E0 A-D view audit | `implemented` |
+| FR-DATA-006 | Manifest service | §2.2 Split Algorithm | `tests/test_manifest.py::test_exact_pfn_split_golden_vectors`; overlap fixtures | E0 split manifest and overlap report | `implemented` |
+| FR-DATA-007 | Dataset service | §4.1 Fitted State | `tests/test_dataset.py::test_fit_uses_train_only` | E0/E0.5 preprocessing policy | `implemented` |
+| FR-DATA-008 | Manifest/view services | §4.2 Training Subsets | `tests/test_views.py::test_balanced_nested_subsets` | split-manifest subset payloads | `implemented` |
+| FR-DATA-009 | Manifest/dataset services | §4.2 and preprocessing contract | manifest overlap/identity tests, dataset train-only fitting, and `tests/test_audit.py::test_forbidden_model_fields_are_rejected` | E0 mixture/confound report | `implemented` |
+| FR-DATA-010 | Dataset, metrics, and E0 aggregation services | §3.2-3.3; §6.2; §7-8 | `tests/test_audit.py` and `tests/test_e0.py` including shuffled-label, resource, and external-evidence gates | Schema-valid E0 data/yield/leakage/cost audit | `implemented` |
 | FR-MODEL-001 | `src/particleml/model_integration.py` external boundary | §5.1 Pinned External Dependency | `tests/test_model_integration.py::test_subprocess_boundary_uses_argument_array_shell_false_and_redacts`; formal environment pending | E0.5 dependency audit | `implemented` |
 | FR-MODEL-002 | `src/particleml/model_integration.py` index validator and CLI resolver | §5.2 Custom-Data Index | `tests/test_model_integration.py::test_index_required_and_hashed_and_stale_view_rejected`; official RunPod index pending | E0.5 index completion records | `implemented` |
 | FR-MODEL-003 | `adapter_flags`, `build_train_argv`, and tensor audit | §5.3 Adapter and Training Command | exact A-D native PID/additional-feature argv snapshots; conditional-flag rejection; tensor-shape report | E0.5 layer-loading audit | `implemented` |
@@ -52,15 +52,15 @@ mean the implementation, test, run, artifact, figure, or claim exists.
 | FR-EVAL-002 | centralized metrics service | §8.1 Per-Run Metrics | golden AUC/rejection/accuracy, zero-background, and unstable-ratio fixtures | E1-E3 run metrics | `implemented` |
 | FR-EVAL-003 | `paired_stratified_bootstrap` and seed-summary service | §8.2 Paired Comparisons | deterministic PCG64 stratified/common-index bootstrap, mismatch, contrast-set, percentile, and seed-summary fixtures | E2/E3 comparison artifacts | `implemented` |
 | FR-EVAL-004 | `src/particleml/reporting.py` evidence-only report builder | §7-8 | completed-input validation, aggregation completeness, failed/missing visibility, deterministic hash, and ineligible-claim tests | generated reports, figures, claim ledger | `implemented` |
-| FR-REP-001 | Contract validator/artifact lifecycle | architecture §8; spec §6.4-7 | content hash and stale-resume tests | hashes and `COMPLETED.json` | `specified` |
+| FR-REP-001 | Contract validator/artifact lifecycle | architecture §8; spec §6.4-7 | `tests/test_artifacts.py` content-hash, completion, and stale-resume tests | hashes and `COMPLETED.json` | `implemented` |
 | FR-REP-002 | Contract validator | §7 Serialized Contracts | `scripts/validate_software_docs.py`; schema fixtures | five JSON Schemas and validated artifacts | `implemented` |
 | FR-REP-003 | reporting status/claim ledger and this traceability matrix | requirements §3; reporting contract | status monotonicity, fallback narrowing, E3 deferral, and unverified-dependency tests | matrix and claim ledger | `implemented` |
-| NFR-COR-001 | All fail-closed boundaries | §9 Error Taxonomy | negative contract/leakage/unit/identity fixtures | failed gate/run records | `specified` |
-| NFR-DET-001 | Manifest, views, orchestration, metrics | §2.2, §4.2, §8.2 | repeated hash/subset/bootstrap regression tests | deterministic hashes and seed records | `specified` |
-| NFR-PORT-001 | Execution topology | architecture §3; spec §3.1 | environment-record validation; compact local fixtures | CMSSW and ML environment records | `specified` |
-| NFR-OBS-001 | Extractor/orchestrator | requirements §5; run timing contract | timing/memory field contract tests | E0 cost table and E1 budget projection | `specified` |
-| NFR-ROB-001 | Artifact lifecycle | architecture §8; spec §6.4 | partial-output and completion-sentinel tests | `COMPLETED.json` and retained failures | `specified` |
-| NFR-MNT-001 | Component model | architecture §4 | import-boundary and thin-CLI tests | package/test structure | `specified` |
+| NFR-COR-001 | All fail-closed boundaries | §9 Error Taxonomy | negative contract/leakage/unit/identity fixtures | failed gate/run records | `implemented` |
+| NFR-DET-001 | Manifest, views, orchestration, metrics | §2.2, §4.2, §8.2 | repeated hash/subset/bootstrap regression tests | deterministic hashes and seed records | `implemented` |
+| NFR-PORT-001 | Execution topology | architecture §3; spec §3.1 | environment-record validation; compact local fixtures | CMSSW and ML environment records | `implemented` |
+| NFR-OBS-001 | Extractor/orchestrator | requirements §5; run timing contract | resource projection and run-record timing/memory contract tests | E0 cost table and E1 budget projection | `implemented` |
+| NFR-ROB-001 | Artifact lifecycle | architecture §8; spec §6.4 | partial-output and completion-sentinel tests | `COMPLETED.json` and retained failures | `implemented` |
+| NFR-MNT-001 | Component model | architecture §4 | package import, CLI, and component-focused tests | package/test structure | `implemented` |
 | NFR-PUB-001 | evidence-only reporting and traceability | architecture §7; spec §7-8 | planned/failed/incomplete claim-eligibility and deterministic rebuild tests | claim ledger and generated evidence | `implemented` |
 | AC-E0-001 | E0 control path | requirements §6; architecture §6.3; specification §6.2 and §7 | local aggregation/fixture non-promotion tests pass; qualified-host acceptance absent | completed, schema-valid E0 audit | `deferred` |
 | AC-E05-001 | E0.5 control path | requirements §6; spec §5 | local checkpoint/adapter/fixture non-promotion tests pass; authorized RunPod evidence absent | completed, schema-valid E0.5 audit | `deferred` |

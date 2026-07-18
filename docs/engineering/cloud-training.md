@@ -1,6 +1,10 @@
 # Cloud Training Strategy
 
-Cloud-only compute note for a `max $500` budget. The dataset is not fixed yet, and the project may move from JetClass to another jet dataset or train a model from scratch.
+Cloud compute guidance for the CMS 2015 `RunIIFall15MiniAODv2` formal study
+under a `max $500` working budget. JetClass remains learning and literature
+comparison material rather than the v0.4 production corpus. For environment
+bootstrap, debugging, qualification, and evidence boundaries, see the
+[Development and Debugging Environments guide](./development-and-debugging.md).
 
 ## Recommended Stack
 

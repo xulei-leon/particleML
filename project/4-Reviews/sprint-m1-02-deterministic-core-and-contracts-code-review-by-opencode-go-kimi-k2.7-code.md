@@ -73,7 +73,7 @@ Implementation delivers the core of M1-02 across manifest parsing, schema valida
 |---|---|---|---|---|
 | `root://example.invalid//store/test/file-7.root` | `86a2d2ef...` | 0 | TEST | `test_exact_pfn_split_golden_vectors` PASS |
 | `root://example.invalid//store/test/file-0.root` | `037bba1c...` | 1 | VALIDATION | `test_exact_pfn_split_golden_vectors` PASS |
-| `root://例子.invalid//cms/μ-jet.root` | `71ac8c09...` | 7 | TRAIN | `test_exact_pfn_split_golden_vectors` PASS |
+| `root://\u4f8b\u5b50.invalid//cms/μ-jet.root` (escaped Unicode form) | `71ac8c09...` | 7 | TRAIN | `test_exact_pfn_split_golden_vectors` PASS |
 
 ### Verification Commands (Section 7)
 

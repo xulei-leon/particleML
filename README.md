@@ -95,6 +95,26 @@ python -m pip install -r requirements-docs.txt
 pnpm test
 ```
 
+## Development and Debugging
+
+The supported development topology, local bootstrap commands, test workflow,
+CMSSW qualified-host boundary, and RunPod GPU workflow are documented in the
+[Development and Debugging Environments guide](docs/engineering/development-and-debugging.md).
+
+For a complete local Python development environment, install the locked CI
+dependencies and the project itself before running tests:
+
+```powershell
+py -3.12 -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install --requirement requirements-ci.lock
+python -m pip install --no-deps --editable .
+pytest
+```
+
+Local checks are implementation diagnostics. They do not replace retained
+CMSSW, RunPod, or experiment-gate evidence.
+
 GitHub Pages deployment is handled by `.github/workflows/docs.yml` on pushes to `main` and manual workflow dispatch. The production site uses the `/particleML/` base path and is expected at:
 
 ```text
@@ -105,9 +125,9 @@ https://xulei-leon.github.io/particleML/
 
 ```
 particleML/
-├── cmssw/ParticleMLExtractor/ # Planned pinned CMS extraction boundary
-├── src/particleml/             # Planned conversion, views, orchestration, metrics
-├── configs/                    # Planned versioned experiment configurations
+├── cmssw/ParticleMLExtractor/ # Implemented pinned CMS extraction boundary
+├── src/particleml/             # Implemented conversion, views, orchestration, metrics
+├── configs/                    # Versioned experiment and evidence policies
 ├── schemas/                    # Machine-readable artifact contracts
 ├── tests/                      # Documentation checks and implementation tests
 ├── docs/                       # VitePress research and software documentation
@@ -119,5 +139,7 @@ particleML/
 └── README.md
 ```
 
-The `cmssw/`, `src/particleml/`, and `configs/` entries describe the approved
-target architecture and are introduced only with tested implementation work.
+The repository contains the local implementation and contract-test layers for
+the approved architecture. Formal CMSSW extraction, checkpoint qualification,
+GPU training, and E0-E3 experiment evidence remain deferred until they run in
+their qualified environments and retain the required artifacts.

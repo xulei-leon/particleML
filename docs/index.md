@@ -7,6 +7,7 @@ availability study and the broader particleML jet-foundation-model program.
 - [Software Architecture](./software/architecture.md)
 - [Implementation Specification](./software/specification.md)
 - [Requirements and Evidence Traceability](./software/traceability-matrix.md)
+- [Development and Debugging Environments](./engineering/development-and-debugging.md)
 - [Legacy Engineering Architecture Link](./engineering/particleml-architecture.md)
 - [Learning](./learning/research-preparation-roadmap.md)
 - [Research](./research/research-plan.md)

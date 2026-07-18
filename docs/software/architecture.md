@@ -4,11 +4,11 @@
 
 | Field | Value |
 |---|---|
-| Status | Approved architecture baseline; implementation not yet verified |
-| Document version | 1.1.0 |
-| Software documentation suite | 1.1.0 |
+| Status | Approved architecture baseline; local implementation present; formal experiments deferred |
+| Document version | 1.2.0 |
+| Software documentation suite | 1.2.0 |
 | Research baseline | Research Plan v0.4.0 |
-| Date | 2026-07-17 |
+| Date | 2026-07-18 |
 | Primary study | CMS 2015 top-versus-QCD feature-availability fine-tuning |
 
 This is the single authoritative architecture for the publication-supporting
@@ -26,9 +26,10 @@ The system must answer one controlled research question:
 > model?
 
 The architecture supports E0 through E3 of
-[Research Plan v0.4](../research/research-plan.md). Initial implementation is
-limited to E0 and E0.5; later components become active only when their upstream
-gates pass. The architecture does not certify that any gate, experiment, or
+[Research Plan v0.4](../research/research-plan.md). Repository-local services
+now cover the planned deterministic data, model-integration, orchestration,
+evaluation, and reporting boundaries. Formal execution remains stage-gated,
+and this architecture does not certify that any gate, experiment, or
 publication claim has passed.
 
 Non-goals are PET reimplementation, foundation-model pretraining, a separate

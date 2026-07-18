@@ -27,7 +27,7 @@ except ImportError as exc:  # pragma: no cover - environment diagnostic
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DOCUMENT_SUITE_VERSION = "1.1.0"
+DOCUMENT_SUITE_VERSION = "1.2.0"
 SCHEMA_VERSION = "1.0.0"
 RESEARCH_VERSION = "Research Plan v0.4.0"
 
@@ -39,6 +39,7 @@ DOCS = (
 )
 LINK_DOCUMENTS = DOCS + (
     ROOT / "docs/index.md",
+    ROOT / "docs/engineering/development-and-debugging.md",
     ROOT / "docs/engineering/particleml-architecture.md",
     ROOT / "README.md",
     ROOT / "project/superpowers/specs/2026-07-16-particleml-software-documentation-suite-design.md",
@@ -99,6 +100,18 @@ REQUIRED_VIEW_MARKERS = {
     ),
 }
 
+DEVELOPMENT_GUIDE = ROOT / "docs/engineering/development-and-debugging.md"
+REQUIRED_DEVELOPMENT_GUIDE_MARKERS = (
+    "python -m pip install --requirement requirements-ci.lock",
+    "python -m pip install --no-deps --editable .",
+    "Local Windows and PowerShell",
+    "GitHub Actions",
+    "Qualified POSIX CMSSW host",
+    "RunPod GPU environment",
+    "Passing a local fixture does not promote E0, E0.5, E1, E2, or E3.",
+    "PackageNotFoundError: particleml-research",
+)
+
 
 def view_contract_errors(documents: Mapping[str, str]) -> list[str]:
     """Return native integer-PID contract errors for software documents."""
@@ -123,6 +136,84 @@ def view_contract_errors(documents: Mapping[str, str]) -> list[str]:
             if marker not in text:
                 errors.append(f"{path}: missing {label}: {marker!r}")
 
+    return errors
+
+
+def development_guide_errors(text: str) -> list[str]:
+    """Return errors for missing development-environment contract markers."""
+
+    return [
+        f"development guide missing required marker: {marker!r}"
+        for marker in REQUIRED_DEVELOPMENT_GUIDE_MARKERS
+        if marker not in text
+    ]
+
+
+def requirement_status_errors(requirements_text: str, traceability_text: str) -> list[str]:
+    """Require requirement and acceptance statuses to match the traceability matrix."""
+
+    requirement_pattern = re.compile(
+        r"^### ((?:FR|NFR|AC)-[A-Z0-9-]+)\s+[^\n]+\n\n\*\*Status:\*\* `([^`]+)`",
+        re.MULTILINE,
+    )
+    requirements = dict(requirement_pattern.findall(requirements_text))
+    traceability = {
+        identifier: status
+        for identifier, status in re.findall(
+            r"^\| ((?:FR|NFR|AC)-[A-Z0-9-]+) \|.*\| `([^`]+)` \|$",
+            traceability_text,
+            re.MULTILINE,
+        )
+    }
+    errors: list[str] = []
+    if set(requirements) != set(traceability):
+        missing_from_matrix = sorted(set(requirements) - set(traceability))
+        missing_from_requirements = sorted(set(traceability) - set(requirements))
+        if missing_from_matrix:
+            errors.append(f"requirements missing from traceability matrix: {missing_from_matrix}")
+        if missing_from_requirements:
+            errors.append(
+                f"traceability IDs missing from requirements: {missing_from_requirements}"
+            )
+    for identifier in sorted(set(requirements) & set(traceability)):
+        if requirements[identifier] != traceability[identifier]:
+            errors.append(
+                f"status mismatch for {identifier}: requirements={requirements[identifier]!r}, "
+                f"traceability={traceability[identifier]!r}"
+            )
+    return errors
+
+
+def traceability_test_reference_errors(text: str) -> list[str]:
+    """Require every fully qualified test reference in the matrix to resolve."""
+
+    errors: list[str] = []
+    references = set(re.findall(r"`(tests/[A-Za-z0-9_./-]+\.py)::([A-Za-z0-9_]+)`", text))
+    for relative_path, function_name in sorted(references):
+        path = ROOT / relative_path
+        if not path.is_file():
+            errors.append(f"traceability test file does not exist: {relative_path}")
+            continue
+        source = path.read_text(encoding="utf-8")
+        if re.search(rf"^def {re.escape(function_name)}\(", source, re.MULTILINE) is None:
+            errors.append(
+                f"traceability test function does not exist: {relative_path}::{function_name}"
+            )
+    return errors
+
+
+def english_document_errors(paths: list[Path]) -> list[str]:
+    """Reject CJK text in project documentation while allowing scientific symbols."""
+
+    errors: list[str] = []
+    cjk = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]")
+    for path in paths:
+        text = path.read_text(encoding="utf-8")
+        match = cjk.search(text)
+        if match:
+            errors.append(
+                f"{path.relative_to(ROOT)}: non-English CJK character {match.group(0)!r}"
+            )
     return errors
 
 HASH = "a" * 64
@@ -485,6 +576,25 @@ def main() -> int:
             errors.append(f"canonical documentation contains {reason}: {match.group(0)!r}")
 
     errors.extend(view_contract_errors(document_text))
+    guide_text = DEVELOPMENT_GUIDE.read_text(encoding="utf-8")
+    errors.extend(development_guide_errors(guide_text))
+    errors.extend(
+        requirement_status_errors(
+            document_text["docs/software/requirements.md"],
+            document_text["docs/software/traceability-matrix.md"],
+        )
+    )
+    errors.extend(
+        traceability_test_reference_errors(
+            document_text["docs/software/traceability-matrix.md"]
+        )
+    )
+    english_paths = [
+        ROOT / "README.md",
+        *sorted((ROOT / "docs").rglob("*.md")),
+        *sorted((ROOT / "project").rglob("*.md")),
+    ]
+    errors.extend(english_document_errors(english_paths))
 
     for path in LINK_DOCUMENTS:
         if not path.exists():

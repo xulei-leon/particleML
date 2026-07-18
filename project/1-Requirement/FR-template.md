@@ -1,70 +1,71 @@
-# FR-<编号> <标题>
+# FR-<identifier> <title>
 
-- `FR-ID`: `FR-<编号>`
-- `标题`: <功能需求标题>
-- `所属阶段`: <阶段编号或待规划阶段说明>
-- `开发顺序`: <数字或待定>
-- `优先级`: <P0/P1/P2/P3>
-- `前置依赖`: <无或 `FR-xxx`, `FR-yyy`>
-- `涉及包`: <例如 `packages/application`, `packages/workflow`, `packages/capabilities`, `packages/shared`, `runtime/`>
-- `是否属于原型阶段`: <是/否>
-- `来源类型`: <SRS 原始/设计拆分/新增 backlog/缺陷修复/其他>
-- `原始 SRS 章节`: <章节编号或无>
+- `FR-ID`: `FR-<identifier>`
+- `Title`: <functional requirement title>
+- `Stage`: <stage identifier or planning status>
+- `Implementation order`: <number or pending>
+- `Priority`: <P0/P1/P2/P3>
+- `Dependencies`: <none or `FR-xxx`, `FR-yyy`>
+- `Affected components`: <packages, modules, schemas, or runtime boundaries>
+- `Prototype-stage requirement`: <yes/no>
+- `Source type`: <SRS baseline/design decomposition/new backlog/defect fix/other>
+- `Original SRS section`: <section identifier or none>
 
-## 目标
+## Goal
 
-<说明该 FR 要达成的业务目标。聚焦 AutoPen V2 微信文章生成主链路，避免写成通用平台能力。>
+<State the scientific or engineering outcome this requirement must achieve.>
 
-## 需求描述
+## Requirement Description
 
-<描述用户场景、系统行为和本 FR 的能力边界。说明为什么需要该能力，以及它如何接入当前 V2 主流程。>
+<Describe the user or research scenario, required system behavior, capability
+boundary, motivation, and relationship to the active particleML workflow.>
 
-## 高层要求
+## High-Level Requirements
 
-- <要求 1>
-- <要求 2>
-- <要求 3>
+- <requirement 1>
+- <requirement 2>
+- <requirement 3>
 
-## 输入
+## Inputs
 
-- <输入数据、配置、状态或上游产物 1>
-- <输入数据、配置、状态或上游产物 2>
+- <input data, configuration, state, or upstream artifact 1>
+- <input data, configuration, state, or upstream artifact 2>
 
-## 输出
+## Outputs
 
-- <输出数据、状态、文件或下游产物 1>
-- <输出数据、状态、文件或下游产物 2>
+- <output data, state, file, or downstream artifact 1>
+- <output data, state, file, or downstream artifact 2>
 
-## 实现约束
+## Implementation Constraints
 
-- <说明应遵守的包边界、DTO/schema 归属、prompt 外置规则或 runtime 数据规则。>
-- <如涉及 `apps/web`，确认它只依赖 `packages/shared` 的 GUI-facing 契约。>
-- <如涉及 prompt，确认长 prompt 放在 `packages/capabilities/prompts/` 对应一级能力域目录。>
-- <如涉及运行期数据，确认写入 `runtime/`，不写回源码、文档或 V1 目录。>
+- <Define component boundaries, schema ownership, and dependency direction.>
+- <Identify the authoritative configuration and prohibit implicit defaults.>
+- <Define runtime-data, provenance, and artifact-retention rules.>
+- <State the qualified environment if local execution is insufficient.>
 
-## 失败与降级
+## Failure and Degradation
 
-- <失败条件或异常场景 1>
-- <失败条件或异常场景 2>
-- <降级、重试、人工复核或任务失败规则>
+- <failure condition or exceptional scenario 1>
+- <failure condition or exceptional scenario 2>
+- <fail-closed, retry, manual-review, or terminal-failure rule>
 
-## 验收要点
+## Acceptance Points
 
-- <可验证验收点 1>
-- <可验证验收点 2>
-- <可验证验收点 3>
+- <verifiable acceptance point 1>
+- <verifiable acceptance point 2>
+- <verifiable acceptance point 3>
 
-## 最小验证方式
+## Minimum Verification
 
-- <先补充或更新相关单元测试、系统测试或回归测试。>
-- <列出需要覆盖的关键场景。>
-- <至少运行受影响包验证；默认需要考虑 `pnpm test`, `pnpm typecheck`, `pnpm build`, `pnpm lint`。>
+- <Add or update the relevant unit, contract, integration, or regression tests.>
+- <List the critical positive and negative scenarios.>
+- <List required local, CI, CMSSW, or RunPod checks without overstating evidence.>
 
-## 不纳入范围
+## Out of Scope
 
-- <明确本 FR 不做的事项 1>
-- <明确本 FR 不做的事项 2>
+- <explicit exclusion 1>
+- <explicit exclusion 2>
 
-## 备注
+## Notes
 
-- <补充说明、与其他 FR 的关系、后续可扩展方向或待确认问题。>
+- <relationships, future extensions, unresolved decisions, or amendment rules>

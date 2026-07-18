@@ -4,11 +4,11 @@
 
 | Field | Value |
 |---|---|
-| Status | Approved implementation contract; implementation not yet verified |
-| Document version | 1.1.0 |
-| Software documentation suite | 1.1.0 |
+| Status | Approved implementation contract; local implementation present; formal experiments deferred |
+| Document version | 1.2.0 |
+| Software documentation suite | 1.2.0 |
 | Research baseline | Research Plan v0.4.0 |
-| Date | 2026-07-17 |
+| Date | 2026-07-18 |
 | Target Python | 3.10 or newer in the pinned ML environment |
 
 This document makes the behavior in the

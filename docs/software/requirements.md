@@ -4,11 +4,11 @@
 
 | Field | Value |
 |---|---|
-| Status | Approved requirements baseline; implementation and experiments not yet verified |
-| Document version | 1.0.0 |
-| Software documentation suite | 1.1.0 |
+| Status | Approved requirements baseline; local implementation present; formal experiments deferred |
+| Document version | 1.1.0 |
+| Software documentation suite | 1.2.0 |
 | Research baseline | Research Plan v0.4.0 |
-| Date | 2026-07-17 |
+| Date | 2026-07-18 |
 | Language | English |
 
 This document defines what the publication-supporting particleML software must
@@ -99,7 +99,7 @@ Identifiers are stable and must never be reused after deletion.
 
 ### FR-DATA-001 — Frozen source manifest
 
-**Status:** `specified`
+**Status:** `implemented`
 
 The system shall consume a persistent, sorted source manifest containing CMS
 record ID, exact canonical PFN, checksum, and byte size. It shall reproduce and
@@ -108,7 +108,7 @@ manifest is insufficient provenance.
 
 ### FR-DATA-002 — CMS extraction
 
-**Status:** `specified`
+**Status:** `implemented`
 
 The CMSSW extractor shall read the frozen records, apply the research-plan AK8
 selection, resolve packed daughters, assign labels, and write compact flat ROOT
@@ -117,7 +117,7 @@ shall not own HDF5 normalization or model behavior.
 
 ### FR-DATA-003 — Leakage-safe labels
 
-**Status:** `specified`
+**Status:** `implemented`
 
 Signal shall require an unambiguous, last-copy, fully hadronic top match with
 the top and each `bqq'` daughter contained within the specified radius.
@@ -126,7 +126,7 @@ signal definition shall not become background.
 
 ### FR-DATA-004 — Canonical full-D dataset
 
-**Status:** `specified`
+**Status:** `implemented`
 
 The system shall convert compact ROOT data into one immutable, full-D canonical
 HDF5 dataset with at most 150 pT-ordered constituents per jet, a boolean mask,
@@ -135,7 +135,7 @@ shall be recorded and content hashed.
 
 ### FR-DATA-005 — Nested A-D views
 
-**Status:** `specified`
+**Status:** `implemented`
 
 Configurations A-D shall be column views of the same canonical jets. Jet
 membership, particle ordering, masks, split assignment, and training subset
@@ -144,7 +144,7 @@ categories so Config C does not duplicate charge sign from Config B.
 
 ### FR-DATA-006 — Deterministic split
 
-**Status:** `specified`
+**Status:** `implemented`
 
 The system shall assign source files to train, validation, and test partitions
 using the exact UTF-8 PFN SHA-256 modulo-10 rule in Research Plan v0.4. It shall
@@ -153,7 +153,7 @@ partition.
 
 ### FR-DATA-007 — Training-only fitted state
 
-**Status:** `specified`
+**Status:** `implemented`
 
 Normalization, pT/eta control, optional pileup reweighting, PID vocabulary, and
 any approved impact-parameter transform shall be fitted or frozen using the
@@ -162,7 +162,7 @@ No unresolved transform may receive an implicit default.
 
 ### FR-DATA-008 — Fixed training subsets
 
-**Status:** `specified`
+**Status:** `implemented`
 
 The system shall materialize class-balanced, nested training subsets for
 `10^3`, `10^4`, and provisional `10^5` jets per class, or a documented amended
@@ -171,7 +171,7 @@ seeds. Selected identities shall be reused across A-D and all model conditions.
 
 ### FR-DATA-009 — QCD mixture and confound controls
 
-**Status:** `specified`
+**Status:** `implemented`
 
 The system shall freeze the active QCD-record mixture and deterministic
 round-robin sampling. It shall fit pT/eta control on training data, audit pileup
@@ -180,7 +180,7 @@ or weights from entering model tensors.
 
 ### FR-DATA-010 — Data audit
 
-**Status:** `specified`
+**Status:** `implemented`
 
 The system shall report product presence, daughter resolution, label cutflow,
 feature finiteness, units, missing charged-track rate, truncation, masks,
@@ -191,7 +191,7 @@ storage cost. A charged no-track rate above 1% shall block E1 pending review.
 
 ### FR-MODEL-001 — Official OmniLearned boundary
 
-**Status:** `specified`
+**Status:** `implemented`
 
 The primary path shall reuse the pinned official OmniLearned package through a
 process boundary. The project shall not fork or reimplement PET, its optimizer,
@@ -199,7 +199,7 @@ checkpoint storage, or its training loop for the baseline study.
 
 ### FR-MODEL-002 — Custom-data index
 
-**Status:** `specified`
+**Status:** `implemented`
 
 Before custom-data training, the system shall run the pinned OmniLearned
 `dataloader`/index-building step, validate the produced index, hash it, and
@@ -208,7 +208,7 @@ missing or stale.
 
 ### FR-MODEL-003 — Configuration-specific adapters
 
-**Status:** `specified`
+**Status:** `implemented`
 
 Each A-D condition shall use a newly initialized input adapter and binary head,
 load the same shape-compatible non-input backbone weights, record every loaded,
@@ -217,7 +217,7 @@ inputs shall be rejected for the primary classifier.
 
 ### FR-MODEL-004 — Checkpoint audit gate
 
-**Status:** `specified`
+**Status:** `implemented`
 
 Before E1, the system shall record checkpoint source, immutable revision or
 tag, license, SHA-256, documented pretraining corpus, input schema, and
@@ -226,7 +226,7 @@ tiny fine-tune must reduce loss.
 
 ### FR-MODEL-005 — Pretraining fallback
 
-**Status:** `specified`
+**Status:** `implemented`
 
 If checkpoint or adapter compatibility cannot be established, the system shall
 either use the E0.5-approved neutralization policy with its limitation recorded,
@@ -235,7 +235,7 @@ shall automatically remove pretrained-transfer claims from eligible reports.
 
 ### FR-MODEL-006 — Deep Sets/PFN control
 
-**Status:** `specified`
+**Status:** `implemented`
 
 The project shall provide a small in-repository masked Deep Sets/PFN-style
 classifier for the required E3 A-versus-D control. It shall reuse the same
@@ -246,7 +246,7 @@ primary model.
 
 ### FR-TRAIN-001 — Stage-gated experiment matrix
 
-**Status:** `specified`
+**Status:** `implemented`
 
 The orchestrator shall represent E0, E0.5, E1, E2, and E3 explicitly and refuse
 to start a stage until all mandatory prior gate records pass. The E2 matrix
@@ -255,7 +255,7 @@ three first-pass seeds rather than from hand-entered commands.
 
 ### FR-TRAIN-002 — Deterministic clean commands
 
-**Status:** `specified`
+**Status:** `implemented`
 
 Every formal operation shall be executable from a non-interactive command with
 validated configuration. Resume shall reuse an artifact only when input and
@@ -264,7 +264,7 @@ Formal artifacts shall never be silently overwritten.
 
 ### FR-TRAIN-003 — Run records
 
-**Status:** `specified`
+**Status:** `implemented`
 
 Every attempted training run shall emit a run record conforming to
 `schemas/run-record.schema.json`, including code, data, preprocessing,
@@ -273,7 +273,7 @@ metrics when successful, and failure information when unsuccessful.
 
 ### FR-TRAIN-004 — Complete failure accounting
 
-**Status:** `specified`
+**Status:** `implemented`
 
 Failed or interrupted formal attempts shall remain visible. A failed run shall
 contain a stable failure code and message, preserve available logs, and shall
@@ -283,7 +283,7 @@ not be included in aggregate results as if it had succeeded.
 
 ### FR-EVAL-001 — Aligned predictions
 
-**Status:** `specified`
+**Status:** `implemented`
 
 Every successful formal evaluation shall save one signal score and target for
 each fixed test jet in stable order, with stable jet identity and payload hash.
@@ -291,7 +291,7 @@ Prediction metadata shall conform to `schemas/prediction.schema.json`.
 
 ### FR-EVAL-002 — Required metrics
 
-**Status:** `specified`
+**Status:** `implemented`
 
 The evaluator shall compute ROC AUC, background rejection at signal efficiencies
 0.30 and 0.50, auxiliary accuracy, and the research-plan data-efficiency
@@ -300,7 +300,7 @@ implementation specification.
 
 ### FR-EVAL-003 — Paired uncertainty
 
-**Status:** `specified`
+**Status:** `implemented`
 
 The system shall compute paired A-B, B-C, C-D, C-A, and D-A comparisons on
 identically ordered test identities, use at least 1,000 fixed-seed paired
@@ -309,7 +309,7 @@ bootstrap uncertainty.
 
 ### FR-EVAL-004 — Evidence-derived reports
 
-**Status:** `specified`
+**Status:** `implemented`
 
 Tables and figures shall be generated only from schema-valid run records and
 prediction artifacts. A report shall distinguish planned, failed, and completed
@@ -320,7 +320,7 @@ controls pass.
 
 ### FR-REP-001 — Content-addressed provenance
 
-**Status:** `specified`
+**Status:** `implemented`
 
 The system shall retain hashes for source manifests, split manifests, canonical
 datasets, views, fitted preprocessing state, OmniLearned indices, checkpoints,
@@ -329,7 +329,7 @@ canonicalization rules shall be versioned.
 
 ### FR-REP-002 — Machine-readable validation
 
-**Status:** `specified`
+**Status:** `implemented`
 
 Run records, split manifests, and prediction metadata shall validate against
 JSON Schema Draft 2020-12 before downstream consumption. Unknown properties at
@@ -337,7 +337,7 @@ defined schema boundaries shall be rejected.
 
 ### FR-REP-003 — Evidence status propagation
 
-**Status:** `specified`
+**Status:** `implemented`
 
 Requirement, test, experiment, artifact, figure, and claim statuses shall use
 the controlled lifecycle vocabulary. A downstream item may not have a stronger
@@ -347,7 +347,7 @@ status than its unmet upstream dependency.
 
 ### NFR-COR-001 — Fail-closed scientific correctness
 
-**Status:** `specified`
+**Status:** `implemented`
 
 Missing provenance, unresolved units, overlap, non-finite values, stale hashes,
 unapproved preprocessing, model-input leakage, and schema violations shall
@@ -355,7 +355,7 @@ block the affected formal stage rather than degrade to warnings.
 
 ### NFR-DET-001 — Determinism
 
-**Status:** `specified`
+**Status:** `implemented`
 
 Given identical versioned inputs, configuration, and seeds, manifest assignment,
 subset identity, A-D views, command construction, and report aggregation shall
@@ -364,7 +364,7 @@ and any known nondeterministic kernels.
 
 ### NFR-PORT-001 — Environment separation and portability
 
-**Status:** `specified`
+**Status:** `implemented`
 
 CMSSW extraction and modern Python ML execution shall have separate, pinned
 environment records and exchange only contract-defined artifacts. Local Windows
@@ -373,7 +373,7 @@ shall run on a compatible POSIX host near the data.
 
 ### NFR-OBS-001 — Resource observability
 
-**Status:** `specified`
+**Status:** `implemented`
 
 E0 and E1 shall measure CPU/GPU time, wall time, source bytes, throughput,
 intermediate and final storage, peak GPU memory, checkpoint size, and failures.
@@ -381,7 +381,7 @@ E2 shall remain blocked until a budget projection with reserve is retained.
 
 ### NFR-ROB-001 — Restartability and artifact integrity
 
-**Status:** `specified`
+**Status:** `implemented`
 
 Stage outputs shall be written to a temporary location and published with a
 completion record only after validation. POSIX production may use atomic rename;
@@ -390,7 +390,7 @@ shall verify hashes before reuse.
 
 ### NFR-MNT-001 — Maintainable boundaries
 
-**Status:** `specified`
+**Status:** `implemented`
 
 Extraction, conversion, views, model integration, orchestration, metrics, and
 reporting shall be independently testable. CLI code shall remain thin, and
@@ -398,7 +398,7 @@ notebooks shall consume package APIs without owning canonical logic.
 
 ### NFR-PUB-001 — Publication integrity
 
-**Status:** `specified`
+**Status:** `implemented`
 
 The system shall never infer an experimental result from configuration or mark
 a planned artifact as completed. Manuscript claim eligibility requires mapped
@@ -409,7 +409,7 @@ baseline/control evidence.
 
 ### AC-E0-001 — Data, yield, leakage, and cost pilot
 
-**Status:** `specified`
+**Status:** `deferred`
 
 E0 passes only when the frozen manifest, multi-file TT/QCD extraction,
 daughter resolution, A-D fields and units, labels, charged no-track rate, yield
@@ -419,7 +419,7 @@ probe, HDF5/view checks, artifact hashes, and measured cost table all pass. An
 
 ### AC-E05-001 — Checkpoint and adapter spike
 
-**Status:** `specified`
+**Status:** `deferred`
 
 E0.5 passes only when checkpoint identity and license, pretraining-corpus
 record, normalization policy, OmniLearned index, layer-loading audit, finite A-D
@@ -427,7 +427,7 @@ forward/backward passes, and a decreasing tiny-fine-tune loss are retained.
 
 ### AC-E1-001 — Reproducible training pilot
 
-**Status:** `specified`
+**Status:** `deferred`
 
 E1 passes only when A and D at `10^3` and `10^4` jets per class run from clean
 commands with one seed, schema-valid run records and aligned predictions, valid
@@ -435,7 +435,7 @@ metrics, measured runtime/memory/storage, and an approved E2 budget projection.
 
 ### AC-E2-001 — Core matrix
 
-**Status:** `specified`
+**Status:** `deferred`
 
 E2 passes only when every approved A-D, training-scale, and three-seed condition
 has either a successful schema-valid record or an explicitly retained failure;
@@ -444,7 +444,7 @@ generated; and no condition is silently omitted.
 
 ### AC-E3-001 — Publication-strength control
 
-**Status:** `specified`
+**Status:** `deferred`
 
 E3's minimum acceptance criterion is the Deep Sets/PFN A-versus-D comparison at
 the frozen largest training scale with three seeds, using the same data,

@@ -103,7 +103,7 @@ Golden PFN vectors are fixed independently of implementation serialization:
 |---|---|---:|---|
 | `root://example.invalid//store/test/file-7.root` | `86a2d2ef501197c748e1c536b523b3b0e491d74dd9e24bddf79577888bbd529a` | 0 | `test` |
 | `root://example.invalid//store/test/file-0.root` | `037bba1c0c146b75f5dea5c3abf38bb287aa9b8ea0d9c96b9885b88adcdbc3b3` | 1 | `validation` |
-| `root://例子.invalid//cms/μ-jet.root` | `71ac8c0965d5841033850debf7bc8bd8c06b825bdfe4928f74d4c12379ff7d61` | 7 | `train` |
+| `root://\u4f8b\u5b50.invalid//cms/μ-jet.root` (escaped Unicode form) | `71ac8c0965d5841033850debf7bc8bd8c06b825bdfe4928f74d4c12379ff7d61` | 7 | `train` |
 
 ### 5.3 Work Package: Schemas and Artifact Lifecycle
 
