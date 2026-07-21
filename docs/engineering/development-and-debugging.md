@@ -3,12 +3,13 @@
 ## 1. Purpose
 
 This guide is the operational entry point for developing, testing, and
-debugging particleML. It defines four separate execution environments and the
+debugging particleML. It defines five separate execution environments and the
 evidence each environment may produce:
 
 | Environment | Primary responsibility | Evidence boundary |
 |---|---|---|
-| Local Windows and PowerShell | Package development, deterministic fixtures, contract tests, and documentation | Diagnostic only; cannot pass a formal experiment gate |
+| Jetson Orin Nano Super 8GB Docker | Primary package development, ARM64/CUDA debugging, deterministic fixtures, and tiny model checks | Diagnostic only; cannot pass a formal experiment gate |
+| Local Windows and PowerShell | Optional package, contract, and documentation checks when the Jetson is unavailable | Diagnostic only; cannot pass a formal experiment gate |
 | GitHub Actions | Commit-bound package build, lint, typing, tests, and documentation checks | Authoritative repository verification when retained against the tested commit |
 | Qualified POSIX CMSSW host | CMS EDM decoding, truth matching, compact ROOT extraction, and E0 measurements | Required for formal CMSSW and E0 evidence |
 | RunPod GPU environment | OmniLearned integration, PyTorch execution, GPU smoke tests, and E1-E3 training | Required for formal model and training evidence |
@@ -16,6 +17,13 @@ evidence each environment may produce:
 Passing a local fixture does not promote E0, E0.5, E1, E2, or E3. A formal
 status change requires the qualified environment and retained artifacts defined
 by the software requirements and traceability matrix.
+
+The primary daily setup is the
+[Jetson Orin Nano Super 8GB Debugging Guide](./jetson-orin-nano-debugging.md).
+It uses a JetPack-compatible NVIDIA PyTorch iGPU image and the repository's
+`containers/jetson/Dockerfile`. Windows remains an optional CPU-oriented
+fallback described in the
+[Local PC Debugging Guide](./local-pc-debugging.md).
 
 ## 2. Local Python Environment
 

@@ -101,8 +101,14 @@ The supported development topology, local bootstrap commands, test workflow,
 CMSSW qualified-host boundary, and RunPod GPU workflow are documented in the
 [Development and Debugging Environments guide](docs/engineering/development-and-debugging.md).
 
-For a complete local Python development environment, install the locked CI
-dependencies and the project itself before running tests:
+The primary daily ARM64/CUDA development path is the
+[Jetson Orin Nano Super 8GB Debugging Guide](docs/engineering/jetson-orin-nano-debugging.md).
+It uses `containers/jetson/Dockerfile` with an NVIDIA PyTorch iGPU image selected
+for the installed JetPack 6.x release. Jetson checks remain diagnostic and do
+not replace formal RunPod evidence.
+
+Windows remains an optional CPU-oriented fallback. For that environment,
+install the locked CI dependencies and the project itself before running tests:
 
 ```powershell
 py -3.12 -m venv .venv

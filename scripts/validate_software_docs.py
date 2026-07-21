@@ -40,6 +40,7 @@ DOCS = (
 LINK_DOCUMENTS = DOCS + (
     ROOT / "docs/index.md",
     ROOT / "docs/engineering/development-and-debugging.md",
+    ROOT / "docs/engineering/jetson-orin-nano-debugging.md",
     ROOT / "docs/engineering/particleml-architecture.md",
     ROOT / "README.md",
     ROOT / "project/superpowers/specs/2026-07-16-particleml-software-documentation-suite-design.md",
@@ -105,11 +106,22 @@ REQUIRED_DEVELOPMENT_GUIDE_MARKERS = (
     "python -m pip install --requirement requirements-ci.lock",
     "python -m pip install --no-deps --editable .",
     "Local Windows and PowerShell",
+    "Jetson Orin Nano Super 8GB Docker",
     "GitHub Actions",
     "Qualified POSIX CMSSW host",
     "RunPod GPU environment",
     "Passing a local fixture does not promote E0, E0.5, E1, E2, or E3.",
     "PackageNotFoundError: particleml-research",
+)
+
+JETSON_GUIDE = ROOT / "docs/engineering/jetson-orin-nano-debugging.md"
+JETSON_DOCKERFILE = ROOT / "containers/jetson/Dockerfile"
+REQUIRED_JETSON_GUIDE_MARKERS = (
+    "JetPack 6.x",
+    "nvcr.io/nvidia/pytorch:<verified-release>-py3-igpu",
+    "--runtime nvidia",
+    "Jetson results are diagnostic only.",
+    "No Jetson result is represented as formal E0--E3 evidence.",
 )
 
 
@@ -147,6 +159,31 @@ def development_guide_errors(text: str) -> list[str]:
         for marker in REQUIRED_DEVELOPMENT_GUIDE_MARKERS
         if marker not in text
     ]
+
+
+def jetson_guide_errors() -> list[str]:
+    """Return errors for missing Jetson debugging environment contracts."""
+
+    errors: list[str] = []
+    for path in (JETSON_GUIDE, JETSON_DOCKERFILE):
+        if not path.is_file() or path.stat().st_size == 0:
+            errors.append(
+                f"required Jetson deliverable missing or empty: {path.relative_to(ROOT)}"
+            )
+    if errors:
+        return errors
+
+    guide = JETSON_GUIDE.read_text(encoding="utf-8")
+    errors.extend(
+        f"Jetson guide missing required marker: {marker!r}"
+        for marker in REQUIRED_JETSON_GUIDE_MARKERS
+        if marker not in guide
+    )
+    dockerfile = JETSON_DOCKERFILE.read_text(encoding="utf-8")
+    for marker in ("ARG JETSON_PYTORCH_IMAGE", "FROM ${JETSON_PYTORCH_IMAGE}"):
+        if marker not in dockerfile:
+            errors.append(f"Jetson Dockerfile missing required marker: {marker!r}")
+    return errors
 
 
 def requirement_status_errors(requirements_text: str, traceability_text: str) -> list[str]:
@@ -578,6 +615,7 @@ def main() -> int:
     errors.extend(view_contract_errors(document_text))
     guide_text = DEVELOPMENT_GUIDE.read_text(encoding="utf-8")
     errors.extend(development_guide_errors(guide_text))
+    errors.extend(jetson_guide_errors())
     errors.extend(
         requirement_status_errors(
             document_text["docs/software/requirements.md"],

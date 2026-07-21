@@ -1,5 +1,9 @@
 # Local PC Debugging Guide
 
+> This Windows workflow is an optional fallback. The primary daily development
+> environment is the
+> [Jetson Orin Nano Super 8GB Debugging Guide](./jetson-orin-nano-debugging.md).
+
 ## Purpose and Boundary
 
 Use this guide to develop and debug the Python package on a local Windows PC.
