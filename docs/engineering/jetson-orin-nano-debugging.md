@@ -79,19 +79,26 @@ reported release does not match the JetPack installation you intended to use.
 
 ### 1.3 Docker and the NVIDIA Runtime
 
-JetPack normally supplies Docker integration through the NVIDIA container
-packages.
+JetPack normally supplies the NVIDIA container packages. On this board,
+`nvidia-container-toolkit` 1.16.2 and the `nvidia` runtime are already present.
+Verify the installed packages before attempting to install or replace them:
 
-Install Docker and the NVIDIA runtime:
+```bash
+dpkg-query -W nvidia-container-toolkit nvidia-container-runtime
+command -v nvidia-ctk
+```
+
+Only install a missing component from the configured JetPack/Ubuntu package
+repositories. The package name is `nvidia-container-toolkit`; do not assume
+that a package named `nvidia-container` is available:
 
 ```bash
 sudo apt update
-sudo apt install -y curl nvidia-container
-
 sudo apt install -y docker.io
+sudo apt install -y nvidia-container-toolkit
 ```
 
-Configure NVIDIA Runtime：
+Configure the NVIDIA runtime:
 
 ```bash
 sudo nvidia-ctk runtime configure --runtime=docker
@@ -139,16 +146,33 @@ Server:
 $ sudo docker info | grep -i runtime
  Runtimes: io.containerd.runc.v2 nvidia runc
  Default Runtime: runc
-
-$ dpkg-query -W nvidia-container-toolkit nvidia-container-runtime
-nvidia-container-runtime
-nvidia-container-toolkit        1.16.2-1
 ```
 
 If Docker requires `sudo`, either keep using `sudo docker` in the commands below
 or add the development account to the `docker` group according to the local
 administration policy, then log out and back in. Docker-group membership is
 root-equivalent and should not be granted casually.
+
+```bash
+$ cat /etc/nv_tegra_release
+# R36 (release), REVISION: 4.3, GCID: 38968081, BOARD: generic, EABI: aarch64, DATE: Wed Jan  8 01:49:37 UTC 2025
+# KERNEL_VARIANT: oot
+TARGET_USERSPACE_LIB_DIR=nvidia
+TARGET_USERSPACE_LIB_DIR_PATH=usr/lib/aarch64-linux-gnu/nvidia
+# Seeed Image Name mfi_recomputer-orin-nano-8g-j401-6.2-36.4.3-2026-02-05.tar.gz
+# branch R36.4.3
+# commit ID 453114c2cb5920e062f46df72765ba73ea6a773b
+
+$ dpkg-query --show nvidia-l4t-core
+nvidia-l4t-core 36.4.3-20250107174145
+
+$ dpkg-query --show nvidia-jetpack 2>/dev/null
+nvidia-jetpack  6.2.1+b38
+
+$ dpkg-query -W nvidia-container-toolkit nvidia-container-runtime
+nvidia-container-runtime
+nvidia-container-toolkit        1.16.2-1
+```
 
 ## 2. Select a JetPack-Compatible PyTorch Image
 
@@ -158,34 +182,99 @@ one release is not automatically valid on another. Use the
 to select an NVIDIA Optimized PyTorch iGPU image compatible with the Jetson
 Linux release reported by `nvidia-l4t-core`.
 
-The expected image form is:
+For this board's JetPack 6.2.1 / Jetson Linux R36.4.3 installation, use the
+NVIDIA PyTorch iGPU image:
 
 ```text
-nvcr.io/nvidia/pytorch:<verified-release>-py3-igpu
+nvcr.io/nvidia/pytorch:25.06-py3-igpu
 ```
+
+The registry pull reference above is the concrete image download URL. Its
+[NGC catalog page](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/pytorch)
+describes the NVIDIA PyTorch container. The NVIDIA support matrix identifies
+25.06 as PyTorch for Jetson `2.8.0a0+5228986c39`, including Python 3.12. The
+published iGPU image configuration reports CUDA `12.9.11.009`, while the 25.06
+release notes identify CUDA 12.9.1 as the release baseline. Python 3.12 remains
+within the project's Python 3.10--3.12 policy. The expected general image form
+remains `nvcr.io/nvidia/pytorch:<verified-release>-py3-igpu` for a different
+JetPack 6.x host.
+
+As checked against NGC on 2026-07-22, the tag resolves to a Linux ARM64-only
+manifest list with digest
+`sha256:05bb8855c5ab94a556653fe4f7206e922c8ec93fdb0c88a02c2e013e20cff1d2`.
+Its ARM64 child manifest is
+`sha256:90f3c17838fde28d5c7ae2d5bfbc8a4c587d3797767ea96cdd48fe82e3613f3b`.
+The digest is registry metadata, not evidence that the image has already run
+successfully on this board. Because this container's CUDA runtime is newer than
+the host JetPack CUDA baseline, the direct runtime check below is mandatory.
 
 Do not substitute the repository's RunPod base image: it targets a discrete GPU
 cloud environment, not Jetson ARM64 and JetPack. The older
 [`l4t-pytorch` catalog](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/l4t-pytorch)
 also does not provide a general JetPack 6.x compatibility promise.
 
-Enter the image selected from the support matrix and reject a malformed value:
+Set the exact image, inspect its remote manifest, and pull it:
 
 ```bash
-read -r -p "Verified NVIDIA PyTorch iGPU image: " PARTICLEML_JETSON_BASE
-case "$PARTICLEML_JETSON_BASE" in
-  nvcr.io/nvidia/pytorch:*-py3-igpu) ;;
-  *) echo "Expected nvcr.io/nvidia/pytorch:<release>-py3-igpu" >&2; exit 1 ;;
-esac
-docker pull "$PARTICLEML_JETSON_BASE"
+export PARTICLEML_JETSON_BASE="nvcr.io/nvidia/pytorch:25.06-py3-igpu"
+export PARTICLEML_JETSON_INDEX_DIGEST="sha256:05bb8855c5ab94a556653fe4f7206e922c8ec93fdb0c88a02c2e013e20cff1d2"
+
+test "$(df -BG --output=avail / | tail -n 1 | tr -dc '0-9')" -ge 45
+sudo docker manifest inspect "$PARTICLEML_JETSON_BASE"
+sudo docker pull "$PARTICLEML_JETSON_BASE"
 ```
 
-Record the immutable digest used for debugging:
+The free-space guard preserves at least 45 GiB of the currently available
+205 GiB for the OS and other software, thereby bounding particleML growth to
+160 GiB. If it fails, do not pull or build another project image.
+
+The manifest output must contain exactly `"architecture": "arm64"` and
+`"os": "linux"`. Record the locally pulled immutable digest and fail if it does
+not match the registry digest verified above:
 
 ```bash
-docker image inspect "$PARTICLEML_JETSON_BASE" \
-  --format '{{index .RepoDigests 0}}'
+$ PARTICLEML_JETSON_REPODIGEST="$(sudo docker image inspect \
+  "$PARTICLEML_JETSON_BASE" --format '{{index .RepoDigests 0}}')"
+$ printf '%s\n' "$PARTICLEML_JETSON_REPODIGEST"
+nvcr.io/nvidia/pytorch@sha256:05bb8855c5ab94a556653fe4f7206e922c8ec93fdb0c88a02c2e013e20cff1d2
+
+$ test "$PARTICLEML_JETSON_REPODIGEST" = \
+  "nvcr.io/nvidia/pytorch@$PARTICLEML_JETSON_INDEX_DIGEST"
 ```
+
+Before adding project layers, test the downloaded base image directly. This
+check needs no network, so `--network none` also avoids the Docker bridge issue
+recorded for this host in Section 7:
+
+```bash
+sudo docker run --rm --interactive --network none --runtime nvidia \
+  "$PARTICLEML_JETSON_BASE" python - <<'PY'
+import platform
+import torch
+
+print({
+    "machine": platform.machine(),
+    "python_torch": torch.__version__,
+    "cuda_runtime": torch.version.cuda,
+    "cuda_available": torch.cuda.is_available(),
+    "device": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
+})
+assert platform.machine() == "aarch64"
+assert torch.__version__.startswith("2.8.0a0+5228986")
+assert torch.cuda.is_available()
+PY
+```
+
+The board produced:
+
+```text
+{'machine': 'aarch64', 'python_torch': '2.8.0a0+5228986c39.nv25.06', 'cuda_runtime': '12.9', 'cuda_available': True, 'device': 'Orin'}
+```
+
+This confirms that the selected base image can use the Orin GPU on this board.
+It remains diagnostic evidence only. The base image also warned about Docker's
+default 64 MiB shared-memory allocation; the project container in Section 4
+uses `--shm-size 1g`.
 
 ## 3. Build the particleML Development Image
 
@@ -194,12 +283,15 @@ Clone the repository onto the NVMe SSD and work from its root:
 ```bash
 git clone https://github.com/xulei-leon/particleML.git
 cd particleML
+test -f containers/jetson/Dockerfile
+test -f requirements-ci.lock
 ```
 
-Build the Jetson image with the verified base image:
+Build the Jetson image with the verified base image. The host network bypasses
+the unavailable Docker bridge and provides network access to package installers:
 
 ```bash
-docker build \
+sudo docker build --network host \
   --build-arg JETSON_PYTORCH_IMAGE="$PARTICLEML_JETSON_BASE" \
   --file containers/jetson/Dockerfile \
   --tag particleml-jetson:dev \
@@ -210,7 +302,9 @@ The Dockerfile reuses `requirements-ci.lock`; there is no second Jetson-only
 Python dependency list. PyTorch comes from the NVIDIA base image because its
 CUDA build must remain compatible with JetPack.
 
-## 4. Start the Debugging Container
+## 4. Start and Verify the Debugging Container
+
+### 4.1 Start the Container
 
 Create a disposable diagnostic artifact directory under the ignored `var/`
 tree, then mount the working copy and artifacts into the container:
@@ -220,7 +314,8 @@ PARTICLEML_REPO="$(pwd)"
 PARTICLEML_JETSON_ARTIFACTS="$PARTICLEML_REPO/var/jetson-artifacts"
 mkdir -p "$PARTICLEML_JETSON_ARTIFACTS"
 
-docker run --rm --interactive --tty \
+sudo docker run --rm --interactive --tty \
+  --network host \
   --runtime nvidia \
   --shm-size 1g \
   --volume "$PARTICLEML_REPO:/workspace/particleML" \
@@ -228,6 +323,10 @@ docker run --rm --interactive --tty \
   --workdir /workspace/particleML \
   particleml-jetson:dev
 ```
+
+Use `--network none` instead for checks that require no network. Host networking
+reduces isolation, so use it only while the bridge limitation in Section 7
+remains.
 
 The bind mount exposes current source edits at the same path used by the
 editable installation. Rebuild the image only when the base image,
@@ -242,11 +341,9 @@ only for that exact directory:
 sudo chown -R "$(id -u):$(id -g)" var/jetson-artifacts
 ```
 
-## 5. Verify the Environment
+Run the following checks inside the container.
 
-Run these checks inside the container.
-
-### 5.1 Package and CLI
+### 4.2 Package and CLI
 
 ```bash
 python -c "import importlib.metadata as m; import particleml; print(m.version('particleml-research'))"
@@ -254,7 +351,13 @@ particleml --help
 python -m pytest -x -vv tests/test_manifest.py
 ```
 
-### 5.2 CUDA and PyTorch
+Recorded on this board:
+
+- `particleml-research` imported at version `0.1.0`.
+- `particleml --help` rendered the 11 expected top-level commands.
+- `tests/test_manifest.py`: 18 passed in 1.64 seconds with Python 3.12.3.
+
+### 4.3 CUDA and PyTorch
 
 ```bash
 python - <<'PY'
@@ -275,7 +378,17 @@ PY
 python -m pytest -x -vv tests/test_baseline.py
 ```
 
-### 5.3 Tiny Forward, Backward, and Loss-Decrease Check
+Recorded CUDA output:
+
+```text
+{'torch': '2.8.0a0+5228986c39.nv25.06', 'cuda': '12.9', 'device': 'Orin', 'allocated_mib': 8.1}
+```
+
+`tests/test_baseline.py` completed twice with the same outcome: 4 passed and
+1 skipped in 4.84 and 4.80 seconds. The skip is expected because PyTorch is
+present and the qualified-runtime shape test covers that dependency boundary.
+
+### 4.4 Tiny Forward, Backward, and Loss-Decrease Check
 
 This check uses synthetic tensors and the in-repository Deep Sets/PFN baseline.
 It is intentionally small enough for the 8 GB device and writes no formal run
@@ -307,16 +420,22 @@ for _ in range(40):
     loss.backward()
     assert all(p.grad is None or torch.isfinite(p.grad).all() for p in model.parameters())
     optimizer.step()
-final = criterion(model(features, mask), targets).item()
+with torch.no_grad():
+    final = criterion(model(features, mask), targets).item()
 assert final < initial, (initial, final)
 print({"initial_loss": initial, "final_loss": final})
 PY
 ```
 
+The board reduced the loss from `0.6900871992111206` to
+`0.046298958361148834`. The original command evaluated the final loss outside
+`torch.no_grad()` and emitted a scalar-conversion warning; the command above
+incorporates the warning's recommended fix.
+
 Passing this script proves only that this tiny diagnostic path can update on the
 Jetson GPU. It does not qualify an OmniLearned checkpoint or an experiment gate.
 
-## 6. Daily Debugging Loop
+## 5. Daily Debugging Loop
 
 Start with the narrowest relevant check:
 
@@ -326,6 +445,13 @@ python -m pytest -x -vv tests/test_cli.py
 ruff check
 mypy src/particleml
 ```
+
+Recorded narrow-check results:
+
+- A/D identity equivalence: 1 passed in 2.62 seconds.
+- CLI tests: 10 passed in 2.88 seconds.
+- Ruff: all checks passed.
+- mypy: no issues in 14 source files.
 
 Before handing off a code change, run the applicable complete checks:
 
@@ -341,8 +467,27 @@ The Jetson image deliberately omits Node.js and pnpm. Documentation-site work
 does not need CUDA; run `pnpm test` and `pnpm docs:build` on a Node.js 20+ host
 or let GitHub Actions perform those checks.
 
-## 7. Memory and Storage Discipline
+## 6. Memory and Storage Discipline
 
+- Treat 160 GiB as a hard ceiling for the repository, the two particleML Docker
+  images/layers, downloaded inputs, caches, and `var/jetson-artifacts` combined.
+  The recorded host has 205 GiB free, so retain at least 45 GiB free for the OS
+  and unrelated software throughout this workflow.
+- Check free space and Docker usage before the image pull, after the project
+  build, and after every diagnostic run. After Section 4 defines the two
+  `PARTICLEML_*` paths, also measure their apparent size:
+
+  ```bash
+  df -BG --output=avail / | tail -n 1
+  sudo docker system df -v
+  test "$(df -BG --output=avail / | tail -n 1 | tr -dc '0-9')" -ge 45
+  test -z "${PARTICLEML_REPO:-}" || \
+    du -sxBG "$PARTICLEML_REPO" "$PARTICLEML_JETSON_ARTIFACTS"
+  ```
+
+  `docker system df -v` exposes shared layers, so do not add its shared size
+  twice. Stop before the next download or build if free root storage approaches
+  45 GiB or attributable project usage approaches 160 GiB.
 - Use synthetic tensors or compact fixtures first. Increase batch size only
   after measuring free memory.
 - Inspect device pressure with `tegrastats` on the host while the container is
@@ -354,7 +499,35 @@ or let GitHub Actions perform those checks.
 - Do not run `jetson_clocks` continuously unless cooling and power delivery are
   appropriate; performance tuning is separate from correctness debugging.
 
-## 8. Troubleshooting
+## 7. Troubleshooting
+
+### Docker cannot create the default bridge endpoint
+
+On this board, Docker 29.1.3 failed before starting the container with:
+
+```text
+Unable to enable DIRECT ACCESS FILTERING - DROP rule
+iptables v1.8.7 (legacy): can't initialize iptables table `raw`
+```
+
+Host checks confirmed that the legacy raw table is unavailable,
+`iptable_raw.ko` is absent from `/lib/modules/5.15.148-tegra`, and the Seeed
+image does not install `/boot/config-5.15.148-tegra`. This is a host
+Docker/kernel networking limitation, not a PyTorch or CUDA failure.
+
+Use `--network none` for offline checks and `--network host` for builds or
+downloads. Do not use `--iptables=false`, and do not copy a kernel module from
+another kernel build. The default bridge remains unresolved until the host uses
+a compatible nftables backend or a vendor kernel providing the required raw
+table support.
+
+### Docker cannot find `containers/jetson/Dockerfile`
+
+An error such as `lstat /home/leon/containers: no such file or directory`
+means the build was launched outside the repository root. Change to the cloned
+`particleML` directory and run the two `test -f` preflight checks in Section
+3. The legacy-builder deprecation message is only a warning and did not cause
+this failure.
 
 ### The image does not start or reports a driver/CUDA mismatch
 
@@ -368,7 +541,8 @@ listed by `docker info`, and the selected image has the `-igpu` suffix. Test the
 base image directly before debugging particleML:
 
 ```bash
-docker run --rm --runtime nvidia "$PARTICLEML_JETSON_BASE" \
+sudo docker run --rm --network none --runtime nvidia \
+  "$PARTICLEML_JETSON_BASE" \
   python -c "import torch; print(torch.cuda.is_available(), torch.version.cuda)"
 ```
 
@@ -391,11 +565,14 @@ experiment path.
 Stop the container and apply the narrowly scoped `chown` command in Section 4.
 Do not recursively change ownership of the repository or a home directory.
 
-## 9. Completion Checklist
+## 8. Completion Checklist
 
 - `aarch64`, JetPack, Jetson Linux, power mode, and free storage were inspected.
 - The selected NVIDIA PyTorch `-igpu` image is compatible with the installed
-  Jetson Linux release and its digest was recorded.
+  Jetson Linux release, its ARM64 manifest was inspected, its digest was
+  recorded, and its direct CUDA check passed.
+- Project-attributable storage is below 160 GiB and at least 45 GiB remains free
+  on the recorded 233 GiB NVMe filesystem.
 - The project image builds from `containers/jetson/Dockerfile`.
 - The package import, CLI, narrow pytest, CUDA tensor, and tiny loss checks pass.
 - Full applicable Python checks pass before handoff.
@@ -406,5 +583,7 @@ Do not recursively change ownership of the repository or a home directory.
 
 - [JetPack installation and setup](https://docs.nvidia.com/jetson/jetpack/install-setup/index.html)
 - [NVIDIA Frameworks Support Matrix](https://docs.nvidia.com/deeplearning/frameworks/support-matrix/index.html)
+- [NVIDIA PyTorch 25.06 release notes](https://docs.nvidia.com/deeplearning/frameworks/pytorch-release-notes/rel-25-06.html)
+- [NVIDIA PyTorch container catalog](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/pytorch)
 - [NVIDIA PyTorch release notes](https://docs.nvidia.com/deeplearning/frameworks/pytorch-release-notes/index.html)
 - [NVIDIA Container Toolkit installation guide](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
